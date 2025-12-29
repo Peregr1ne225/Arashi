@@ -6,14 +6,11 @@ services:
       - "8000:8000"
     volumes:
       - ./backend:/app # Hot reloading
+    env_file: .env
     environment:
       - DJANGO_SETTINGS_MODULE=config.settings.development
       - PYTHONUNBUFFERED=1
-      # Local DB
-      - SQL_ENGINE=django.db.backends.postgresql
-      - SQL_DATABASE=app_db
-      - SQL_USER=${POSTGRES_USER}
-      - SQL_PASSWORD=${POSTGRES_PASSWORD}
+      # Local DB overrides
       - SQL_HOST=db
       - SQL_PORT=5432
     depends_on:
@@ -31,6 +28,7 @@ services:
       - ./frontend:/app # Hot reloading
       - /app/node_modules # Prevent host node_modules clashing
       - /app/.next # Persist build cache
+    env_file: .env
     environment:
       - NEXT_PRIVATE_TURBOPACK=true
       - WATCHPACK_POLLING=true
@@ -42,10 +40,8 @@ services:
   db:
     image: postgres:15-alpine
     container_name: postgres_db_dev
-    environment:
-      - POSTGRES_DB=app_db
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    env_file: .env
+    # environment: (No specific overrides needed if .env has POSTGRES_ vars)
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:

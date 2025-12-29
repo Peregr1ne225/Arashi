@@ -34,4 +34,5 @@ COPY . .
 EXPOSE 8000
 
 # Default command
-CMD ["uv", "run", "daphne", "-b", "0.0.0.0", "-p", "8000", "config.asgi:application"]
+# Default command
+CMD ["sh", "-c", "uv run python manage.py migrate && uv run python manage.py collectstatic --noinput && uv run daphne -b 0.0.0.0 -p 8000 config.asgi:application"]
