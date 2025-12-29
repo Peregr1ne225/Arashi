@@ -18,6 +18,9 @@ fi
 # Run migrations
 # Note: In some highly available setups you might run this manually or in a separate job.
 # For single-VPS, running it on startup is convenient.
+echo "Collecting static files..."
+uv run python manage.py collectstatic --noinput
+
 echo "Running migrations..."
 uv run python manage.py migrate --noinput
 
