@@ -107,15 +107,7 @@ async function request(
   // Log request details for debugging
   console.log(`[API] ${options.method || "GET"} ${apiBaseUrl}${endpoint}`);
   if (options.body && options.body instanceof FormData) {
-    console.log("[API] FormData contents:");
-    for (const [key, value] of (options.body as FormData).entries()) {
-      console.log(
-        `  ${key}:`,
-        value instanceof File
-          ? `File: ${value.name} (${value.size} bytes)`
-          : value,
-      );
-    }
+    // FormData logging suppressed
   } else if (options.body) {
     console.log("[API] Request body:", options.body);
   }

@@ -177,43 +177,12 @@ export default function CreateProductPage() {
         formData.append("uploaded_images", file);
       });
 
-
-
-
-
       const response = await productsApi.createProduct(formData);
-
 
       await revalidateProducts();
       router.push("/admin/products");
     } catch (error: any) {
       console.error("Failed to create product - Full error:", error);
-
-      // Try to extract more details from the error
-      if (error.response) {
-        console.error("Response status:", error.response.status);
-        console.error("Response data:", error.response.data);
-        console.error("Response headers:", error.response.headers);
-
-        const errorMessage =
-          error.response.data?.detail ||
-          error.response.data?.message ||
-          error.response.data?.error ||
-          error.message ||
-          "Failed to create product";
-
-        const rawError = (error as any).rawText
-          ? `\n\nRaw response:\n${(error as any).rawText.substring(0, 500)}`
-          : "";
-
-        alert(`Error: ${errorMessage}${rawError}`);
-      } else if (error.request) {
-        console.error("Request made but no response:", error.request);
-        alert("No response from server. Please check your connection.");
-      } else {
-        console.error("Error setting up request:", error.message);
-        alert(`Error: ${error.message}`);
-      }
     } finally {
       setIsSubmitting(false);
     }

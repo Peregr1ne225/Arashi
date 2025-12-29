@@ -25,7 +25,9 @@ export default function ProductForm({
     // Form State
     const [name, setName] = useState(initialData?.name || "");
     const [description, setDescription] = useState(initialData?.description || "");
-    const [price, setPrice] = useState(initialData?.price.toString() || "");
+    const [price, setPrice] = useState(
+        (initialData?.originalPrice ?? initialData?.price)?.toString() || ""
+    );
     const [discount, setDiscount] = useState(initialData?.discount?.toString() || "");
     const [stock, setStock] = useState(initialData?.stock.toString() || "");
     const [categoryId, setCategoryId] = useState(
@@ -49,7 +51,11 @@ export default function ProductForm({
         if (initialData) {
             setName(initialData.name);
             setDescription(initialData.description);
-            setPrice(initialData.price.toString());
+            // Use originalPrice (base price) if available, otherwise use price
+            const basePrice = initialData.originalPrice !== undefined
+                ? initialData.originalPrice
+                : initialData.price;
+            setPrice(basePrice.toString());
             setDiscount(initialData.discount ? initialData.discount.toString() : "");
             setStock(initialData.stock.toString());
             setCategoryId(

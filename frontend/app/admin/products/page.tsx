@@ -263,14 +263,10 @@ export default function AdminProductsPage() {
                     {product.discount && product.discount > 0 ? (
                       <div className="flex flex-col">
                         <span className="text-white font-bold">
-                          ฿
-                          {(
-                            Number(product.price) *
-                            (1 - product.discount / 100)
-                          ).toFixed(2)}
+                          ฿{Number(product.price).toFixed(2)}
                         </span>
                         <span className="text-gray-500 text-xs line-through decoration-red-500">
-                          ฿{Number(product.price).toFixed(2)}
+                          ฿{Number(product.originalPrice || product.price).toFixed(2)}
                         </span>
                       </div>
                     ) : (
