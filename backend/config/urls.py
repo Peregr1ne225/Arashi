@@ -31,5 +31,14 @@ if settings.DEBUG:
     # Serve static files from ALL finders (app dirs + STATICFILES_DIRS)
     # This is needed because Daphne doesn't auto-serve static files like runserver
     urlpatterns += staticfiles_urlpatterns()
-    # Serve media files
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# Explicitly serve media files using django.views.static.serve
+# This ensures it works even if static() helper behaves unexpectedly with Daphne/DEBUG
+from django.views.static import serve
+from django.urls import re_path
+
+urlpatterns += [
+    re_path(r'^media/(?P<path>.*)$', serve, {
+        'document_root': settings.MEDIA_ROOT,
+    }),
+]

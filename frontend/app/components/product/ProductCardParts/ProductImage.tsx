@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { getImageUrl } from "@/app/lib/utils/image";
 
 interface ProductImageProps {
   productId: number;
@@ -79,7 +80,7 @@ export default function ProductImage({
         <div className="aspect-w-3 aspect-h-4 w-full overflow-hidden relative">
           {/* Primary Image */}
           <Image
-            src={images[0] || "/placeholder-product.svg"}
+            src={getImageUrl(images[0])}
             alt={`Product ${productId}`}
             width={500}
             height={650}
@@ -91,7 +92,7 @@ export default function ProductImage({
           {/* Secondary Image (Hover) */}
           {images.length > 1 && (
             <Image
-              src={images[1]}
+              src={getImageUrl(images[1])}
               alt={`Product ${productId} - Back`}
               width={500}
               height={650}
