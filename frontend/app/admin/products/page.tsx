@@ -159,9 +159,7 @@ export default function AdminProductsPage() {
 
       // Update the product in the local list
       // Log what we got back from API
-      console.log("Updated product from API:", updatedProduct);
-      console.log("Updated product images:", updatedProduct.images);
-      console.log("Updated product main_image:", updatedProduct.main_image);
+
 
       // Update product in local list
       setProducts(
@@ -375,11 +373,10 @@ export default function AdminProductsPage() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <button
                       onClick={() => handleToggleStatus(product)}
-                      className={`px-3 py-1 flex items-center justify-center text-[10px] font-black uppercase italic tracking-widest w-24 skew-box-sm transition-all border ${
-                        product.is_active
+                      className={`px-3 py-1 flex items-center justify-center text-[10px] font-black uppercase italic tracking-widest w-24 skew-box-sm transition-all border ${product.is_active
                           ? "bg-green-900/20 text-green-500 border-green-500/50 hover:bg-green-500 hover:text-black"
                           : "bg-red-900/20 text-red-500 border-red-500/50 hover:bg-red-500 hover:text-white"
-                      }`}
+                        }`}
                     >
                       {product.is_active ? "Active" : "Inactive"}
                     </button>

@@ -177,52 +177,13 @@ export default function CreateProductPage() {
         formData.append("uploaded_images", file);
       });
 
-      // Log what we're sending
-      console.log("Submitting product with data:", {
-        name,
-        description,
-        price,
-        discount,
-        stock: stock || "0",
-        categoryId,
-        imageCount: imageFiles.length,
-        images: imageFiles.map((f) => ({
-          name: f.name,
-          size: f.size,
-          type: f.type,
-        })),
-      });
 
-      // Log FormData contents for debugging
-      console.log("FormData contents:");
-      for (const [key, value] of formData.entries()) {
-        console.log(
-          `  ${key}:`,
-          value instanceof File
-            ? `File: ${value.name} (${value.size} bytes)`
-            : value,
-        );
-      }
 
-      // Direct fetch test to see raw backend response
-      console.log("Making direct fetch to backend...");
-      const testResponse = await fetch(
-        "http://127.0.0.1:8000/api/v1/products/",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${typeof window !== "undefined" ? localStorage.getItem("accessToken") || "" : ""}`,
-          },
-          body: formData,
-        },
-      );
-      console.log("Direct fetch response status:", testResponse.status);
-      const testText = await testResponse.text();
-      console.log("Direct fetch response body:", testText);
+
 
       const response = await productsApi.createProduct(formData);
 
-      console.log("Product created successfully:", response);
+
       await revalidateProducts();
       router.push("/admin/products");
     } catch (error: any) {
