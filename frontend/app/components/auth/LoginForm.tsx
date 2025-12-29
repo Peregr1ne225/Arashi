@@ -51,7 +51,7 @@ export default function LoginForm({ onSuccess, redirectTo, onRegisterClick }: Lo
             <form className="space-y-6" onSubmit={handleSubmit}>
                 <div className="space-y-4">
                     <div>
-                        <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                        <label htmlFor="username" className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">
                             Username
                         </label>
                         <div className="mt-1">
@@ -60,8 +60,8 @@ export default function LoginForm({ onSuccess, redirectTo, onRegisterClick }: Lo
                                 name="username"
                                 type="text"
                                 required
-                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black sm:text-sm px-3 py-2 border"
-                                placeholder="Enter your username"
+                                className="block w-full bg-black/50 border-2 border-transparent focus:border-accent text-white placeholder-gray-600 px-4 py-3 font-bold uppercase tracking-wider outline-none transition-all duration-300 skew-box"
+                                placeholder="USERNAME"
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
                             />
@@ -69,7 +69,7 @@ export default function LoginForm({ onSuccess, redirectTo, onRegisterClick }: Lo
                     </div>
 
                     <div>
-                        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                        <label htmlFor="password" className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">
                             Password
                         </label>
                         <div className="mt-1">
@@ -78,8 +78,8 @@ export default function LoginForm({ onSuccess, redirectTo, onRegisterClick }: Lo
                                 name="password"
                                 type="password"
                                 required
-                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black sm:text-sm px-3 py-2 border"
-                                placeholder="Enter your password"
+                                className="block w-full bg-black/50 border-2 border-transparent focus:border-accent text-white placeholder-gray-600 px-4 py-3 font-bold uppercase tracking-wider outline-none transition-all duration-300 skew-box"
+                                placeholder="PASSWORD"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                             />
@@ -88,9 +88,9 @@ export default function LoginForm({ onSuccess, redirectTo, onRegisterClick }: Lo
                 </div>
 
                 {error && (
-                    <div className="rounded-md bg-red-50 p-4">
+                    <div className="bg-red-900/50 border-l-4 border-red-500 p-4 backdrop-blur-sm">
                         <div className="flex">
-                            <div className="text-sm text-red-700">{error}</div>
+                            <div className="text-sm text-red-200 font-bold uppercase tracking-wide">{error}</div>
                         </div>
                     </div>
                 )}
@@ -99,38 +99,38 @@ export default function LoginForm({ onSuccess, redirectTo, onRegisterClick }: Lo
                     <button
                         type="submit"
                         disabled={loading}
-                        className="flex w-full justify-center rounded-md border border-transparent bg-black py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="btn-primary w-full py-4 text-xl"
                     >
-                        {loading ? "Signing in..." : "Sign in"}
+                        {loading ? "AUTHENTICATING..." : "SIGN IN //"}
                     </button>
                 </div>
             </form>
 
-            <div className="mt-6">
+            <div className="mt-8">
                 <div className="relative">
                     <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-gray-300" />
+                        <div className="w-full border-t border-white/10" />
                     </div>
                     <div className="relative flex justify-center text-sm">
-                        <span className="bg-white px-2 text-gray-500">Or</span>
+                        <span className="bg-neutral-900 px-2 text-gray-500 font-bold uppercase tracking-widest text-xs">Or</span>
                     </div>
                 </div>
 
                 <div className="mt-6 text-center text-sm">
-                    <span className="text-gray-600">Don't have an account? </span>
+                    <span className="text-gray-400 uppercase tracking-wide font-medium">New Recruit? </span>
                     {onRegisterClick ? (
                         <button
                             onClick={onRegisterClick}
-                            className="font-medium text-black hover:text-gray-800 underline"
+                            className="font-bold text-accent hover:text-white uppercase tracking-wider transition-colors ml-2"
                         >
-                            Register here
+                            Enlist Here
                         </button>
                     ) : (
                         <Link
                             href="/register"
-                            className="font-medium text-black hover:text-gray-800 underline"
+                            className="font-bold text-accent hover:text-white uppercase tracking-wider transition-colors ml-2"
                         >
-                            Register here
+                            Enlist Here
                         </Link>
                     )}
                 </div>

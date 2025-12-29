@@ -23,31 +23,31 @@ const CheckoutItem = ({ item }: { item: CartItem }) => {
   );
 
   return (
-    <div className="flex gap-4">
-      <div className="relative w-16 h-16 flex-shrink-0">
+    <div className="flex gap-4 border-b border-white/5 pb-4 last:border-0">
+      <div className="relative w-20 h-20 flex-shrink-0 bg-black border border-white/10 overflow-hidden skew-box-sm">
         <Image
           src={imgSrc}
           alt={item.product.name}
           fill
-          className="object-cover rounded-md"
+          className="object-cover"
           onError={() => setImgSrc("/placeholder-product.svg")}
         />
       </div>
       <div className="flex-1">
-        <h3 className="font-medium text-sm text-black">
+        <h3 className="font-bold text-lg uppercase italic tracking-tighter text-white line-clamp-1">
           {item.product.name}
         </h3>
-        <p className="text-sm text-gray-600">
-          Qty: {item.quantity}
+        <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-1">
+          QTY: {item.quantity}
         </p>
-        <div className="font-semibold text-black">
+        <div className="font-black text-accent italic tracking-tighter text-lg">
           {/* Display original price if discounted */}
           {item.product.originalPrice ? (
             <>
-              <span className="line-through mr-1 text-gray-400 text-sm">
+              <span className="line-through mr-2 text-gray-600 text-sm font-bold decoration-accent">
                 ฿{Number(item.product.originalPrice).toFixed(2)}
               </span>
-              <span className="text-red-600">
+              <span>
                 ฿{Number(item.price).toFixed(2)}
               </span>
             </>
@@ -206,21 +206,21 @@ export default function CheckoutPage() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gray-50 container mx-auto px-4 py-8">
-        Loading...
+      <div className="min-h-screen bg-background container mx-auto px-4 py-8 flex items-center justify-center">
+        <div className="text-accent font-bold uppercase tracking-widest animate-pulse">Loading Authenticated Session...</div>
       </div>
     );
   }
 
   if (orderComplete && orderData) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="container mx-auto px-4 py-8 max-w-2xl">
-          <div className="bg-white rounded-lg shadow-sm p-8 text-center">
-            <div className="w-16 h-16 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-4">
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-16 max-w-2xl">
+          <div className="bg-neutral-900 border border-accent rounded-none skew-box p-8 text-center shadow-[0_0_50px_rgba(204,255,0,0.1)]">
+            <div className="w-20 h-20 mx-auto bg-accent/20 border border-accent rounded-full flex items-center justify-center mb-6 animate-bounce">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-8 w-8 text-green-600"
+                className="h-10 w-10 text-accent"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -228,28 +228,27 @@ export default function CheckoutPage() {
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={2}
+                  strokeWidth={3}
                   d="M5 13l4 4L19 7"
                 />
               </svg>
             </div>
-            <h1 className="text-2xl font-bold mb-2 text-black">
-              Order Placed Successfully!
+            <h1 className="text-4xl font-black uppercase italic tracking-tighter text-white mb-4">
+              Victory! Order Placed
             </h1>
-            <p className="text-gray-600 mb-6">
-              Your order #{orderData.id} has been received and is now being
-              processed.
+            <p className="text-gray-400 mb-8 font-bold uppercase tracking-wide">
+              Your order #{orderData.id} is confirmed and entering the locker.
             </p>
-            <div className="space-y-3">
+            <div className="space-y-4">
               <Link
                 href="/account"
-                className="block w-full py-3 px-4 bg-blue-600 text-white rounded-md text-center font-medium hover:bg-blue-700 transition"
+                className="btn-primary w-full py-4 block"
               >
-                View My Orders
+                View My Orders //
               </Link>
               <Link
                 href="/"
-                className="block w-full py-3 px-4 border border-gray-300 rounded-md text-center font-medium hover:bg-gray-50 transition"
+                className="block w-full py-4 border border-white/20 text-white hover:border-accent hover:text-accent font-bold uppercase tracking-widest transition skew-box"
               >
                 Continue Shopping
               </Link>
@@ -262,34 +261,38 @@ export default function CheckoutPage() {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 container mx-auto px-4 py-8">
-        <div className="bg-white rounded-lg shadow-sm p-8 text-center">
-          Your cart is empty
+      <div className="min-h-screen bg-background container mx-auto px-4 py-16 flex items-center justify-center">
+        <div className="bg-neutral-900 border border-white/10 skew-box p-12 text-center">
+          <h2 className="text-2xl font-black uppercase italic tracking-tighter text-white mb-4">Locker is Empty</h2>
+          <Link href="/" className="text-accent hover:underline font-bold uppercase tracking-wide">Go to Catalog</Link>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8 text-black pt-6">Checkout</h1>
+    <div className="min-h-screen bg-background text-white">
+      <div className="container mx-auto px-4 py-12">
+        <h1 className="text-6xl font-black uppercase italic tracking-tighter text-white mb-12 border-b border-white/10 pb-6">
+          Checkout // <span className="text-accent">Game Plan</span>
+        </h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Order Summary */}
           <div>
-            <h2 className="text-xl font-semibold mb-4 text-black">
-              Order Summary
+            <h2 className="text-2xl font-black uppercase italic tracking-tighter text-white mb-6 flex items-center gap-3">
+              <span className="bg-accent text-black w-8 h-8 flex items-center justify-center text-lg skew-box font-bold">1</span>
+              Your Gear
             </h2>
-            <div className="bg-white rounded-md shadow-sm p-4 space-y-4">
+            <div className="bg-neutral-900 border border-white/10 skew-box p-6 space-y-6">
               {items.map((item) => (
                 <CheckoutItem key={item.id} item={item} />
               ))}
 
-              <div className="pt-4 border-t">
-                <div className="flex justify-between font-semibold text-black">
+              <div className="pt-6 border-t border-dashed border-white/20">
+                <div className="flex justify-between font-black text-2xl uppercase italic tracking-tighter text-white">
                   <span>Total</span>
-                  <span>฿{totalPrice.toFixed(2)}</span>
+                  <span className="text-accent">฿{totalPrice.toFixed(2)}</span>
                 </div>
               </div>
             </div>
@@ -297,15 +300,20 @@ export default function CheckoutPage() {
 
           {/* Shipping Information Form */}
           <div>
-            <h2 className="text-xl font-semibold mb-4 text-black">
-              Shipping Information
+            <h2 className="text-2xl font-black uppercase italic tracking-tighter text-white mb-6 flex items-center gap-3">
+              <span className="bg-white text-black w-8 h-8 flex items-center justify-center text-lg skew-box font-bold">2</span>
+              Shipping Details
             </h2>
-            <div className="bg-white rounded-md shadow-sm p-6">
-              <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="bg-neutral-900 border-2 border-dashed border-accent/20 p-8 skew-box relative">
+              {/* Ticket cutouts */}
+              <div className="absolute -left-3 top-1/2 w-6 h-6 bg-background rounded-full transform -translate-y-1/2"></div>
+              <div className="absolute -right-3 top-1/2 w-6 h-6 bg-background rounded-full transform -translate-y-1/2"></div>
+
+              <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label
                     htmlFor="full_name"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2"
                   >
                     Full Name
                   </label>
@@ -315,12 +323,12 @@ export default function CheckoutPage() {
                     name="full_name"
                     value={formData.full_name}
                     onChange={handleInputChange}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 ${errors.full_name ? "border-red-500" : "border-gray-300"
-                      }`}
+                    className={`w-full px-4 py-3 bg-black border ${errors.full_name ? "border-red-500" : "border-white/20"} rounded-none text-white font-bold tracking-wide focus:outline-none focus:border-accent skew-box placeholder-gray-700 transition-colors`}
+                    placeholder="ENTER YOUR FULL NAME"
                     required
                   />
                   {errors.full_name && (
-                    <p className="text-red-500 text-sm mt-1">
+                    <p className="text-red-500 text-xs mt-2 font-bold uppercase tracking-wide">
                       {errors.full_name}
                     </p>
                   )}
@@ -329,7 +337,7 @@ export default function CheckoutPage() {
                 <div>
                   <label
                     htmlFor="phone_number"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2"
                   >
                     Phone Number
                   </label>
@@ -339,12 +347,12 @@ export default function CheckoutPage() {
                     name="phone_number"
                     value={formData.phone_number}
                     onChange={handleInputChange}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 ${errors.phone_number ? "border-red-500" : "border-gray-300"
-                      }`}
+                    className={`w-full px-4 py-3 bg-black border ${errors.phone_number ? "border-red-500" : "border-white/20"} rounded-none text-white font-bold tracking-wide focus:outline-none focus:border-accent skew-box placeholder-gray-700 transition-colors`}
+                    placeholder="ENTER PHONE NUMBER"
                     required
                   />
                   {errors.phone_number && (
-                    <p className="text-red-500 text-sm mt-1">
+                    <p className="text-red-500 text-xs mt-2 font-bold uppercase tracking-wide">
                       {errors.phone_number}
                     </p>
                   )}
@@ -353,7 +361,7 @@ export default function CheckoutPage() {
                 <div>
                   <label
                     htmlFor="shipping_address"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2"
                   >
                     Shipping Address
                   </label>
@@ -363,42 +371,44 @@ export default function CheckoutPage() {
                     rows={4}
                     value={formData.shipping_address}
                     onChange={handleInputChange}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 ${errors.shipping_address
-                      ? "border-red-500"
-                      : "border-gray-300"
-                      }`}
+                    className={`w-full px-4 py-3 bg-black border ${errors.shipping_address ? "border-red-500" : "border-white/20"} rounded-none text-white font-bold tracking-wide focus:outline-none focus:border-accent skew-box placeholder-gray-700 transition-colors resize-none`}
+                    placeholder="ENTER DELIVERY ADDRESS..."
                     required
                   />
                   {errors.shipping_address && (
-                    <p className="text-red-500 text-sm mt-1">
+                    <p className="text-red-500 text-xs mt-2 font-bold uppercase tracking-wide">
                       {errors.shipping_address}
                     </p>
                   )}
                 </div>
 
                 {/* Save to Profile Checkbox */}
-                <div className="flex items-center">
+                <div className="flex items-center group cursor-pointer">
                   <input
                     id="save-to-profile"
                     name="save-to-profile"
                     type="checkbox"
                     checked={saveToProfile}
                     onChange={(e) => setSaveToProfile(e.target.checked)}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    className="h-5 w-5 bg-black border-white/20 rounded-none text-accent focus:ring-accent focus:ring-offset-black"
                   />
-                  <label htmlFor="save-to-profile" className="ml-2 block text-sm text-gray-900">
-                    Save this information to my profile
+                  <label htmlFor="save-to-profile" className="ml-3 block text-sm font-bold uppercase tracking-wide text-gray-400 group-hover:text-white transition-colors cursor-pointer select-none">
+                    Save to Locker Profile
                   </label>
                 </div>
 
-                <div className="pt-4">
+                <div className="pt-6">
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-3 px-4 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    className="btn-primary w-full py-5 text-xl relative overflow-hidden group"
                   >
-                    {isSubmitting ? "Placing Order..." : "Confirm Order"}
+                    {isSubmitting ? "PROCESSING..." : "CONFIRM ORDER //"}
+                    <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 pointer-events-none"></div>
                   </button>
+                  <p className="text-center mt-4 text-xs font-bold uppercase tracking-widest text-gray-600">
+                    Redirecting to Secure Payment
+                  </p>
                 </div>
               </form>
             </div>

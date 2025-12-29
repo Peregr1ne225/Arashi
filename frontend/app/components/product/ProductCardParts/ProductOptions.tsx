@@ -78,9 +78,9 @@ const AddToCartButton = ({
   return (
     <button
       onClick={handleAddToCart}
-      className={`absolute bottom-0 left-0 right-0 py-2 px-4 rounded-t-lg transition-all duration-200 font-medium transform translate-y-full opacity-0 group-hover:opacity-100 group-hover:translate-y-0 z-10 flex items-center justify-center gap-2 ${isInCart
-          ? "bg-green-600 hover:bg-green-700 text-white"
-          : "bg-blue-600 hover:bg-blue-700 text-white"
+      className={`absolute bottom-0 left-0 right-0 py-3 px-4 font-bold uppercase tracking-wider transform translate-y-full group-hover:translate-y-0 transition-transform duration-200 z-10 flex items-center justify-center gap-2 ${isInCart
+        ? "bg-accent text-accent-foreground hover:bg-white"
+        : "bg-primary text-primary-foreground hover:bg-accent hover:text-accent-foreground"
         }`}
     >
       <svg

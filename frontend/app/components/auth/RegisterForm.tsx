@@ -285,7 +285,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
           <div>
             <label
               htmlFor="username"
-              className="block text-sm font-medium text-gray-900"
+              className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-1"
             >
               Username
             </label>
@@ -296,18 +296,17 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
                 type="text"
                 required
                 autoComplete="username"
-                className={`block w-full px-3 py-2 border-b-2 bg-transparent focus:outline-none focus:ring-0 transition-colors ${
-                  errors.username
-                    ? "border-b-red-500 focus:border-red-500"
-                    : "border-b-gray-300 focus:border-black"
-                } ${touched.has("username") && !errors.username ? "border-b-gray-400" : ""}`}
-                placeholder="Enter your username"
+                className={`block w-full bg-black/50 border-2 text-white placeholder-gray-600 px-4 py-3 font-bold uppercase tracking-wider outline-none transition-all duration-300 skew-box ${errors.username
+                  ? "border-red-500 focus:border-red-500"
+                  : "border-transparent focus:border-accent"
+                  } ${touched.has("username") && !errors.username ? "border-green-500/50" : ""}`}
+                placeholder="CHOOSE USERNAME"
                 value={formData.username}
                 onChange={(e) => handleFieldChange("username", e.target.value)}
                 onBlur={() => handleFieldBlur("username")}
               />
               {errors.username && (
-                <p className="mt-1 text-sm text-red-600">{errors.username}</p>
+                <p className="mt-1 text-xs text-red-500 font-bold uppercase tracking-wide">{errors.username}</p>
               )}
             </div>
           </div>
@@ -316,7 +315,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
           <div>
             <label
               htmlFor="email"
-              className="block text-sm font-medium text-gray-900"
+              className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-1"
             >
               Email
             </label>
@@ -327,18 +326,17 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
                 type="email"
                 required
                 autoComplete="email"
-                className={`block w-full px-3 py-2 border-b-2 bg-transparent focus:outline-none focus:ring-0 transition-colors ${
-                  errors.email
-                    ? "border-b-red-500 focus:border-red-500"
-                    : "border-b-gray-300 focus:border-black"
-                } ${touched.has("email") && !errors.email ? "border-b-gray-400" : ""}`}
-                placeholder="Enter your email"
+                className={`block w-full bg-black/50 border-2 text-white placeholder-gray-600 px-4 py-3 font-bold uppercase tracking-wider outline-none transition-all duration-300 skew-box ${errors.email
+                  ? "border-red-500 focus:border-red-500"
+                  : "border-transparent focus:border-accent"
+                  } ${touched.has("email") && !errors.email ? "border-green-500/50" : ""}`}
+                placeholder="ENTER EMAIL"
                 value={formData.email}
                 onChange={(e) => handleFieldChange("email", e.target.value)}
                 onBlur={() => handleFieldBlur("email")}
               />
               {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                <p className="mt-1 text-xs text-red-500 font-bold uppercase tracking-wide">{errors.email}</p>
               )}
             </div>
           </div>
@@ -347,7 +345,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
           <div>
             <label
               htmlFor="firstName"
-              className="block text-sm font-medium text-gray-900"
+              className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-1"
             >
               First Name
             </label>
@@ -358,18 +356,17 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
                 type="text"
                 required
                 autoComplete="given-name"
-                className={`block w-full px-3 py-2 border-b-2 bg-transparent focus:outline-none focus:ring-0 transition-colors ${
-                  errors.firstName
-                    ? "border-b-red-500 focus:border-red-500"
-                    : "border-b-gray-300 focus:border-black"
-                } ${touched.has("firstName") && !errors.firstName ? "border-b-gray-400" : ""}`}
-                placeholder="Enter your first name"
+                className={`block w-full bg-black/50 border-2 text-white placeholder-gray-600 px-4 py-3 font-bold uppercase tracking-wider outline-none transition-all duration-300 skew-box ${errors.firstName
+                  ? "border-red-500 focus:border-red-500"
+                  : "border-transparent focus:border-accent"
+                  } ${touched.has("firstName") && !errors.firstName ? "border-green-500/50" : ""}`}
+                placeholder="FIRST NAME"
                 value={formData.firstName}
                 onChange={(e) => handleFieldChange("firstName", e.target.value)}
                 onBlur={() => handleFieldBlur("firstName")}
               />
               {errors.firstName && (
-                <p className="mt-1 text-sm text-red-600">{errors.firstName}</p>
+                <p className="mt-1 text-xs text-red-500 font-bold uppercase tracking-wide">{errors.firstName}</p>
               )}
             </div>
           </div>
@@ -378,7 +375,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
           <div>
             <label
               htmlFor="lastName"
-              className="block text-sm font-medium text-gray-900"
+              className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-1"
             >
               Last Name
             </label>
@@ -389,18 +386,17 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
                 type="text"
                 required
                 autoComplete="family-name"
-                className={`block w-full px-3 py-2 border-b-2 bg-transparent focus:outline-none focus:ring-0 transition-colors ${
-                  errors.lastName
-                    ? "border-b-red-500 focus:border-red-500"
-                    : "border-b-gray-300 focus:border-black"
-                } ${touched.has("lastName") && !errors.lastName ? "border-b-gray-400" : ""}`}
-                placeholder="Enter your last name"
+                className={`block w-full bg-black/50 border-2 text-white placeholder-gray-600 px-4 py-3 font-bold uppercase tracking-wider outline-none transition-all duration-300 skew-box ${errors.lastName
+                  ? "border-red-500 focus:border-red-500"
+                  : "border-transparent focus:border-accent"
+                  } ${touched.has("lastName") && !errors.lastName ? "border-green-500/50" : ""}`}
+                placeholder="LAST NAME"
                 value={formData.lastName}
                 onChange={(e) => handleFieldChange("lastName", e.target.value)}
                 onBlur={() => handleFieldBlur("lastName")}
               />
               {errors.lastName && (
-                <p className="mt-1 text-sm text-red-600">{errors.lastName}</p>
+                <p className="mt-1 text-xs text-red-500 font-bold uppercase tracking-wide">{errors.lastName}</p>
               )}
             </div>
           </div>
@@ -409,7 +405,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
           <div>
             <label
               htmlFor="password"
-              className="block text-sm font-medium text-gray-900"
+              className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-1"
             >
               Password
             </label>
@@ -420,12 +416,11 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
                 type={showPassword ? "text" : "password"}
                 required
                 autoComplete="new-password"
-                className={`block w-full px-3 py-2 pr-10 border-b-2 bg-transparent focus:outline-none focus:ring-0 transition-colors ${
-                  errors.password
-                    ? "border-b-red-500 focus:border-red-500"
-                    : "border-b-gray-300 focus:border-black"
-                } ${touched.has("password") && !errors.password ? "border-b-gray-400" : ""}`}
-                placeholder="Create a password"
+                className={`block w-full bg-black/50 border-2 text-white placeholder-gray-600 px-4 py-3 font-bold uppercase tracking-wider outline-none transition-all duration-300 skew-box ${errors.password
+                  ? "border-red-500 focus:border-red-500"
+                  : "border-transparent focus:border-accent"
+                  } ${touched.has("password") && !errors.password ? "border-green-500/50" : ""}`}
+                placeholder="CREATE PASSWORD"
                 value={formData.password}
                 onChange={(e) => handleFieldChange("password", e.target.value)}
                 onBlur={() => handleFieldBlur("password")}
@@ -433,7 +428,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                className="absolute right-3 top-4 text-gray-400 hover:text-white focus:outline-none"
               >
                 {showPassword ? (
                   <EyeOff className="w-5 h-5" />
@@ -442,7 +437,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
                 )}
               </button>
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+                <p className="mt-1 text-xs text-red-500 font-bold uppercase tracking-wide">{errors.password}</p>
               )}
             </div>
 
@@ -450,21 +445,21 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
             {formData.password && (
               <div className="mt-2">
                 <div className="flex justify-between items-center mb-1">
-                  <span className="text-xs text-gray-600">
-                    Password strength
+                  <span className="text-xs text-gray-400 font-bold uppercase tracking-widest">
+                    Strength
                   </span>
                   {passwordStrength.label && (
                     <span
-                      className="text-xs font-medium"
+                      className="text-xs font-bold uppercase tracking-widest"
                       style={{
-                        color: passwordStrength.color.replace("bg-", ""),
+                        color: passwordStrength.label === "Strong" ? "#ccff00" : passwordStrength.color.replace("bg-", ""),
                       }}
                     >
                       {passwordStrength.label}
                     </span>
                   )}
                 </div>
-                <div className="h-1 w-full bg-gray-200 rounded-full overflow-hidden">
+                <div className="h-1 w-full bg-white/10 overflow-hidden transform skew-x-[-20deg]">
                   <div
                     className={`h-full transition-all duration-300 ${passwordStrength.color}`}
                     style={{ width: passwordStrength.width }}
@@ -478,7 +473,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
           <div>
             <label
               htmlFor="confirmPassword"
-              className="block text-sm font-medium text-gray-900"
+              className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-1"
             >
               Confirm Password
             </label>
@@ -489,12 +484,11 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
                 type={showConfirmPassword ? "text" : "password"}
                 required
                 autoComplete="new-password"
-                className={`block w-full px-3 py-2 pr-10 border-b-2 bg-transparent focus:outline-none focus:ring-0 transition-colors ${
-                  errors.confirmPassword
-                    ? "border-b-red-500 focus:border-red-500"
-                    : "border-b-gray-300 focus:border-black"
-                } ${touched.has("confirmPassword") && !errors.confirmPassword ? "border-b-gray-400" : ""}`}
-                placeholder="Confirm your password"
+                className={`block w-full bg-black/50 border-2 text-white placeholder-gray-600 px-4 py-3 font-bold uppercase tracking-wider outline-none transition-all duration-300 skew-box ${errors.confirmPassword
+                  ? "border-red-500 focus:border-red-500"
+                  : "border-transparent focus:border-accent"
+                  } ${touched.has("confirmPassword") && !errors.confirmPassword ? "border-green-500/50" : ""}`}
+                placeholder="CONFIRM PASSWORD"
                 value={formData.confirmPassword}
                 onChange={(e) =>
                   handleFieldChange("confirmPassword", e.target.value)
@@ -504,7 +498,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                className="absolute right-3 top-4 text-gray-400 hover:text-white focus:outline-none"
               >
                 {showConfirmPassword ? (
                   <EyeOff className="w-5 h-5" />
@@ -513,7 +507,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
                 )}
               </button>
               {errors.confirmPassword && (
-                <p className="mt-1 text-sm text-red-600">
+                <p className="mt-1 text-xs text-red-500 font-bold uppercase tracking-wide">
                   {errors.confirmPassword}
                 </p>
               )}
@@ -526,12 +520,12 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
           <button
             type="submit"
             disabled={loading}
-            className="group relative flex w-full justify-center rounded-md border border-transparent bg-black py-3 px-4 text-sm font-semibold text-white shadow-sm hover:-translate-y-0.5 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:bg-black transition-all duration-200"
+            className="btn-primary w-full py-4 text-lg"
           >
             {loading ? (
-              <span className="flex items-center">
+              <span className="flex items-center justify-center">
                 <svg
-                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-black"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -550,22 +544,22 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   />
                 </svg>
-                Creating account...
+                JOINING TEAM...
               </span>
             ) : (
-              "Create Account"
+              "CREATE ACCOUNT //"
             )}
           </button>
         </div>
       </form>
 
       {/* Link to Login */}
-      <div className="mt-8 text-center">
-        <span className="text-sm text-gray-600">
-          Already have an account?{" "}
+      <div className="mt-8 text-center border-t border-white/10 pt-6">
+        <span className="text-sm text-gray-400 font-medium uppercase tracking-wide">
+          Already on the roster?{" "}
           <Link
             href="/login"
-            className="font-medium text-black hover:text-gray-800 underline underline-offset-4"
+            className="font-bold text-accent hover:text-white uppercase tracking-wider transition-colors ml-1"
           >
             Sign in
           </Link>

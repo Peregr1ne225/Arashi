@@ -43,39 +43,38 @@ export default function CommentItem({ comment, onDelete, onImageClick }: Comment
     ));
 
     return (
-        <div className="flex gap-4 p-4 bg-gray-50 rounded-lg group hover:bg-gray-100 transition-colors relative">
+        <div className="flex gap-4 p-5 bg-black/40 border border-white/10 skew-box relative group hover:border-white/20 transition-all">
             {/* Avatar */}
-            <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${getAvatarColor(comment.author_pseudonym)} flex items-center justify-center text-white font-bold flex-shrink-0`}>
+            <div className={`w-10 h-10 bg-white/10 border border-white/20 flex items-center justify-center text-accent font-black skew-box-sm flex-shrink-0`}>
                 {comment.author_pseudonym.charAt(0)}
             </div>
 
             {/* Content */}
             <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center gap-2">
-                        <span className="font-medium text-gray-900">{comment.author_pseudonym}</span>
-                        <span className="text-xs text-gray-500">•</span>
-                        <span className="text-xs text-gray-500">{formattedDate}</span>
+                <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-3">
+                        <span className="font-bold uppercase tracking-wider text-white text-sm">{comment.author_pseudonym}</span>
+                        <span className="text-[10px] bg-white/10 px-2 py-0.5 skew-box-sm text-gray-400 font-mono">{formattedDate}</span>
                     </div>
                     {canDelete && (
                         <button
                             onClick={() => onDelete(comment.id)}
-                            className="text-gray-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                            className="text-gray-500 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
                             title="Delete comment"
                         >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                             </svg>
                         </button>
                     )}
                 </div>
-                <p className="text-gray-700 whitespace-pre-wrap break-words">{comment.content}</p>
+                <p className="text-gray-300 whitespace-pre-wrap break-words text-sm leading-relaxed font-medium">{comment.content}</p>
                 {comment.image && (
-                    <div className="mt-2">
+                    <div className="mt-3">
                         <img
                             src={getImageUrl(comment.image)}
                             alt="Comment attachment"
-                            className="max-h-64 rounded-lg border border-gray-200 object-cover cursor-pointer hover:opacity-95 transition-opacity"
+                            className="max-h-64 border border-white/20 object-cover cursor-pointer hover:opacity-80 transition-opacity skew-box-sm"
                             // Optional: Add simple lightbox or zoom on click if needed
                             onClick={() => comment.image && onImageClick(getImageUrl(comment.image))}
                         />

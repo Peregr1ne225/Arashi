@@ -33,9 +33,9 @@ export default function UserDropdown() {
     };
 
     const menuItems = [
-        { label: "My Account", href: "/account", show: isAuthenticated },
-        { label: "Admin Dashboard", href: "/admin", show: isAuthenticated && (user?.is_staff || user?.is_superuser) },
-        { label: "Orders", href: "/account?tab=orders", show: isAuthenticated },
+        { label: "My Profile", href: "/account", show: isAuthenticated },
+        { label: "Mission Control", href: "/admin", show: isAuthenticated && (user?.is_staff || user?.is_superuser) },
+        { label: "Match History", href: "/account?tab=orders", show: isAuthenticated },
     ];
 
     return (
@@ -43,7 +43,7 @@ export default function UserDropdown() {
             <div className="relative" ref={dropdownRef}>
                 <button
                     onClick={() => setIsOpen(!isOpen)}
-                    className="flex items-center text-gray-700 hover:text-black focus:outline-none"
+                    className="flex items-center text-white hover:text-accent focus:outline-none transition-colors p-2 skew-box hover:bg-white/10"
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -62,58 +62,60 @@ export default function UserDropdown() {
                 </button>
 
                 {isOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg py-1 z-50 animate-in fade-in slide-in-from-top-1 duration-200">
+                    <div className="absolute right-0 mt-2 w-64 bg-neutral-900 border border-white/20 skew-box shadow-[0_0_20px_rgba(0,0,0,0.5)] z-50 animate-in fade-in slide-in-from-top-1 duration-200 overflow-hidden">
                         {isAuthenticated ? (
                             <>
-                                <div className="px-4 py-2 border-b border-gray-100">
-                                    <p className="text-sm font-medium text-gray-900 truncate">
-                                        {user?.username || "Abstract User"}
+                                <div className="px-6 py-4 border-b border-white/10 bg-black/40">
+                                    <p className="text-sm font-black uppercase italic tracking-wider text-white truncate">
+                                        {user?.username || "Operative"}
                                     </p>
-                                    <p className="text-xs text-gray-500 truncate">
-                                        {user?.email || "user@example.com"}
+                                    <p className="text-xs font-medium text-gray-400 truncate tracking-wide">
+                                        {user?.email || "operative@arashi.com"}
                                     </p>
                                 </div>
 
-                                {menuItems.map(
-                                    (item) =>
-                                        item.show && (
-                                            <Link
-                                                key={item.href}
-                                                href={item.href}
-                                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                                onClick={() => setIsOpen(false)}
-                                            >
-                                                {item.label}
-                                            </Link>
-                                        )
-                                )}
+                                <div className="py-2">
+                                    {menuItems.map(
+                                        (item) =>
+                                            item.show && (
+                                                <Link
+                                                    key={item.href}
+                                                    href={item.href}
+                                                    className="block px-6 py-3 text-sm font-bold uppercase tracking-wider text-gray-300 hover:text-accent hover:bg-white/5 transition-colors border-l-2 border-transparent hover:border-accent"
+                                                    onClick={() => setIsOpen(false)}
+                                                >
+                                                    {item.label}
+                                                </Link>
+                                            )
+                                    )}
+                                </div>
 
                                 <button
                                     onClick={handleLogout}
-                                    className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 border-t border-gray-100"
+                                    className="block w-full text-left px-6 py-4 text-sm font-black uppercase italic tracking-widest text-red-500 hover:bg-red-900/10 hover:text-red-400 border-t border-white/10 transition-colors"
                                 >
-                                    Sign out
+                                    Log Out //
                                 </button>
                             </>
                         ) : (
-                            <>
+                            <div className="p-4 space-y-3">
                                 <button
                                     onClick={() => {
                                         setIsOpen(false);
                                         setIsLoginModalOpen(true);
                                     }}
-                                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    className="block w-full text-center px-4 py-3 bg-accent text-black font-black uppercase italic tracking-tighter skew-box hover:bg-white transition-all shadow-[0_0_10px_rgba(204,255,0,0.2)]"
                                 >
-                                    Sign in
+                                    Sign In
                                 </button>
                                 <Link
                                     href="/register"
-                                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    className="block w-full text-center px-4 py-3 border border-white/20 text-white font-bold uppercase tracking-widest text-xs skew-box hover:border-accent hover:text-accent transition-colors"
                                     onClick={() => setIsOpen(false)}
                                 >
-                                    Create account
+                                    Join The Squad
                                 </Link>
-                            </>
+                            </div>
                         )}
                     </div>
                 )}

@@ -32,7 +32,7 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
   const cartItemCount = 0; // Placeholder for cart count - will be connected to state management
 
   return (
-    <header className="sticky top-0 z-50 bg-white shadow-sm">
+    <header className="sticky top-0 z-50 bg-background border-b border-accent shadow-none">
       <div className="flex items-center">
         <HeaderMain setMobileCategoryMenuOpen={setMobileCategoryMenuOpen} />
         <HeaderIcons

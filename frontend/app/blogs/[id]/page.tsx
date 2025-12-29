@@ -15,12 +15,12 @@ export async function generateMetadata({ params }: BlogPostPageProps) {
     try {
         const post = await blogsApi.getPost(id);
         return {
-            title: `${post.title} - KawJaw Blog`,
+            title: `${post.title} - Arashi Blog`,
             description: post.content.substring(0, 160),
         };
     } catch {
         return {
-            title: "Post Not Found - KawJaw Blog",
+            title: "Post Not Found - Arashi Blog",
         };
     }
 }
@@ -57,19 +57,18 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
-
-            <main className="container py-8">
+        <div className="min-h-screen bg-background text-white">
+            <main className="container py-12">
                 <div className="max-w-4xl mx-auto">
                     {/* Back Link */}
                     <Link
                         href="/blogs"
-                        className="inline-flex items-center gap-2 text-gray-600 hover:text-purple-600 mb-6 transition-colors pt-6"
+                        className="inline-flex items-center gap-2 text-gray-500 hover:text-accent font-bold uppercase tracking-wider mb-8 transition-colors"
                     >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                            <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={2} d="M15 19l-7-7 7-7" />
                         </svg>
-                        Back to Blog
+                        Back to Playbook
                     </Link>
 
                     {/* Admin Actions (Client-side check) */}
@@ -79,38 +78,41 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                     />
 
                     {/* Article */}
-                    <article className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-8">
+                    <article className="bg-neutral-900 border border-white/10 skew-box overflow-hidden mb-12 shadow-[0_0_30px_rgba(0,0,0,0.5)]">
                         {/* Cover Image */}
                         {post.image && (
-                            <PostImage
-                                src={post.image}
-                                alt={post.title}
-                            />
+                            <div className="border-b border-white/10 relative">
+                                <PostImage
+                                    src={post.image}
+                                    alt={post.title}
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-neutral-900 via-transparent to-transparent opacity-50" />
+                            </div>
                         )}
 
                         {/* Content */}
-                        <div className="p-8">
+                        <div className="p-8 md:p-12">
                             {/* Author Info */}
-                            <div className="flex items-center gap-4 mb-6">
-                                <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${getAvatarColor(post.author_pseudonym)} flex items-center justify-center text-white text-lg font-bold`}>
+                            <div className="flex items-center gap-5 mb-8 border-b border-white/5 pb-8">
+                                <div className={`w-14 h-14 bg-white/5 border border-white/20 flex items-center justify-center text-accent text-xl font-black skew-box-sm`}>
                                     {post.author_pseudonym.charAt(0)}
                                 </div>
                                 <div>
-                                    <p className="font-medium text-gray-900">{post.author_pseudonym}</p>
-                                    <p className="text-sm text-gray-500">{formattedDate}</p>
+                                    <p className="font-bold uppercase tracking-widest text-white text-lg">{post.author_pseudonym}</p>
+                                    <p className="text-sm font-bold uppercase tracking-wider text-gray-500">{formattedDate}</p>
                                 </div>
                             </div>
 
                             {/* Title */}
-                            <h1 className="text-3xl font-bold text-gray-900 mb-6">
+                            <h1 className="text-4xl md:text-5xl font-black uppercase italic tracking-tighter text-white mb-10 leading-none">
                                 {post.title}
                             </h1>
 
                             {/* Post Content */}
-                            <div className="prose prose-lg max-w-none">
+                            <div className="prose prose-invert prose-lg max-w-none prose-headings:font-black prose-headings:uppercase prose-headings:italic prose-headings:tracking-tighter prose-p:text-gray-300 prose-p:leading-relaxed prose-strong:text-accent prose-blockquote:border-accent prose-blockquote:bg-white/5 prose-blockquote:skew-box-sm prose-blockquote:p-6 prose-blockquote:not-italic">
                                 {post.content.split("\n").map((paragraph, idx) => (
                                     paragraph.trim() && (
-                                        <p key={idx} className="text-gray-700 leading-relaxed mb-4">
+                                        <p key={idx} className="mb-6">
                                             {paragraph}
                                         </p>
                                     )
@@ -122,16 +124,11 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                     {/* Comments Section */}
                     <CommentSection
                         postId={post.id}
-                        // We keep postSlug for compatibility or remove it if updated context allows, 
-                        // but component still accepts it. Wait, CommentSection accepts postSlug but I should check if I need it.
-                        // I updated CommentSection to use postId for connection. 
-                        // Let's pass slug just in case, but connection uses ID.
                         postSlug={post.slug}
                         initialComments={post.comments || []}
                     />
                 </div>
             </main>
-
         </div>
     );
 }

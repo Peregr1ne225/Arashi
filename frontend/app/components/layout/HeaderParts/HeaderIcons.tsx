@@ -42,7 +42,7 @@ export default function HeaderIcons({
       <div className="hidden sm:block">
         <UserDropdown />
       </div>
-      <button onClick={openCart} className="relative">
+      <button onClick={openCart} className="relative p-2 hover:bg-secondary transition-colors skew-box">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="h-6 w-6"
@@ -59,7 +59,7 @@ export default function HeaderIcons({
         </svg>
         {/* Cart item count badge */}
         {totalItems > 0 && (
-          <span className="absolute top-0 right-0 bg-red-600 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+          <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground text-xs font-bold h-5 w-5 flex items-center justify-center border border-background">
             {totalItems > 9 ? "9+" : totalItems}
           </span>
         )}

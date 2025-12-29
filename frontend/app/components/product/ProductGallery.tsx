@@ -68,7 +68,7 @@ export default function ProductGallery({ images, name }: ProductGalleryProps) {
             {/* Zoom Modal */}
             {isZoomOpen && (
                 <div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md p-4 animate-in fade-in duration-200"
+                    className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/95 backdrop-blur-md p-4 animate-in fade-in duration-200"
                     onClick={() => setIsZoomOpen(false)}
                 >
                     <button

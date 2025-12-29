@@ -18,26 +18,28 @@ const CategoryCard = ({ category }: { category: Category }) => {
   );
 
   return (
-    <div className="relative group overflow-hidden rounded-lg">
+    <div className="relative group overflow-hidden skew-box border-2 border-transparent hover:border-accent transition-all duration-300">
       <Link
         href={`/category/${category.slug || category.id || category.name?.toLowerCase().replace(/\s+/g, "-")}`}
       >
         <div className="aspect-square relative">
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10"></div>
+          <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors z-10"></div>
           <Image
             src={imgSrc}
             alt={category.name}
             fill
-            className="object-cover"
+            className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500 scale-100 group-hover:scale-110"
             sizes="(max-width: 768px) 50vw, (max-width: 1024px) 25vw, 20vw"
             onError={() => setImgSrc("/placeholder-product.svg")}
           />
-          <div className="absolute inset-0 flex items-center justify-center z-20">
-            <div className="text-center text-white">
-              <h3 className="text-xl md:text-2xl font-bold mb-2">
+          <div className="absolute inset-0 flex items-center justify-center z-20 p-4">
+            <div className="text-center w-full">
+              <h3 className="text-2xl md:text-3xl font-black uppercase italic text-white mb-2 tracking-wider drop-shadow-md skew-box-reverse">
                 {category.name}
               </h3>
-              <p className="text-sm">Shop Now →</p>
+              <div className="inline-block bg-accent text-black font-bold uppercase text-xs px-4 py-1 skew-box-reverse transform translate-y-8 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+                Shop Now
+              </div>
             </div>
           </div>
         </div>

@@ -18,24 +18,24 @@ export default function AccountSidebar({ activeTab }: AccountSidebarProps) {
     ];
 
     return (
-        <div className="bg-white shadow rounded-lg overflow-hidden">
+        <div className="bg-neutral-900 border border-white/10 skew-box overflow-hidden sticky top-24">
             {/* User Brief Info */}
-            <div className="p-6 border-b bg-gray-50">
+            <div className="p-6 border-b border-white/10 bg-black/40">
                 <div className="flex items-center space-x-4">
-                    <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xl">
+                    <div className="h-14 w-14 bg-accent/20 border border-accent flex items-center justify-center text-accent font-black text-2xl skew-box-sm">
                         {user?.first_name?.[0] || user?.username?.[0] || "U"}
                     </div>
-                    <div>
-                        <h3 className="font-semibold text-gray-900">
+                    <div className="overflow-hidden">
+                        <h3 className="font-bold uppercase italic tracking-tighter text-white text-lg truncate">
                             {user?.first_name ? `${user.first_name} ${user.last_name || ""}` : user?.username}
                         </h3>
-                        <p className="text-sm text-gray-500">{user?.email}</p>
+                        <p className="text-xs font-bold uppercase tracking-widest text-gray-500 truncate">{user?.email}</p>
                     </div>
                 </div>
             </div>
 
             {/* Navigation */}
-            <nav className="p-2 space-y-1">
+            <nav className="p-3 space-y-2">
                 {menuItems.map((item) => {
                     const isActive = activeTab === item.id || (item.id === "profile" && !activeTab);
                     const Icon = item.icon;
@@ -44,12 +44,12 @@ export default function AccountSidebar({ activeTab }: AccountSidebarProps) {
                         <Link
                             key={item.id}
                             href={item.href}
-                            className={`flex items-center space-x-3 px-4 py-3 rounded-md transition-colors ${isActive
-                                    ? "bg-blue-50 text-blue-700 font-medium"
-                                    : "text-gray-700 hover:bg-gray-50"
+                            className={`flex items-center space-x-3 px-4 py-3 transition-all skew-box ${isActive
+                                ? "bg-accent text-black font-black uppercase italic tracking-wide border border-transparent shadow-[0_0_15px_rgba(204,255,0,0.3)]"
+                                : "text-gray-400 hover:text-white hover:bg-white/5 font-bold uppercase tracking-wider border border-transparent hover:border-white/10"
                                 }`}
                         >
-                            <Icon className={`w-5 h-5 ${isActive ? "text-blue-600" : "text-gray-400"}`} />
+                            <Icon className={`w-5 h-5 ${isActive ? "text-black" : "text-gray-500 group-hover:text-white"}`} strokeWidth={isActive ? 2.5 : 2} />
                             <span>{item.label}</span>
                         </Link>
                     );
@@ -57,7 +57,7 @@ export default function AccountSidebar({ activeTab }: AccountSidebarProps) {
 
                 <button
                     onClick={logout}
-                    className="w-full flex items-center space-x-3 px-4 py-3 rounded-md text-red-600 hover:bg-red-50 transition-colors mt-4"
+                    className="w-full flex items-center space-x-3 px-4 py-3 text-red-500 hover:text-red-400 hover:bg-red-900/20 transition-all mt-6 skew-box border border-transparent hover:border-red-500/30 font-bold uppercase tracking-wider"
                 >
                     <LogOut className="w-5 h-5" />
                     <span>Logout</span>

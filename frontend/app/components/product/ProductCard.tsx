@@ -28,7 +28,7 @@ const ProductCard = memo<ProductCardProps>(({ product }) => {
   const colors = product.colors || [];
 
   return (
-    <div className="group relative bg-white rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 h-full flex flex-col">
+    <div className="group relative card-sport h-full flex flex-col overflow-hidden">
       {/* Product Images */}
       <ProductImage
         productId={product.id}

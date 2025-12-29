@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import ProductGrid from "@/app/components/product/ProductGrid";
 import CategorySection from "@/app/components/ui/CategorySection";
 import ProductSkeleton from "@/app/components/product/ProductSkeleton";
+
 import { productsApi, categoriesApi } from "@/app/lib/api/client";
 import { Product } from "@/app/types";
 
@@ -90,10 +91,11 @@ async function SaleSection() {
 // Server Component - No "use client" directive
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <main className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-background">
+
+      <main className="container mx-auto px-4 py-12 space-y-24">
         {/* Categories - Streamed */}
-        <Suspense fallback={<div className="h-40 bg-gray-200 animate-pulse m-4 rounded"></div>}>
+        <Suspense fallback={<div className="h-40 bg-secondary animate-pulse m-4 rounded-none"></div>}>
           <CategoriesFetcher />
         </Suspense>
 

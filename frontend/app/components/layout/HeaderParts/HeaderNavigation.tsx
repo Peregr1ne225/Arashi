@@ -17,14 +17,14 @@ export default function HeaderNavigation({
   );
 
   return (
-    <nav className="hidden lg:block border-t border-gray-200">
+    <nav className="hidden lg:block py-2">
       <div className="container mx-auto px-4">
         <div className="relative flex justify-center items-center">
-          <ul className="flex items-center py-3 space-x-6 text-sm font-medium text-black overflow-visible">
+          <ul className="flex items-center space-x-8 text-lg font-bold uppercase tracking-wider overflow-visible">
             <li>
               <Link
                 href="/sale"
-                className="whitespace-nowrap text-red-600 hover:text-red-700"
+                className="whitespace-nowrap text-accent hover:text-white transition-colors skew-box inline-block"
               >
                 Sale
               </Link>
@@ -32,13 +32,13 @@ export default function HeaderNavigation({
             <li>
               <Link
                 href="/new"
-                className="whitespace-nowrap hover:text-gray-700"
+                className="whitespace-nowrap text-foreground hover:text-accent transition-colors skew-box inline-block"
               >
                 New Arrivals
               </Link>
             </li>
             {topLevelCategories.map((category) => (
-              <li key={category.id}>
+              <li key={category.id} className="skew-box">
                 <CategoryDropdown
                   categories={topLevelCategories}
                   navCategory={category}
@@ -50,10 +50,10 @@ export default function HeaderNavigation({
 
           <div className="absolute right-0">
             <Link
-              href="/blogs"
-              className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm font-medium rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+              href="/model"
+              className="btn-secondary text-sm"
             >
-              Blogs
+              <span>Model</span>
             </Link>
           </div>
         </div>

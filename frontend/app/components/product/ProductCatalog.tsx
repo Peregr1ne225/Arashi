@@ -168,41 +168,40 @@ function ProductCatalogContent({
     return (
         <div className="flex flex-col lg:flex-row gap-8">
             {/* Mobile Filter Button */}
-            <div className="lg:hidden mb-4">
+            <div className="lg:hidden mb-8">
                 <button
                     onClick={() => setIsMobileFiltersOpen(true)}
-                    className="w-full py-3 bg-white border border-gray-200 rounded-lg shadow-sm font-medium flex items-center justify-center gap-2"
+                    className="w-full py-4 bg-accent border border-black text-black font-black uppercase tracking-widest flex items-center justify-center gap-3 skew-box hover:bg-white transition-colors shadow-[4px_4px_0px_rgba(0,0,0,1)]"
                 >
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                        <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={3} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                     </svg>
-                    Filters & Sort
+                    Filters & Sort //
                 </button>
             </div>
 
             {/* Sidebar - Desktop & Mobile Drawer */}
             <div className={`
-                fixed inset-0 z-50 bg-black/50 transition-opacity lg:static lg:bg-transparent lg:z-auto lg:block
+                fixed inset-0 z-50 bg-black/80 backdrop-blur-sm transition-opacity lg:static lg:bg-transparent lg:z-auto lg:block
                 ${isMobileFiltersOpen ? 'opacity-100 visible' : 'opacity-0 invisible lg:opacity-100 lg:visible'}
             `}>
                 <div className={`
-                    absolute inset-y-0 left-0 w-[80%] max-w-xs bg-white shadow-xl transform transition-transform duration-300 lg:static lg:transform-none lg:w-64 lg:shadow-none lg:bg-transparent
+                    absolute inset-y-0 left-0 w-[85%] max-w-xs bg-neutral-900 border-r border-white/10 shadow-2xl transform transition-transform duration-300 lg:static lg:transform-none lg:w-64 lg:shadow-none lg:bg-transparent lg:border-none
                     ${isMobileFiltersOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
                 `}>
-                    <div className="flex justify-between items-center p-4 border-b lg:hidden">
-                        <span className="font-semibold text-lg">Filters</span>
-                        <button onClick={() => setIsMobileFiltersOpen(false)} className="p-2">
-                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    <div className="flex justify-between items-center p-6 border-b border-white/10 lg:hidden">
+                        <span className="font-black uppercase italic tracking-tighter text-white text-2xl">Filters</span>
+                        <button onClick={() => setIsMobileFiltersOpen(false)} className="text-white hover:text-accent p-2 transition-colors">
+                            <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
                     </div>
-                    <div className="p-4 lg:p-0 overflow-y-auto h-full lg:h-auto">
+                    <div className="p-6 lg:p-0 overflow-y-auto h-full lg:h-auto">
                         <SidebarFilters
                             onFiltersChange={(f) => {
                                 handleFiltersChange(f);
-                                // Optional: close drawer on apply, or let user close manually
-                                // setIsMobileFiltersOpen(false); 
+                                // Optional: close drawer on apply
                             }}
                             initialFilters={getInitialFilters()}
                             currentCategory={initialCategorySlug}
@@ -213,37 +212,41 @@ function ProductCatalogContent({
                 </div>
 
                 {/* Overlay click to close */}
-                <div onClick={() => setIsMobileFiltersOpen(false)} className="absolute inset-0 lg:hidden"></div>
+                <div onClick={() => setIsMobileFiltersOpen(false)} className="absolute inset-0 lg:hidden -z-10"></div>
             </div>
 
             {/* Grid Area with Overlay Loading */}
             <div className="flex-1 relative min-h-[400px]">
                 {isLoading && (
-                    <div className="absolute inset-0 bg-white/60 z-50 flex justify-center items-start pt-32 backdrop-blur-[1px] transition-all duration-200">
-                        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-neutral-900 shadow-lg"></div>
+                    <div className="absolute inset-0 bg-neutral-900/80 z-50 flex justify-center items-start pt-32 backdrop-blur-sm transition-all duration-200">
+                        <div className="flex flex-col items-center gap-4">
+                            <div className="animate-spin rounded-full h-12 w-12 border-4 border-white/10 border-t-accent shadow-[0_0_20px_rgba(204,255,0,0.5)]"></div>
+                            <span className="text-accent font-bold uppercase tracking-widest animate-pulse">Scouting Gear...</span>
+                        </div>
                     </div>
                 )}
 
                 {error ? (
-                    <div className="text-center py-16">
-                        <p className="text-red-500 mb-4">{error}</p>
+                    <div className="text-center py-20 border border-red-900/50 bg-red-900/10 skew-box">
+                        <p className="text-red-500 mb-6 font-bold uppercase tracking-wider">{error}</p>
                         <button
                             onClick={() => fetchProducts(getInitialFilters())}
-                            className="px-4 py-2 bg-neutral-900 text-white rounded"
+                            className="px-8 py-3 bg-white text-black font-black uppercase tracking-widest hover:bg-accent transition-colors skew-box"
                         >
                             Try Again
                         </button>
                     </div>
                 ) : (
                     <>
-
                         {products.length > 0 ? (
-                            <div className={`transition-opacity duration-200 ${isLoading ? 'opacity-40' : 'opacity-100'}`}>
+                            <div className={`transition-opacity duration-200 ${isLoading ? 'opacity-20' : 'opacity-100'}`}>
                                 <ProductGrid products={products} />
                             </div>
                         ) : (
-                            <div className="text-center py-16 text-gray-500">
-                                No products found.
+                            <div className="text-center py-24 text-gray-500 border border-white/10 bg-white/5 skew-box">
+                                <div className="mb-4 text-4xl opacity-50">🔍</div>
+                                <h3 className="text-xl font-black uppercase italic tracking-wider text-white mb-2">No Gear Found</h3>
+                                <p className="text-sm font-medium uppercase tracking-wide">Adjust your filters to find what you need.</p>
                             </div>
                         )}
                     </>

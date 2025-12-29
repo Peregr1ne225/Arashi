@@ -18,9 +18,9 @@ export default async function ProductPage({
     const product = await productsApi.getProduct(parseInt(id));
 
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-background text-white">
 
-        <main className="container mx-auto px-4 py-8">
+        <main className="container mx-auto px-4 py-12">
           {/* Refactored Product Detail Component */}
           <ProductDetail product={product} />
         </main>

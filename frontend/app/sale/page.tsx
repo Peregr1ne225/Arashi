@@ -1,8 +1,9 @@
 import { Suspense } from "react";
 import SaleContent from "./SaleContent";
 import { productsApi } from "@/app/lib/api/client";
-
 import { ProductListResponse } from "@/app/types";
+import CatalogLayout from "@/app/components/layout/CatalogLayout";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
@@ -20,25 +21,27 @@ export default async function SalePage() {
     console.warn("Failed to fetch sale products (likely during build):", error);
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <main className="container mx-auto px-4 py-8">
-        {/* Breadcrumb */}
-        <div className="flex items-center text-sm text-gray-600 mb-6">
-          <a href="/" className="hover:text-gray-900">
-            Home
-          </a>
-          <span className="mx-2">/</span>
-          <span className="text-gray-900">Sale</span>
-        </div>
+  // Breadcrumb
+  const breadcrumb = (
+    <>
+      <Link href="/" className="hover:text-white transition-colors">Home</Link>
+      <span className="mx-2 text-accent">/</span>
+      <span className="text-white">Sale</span>
+    </>
+  );
 
-        <Suspense fallback={<div>Loading sale products...</div>}>
-          <SaleContent
-            initialProducts={initialData.results || []}
-            initialCount={initialData.count || 0}
-          />
-        </Suspense>
-      </main>
-    </div>
+  return (
+    <CatalogLayout
+      title="Clearance"
+      description="Limited Stock // Final Markdowns"
+      breadcrumb={breadcrumb}
+    >
+      <Suspense fallback={<div className="text-white">Loading sale products...</div>}>
+        <SaleContent
+          initialProducts={initialData.results || []}
+          initialCount={initialData.count || 0}
+        />
+      </Suspense>
+    </CatalogLayout>
   );
 }

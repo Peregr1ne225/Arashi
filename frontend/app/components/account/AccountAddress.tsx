@@ -30,59 +30,64 @@ export default function AccountAddress() {
     };
 
     return (
-        <div className="bg-white shadow rounded-lg overflow-hidden">
-            <div className="px-4 py-5 border-b border-gray-200 sm:px-6 flex justify-between items-center">
+        <div className="bg-neutral-900 border border-white/10 skew-box overflow-hidden">
+            <div className="px-6 py-5 border-b border-white/10 bg-black/20 flex justify-between items-center">
                 <div>
-                    <h3 className="text-lg leading-6 font-medium text-gray-900">Address Book</h3>
-                    <p className="mt-1 text-sm text-gray-500">Manage your shipping addresses.</p>
+                    <h3 className="text-2xl font-black uppercase italic tracking-tighter text-white">Shipping Coordinates</h3>
+                    <p className="mt-1 text-xs font-bold uppercase tracking-widest text-gray-500">Manage your delivery zone.</p>
                 </div>
                 {!isEditing && (
                     <button
                         onClick={() => setIsEditing(true)}
-                        className="px-3 py-1 bg-blue-50 text-blue-700 rounded-md text-sm font-medium hover:bg-blue-100"
+                        className="text-xs font-bold uppercase tracking-widest text-accent hover:text-white transition-colors skew-box border border-accent/20 px-4 py-2 hover:bg-accent hover:text-black"
                     >
-                        Edit Address
+                        Edit Zone //
                     </button>
                 )}
             </div>
 
             <div className="p-6">
                 {isEditing ? (
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                    <form onSubmit={handleSubmit} className="space-y-6">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Default Shipping Address</label>
+                            <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Default Shipping Address</label>
                             <textarea
                                 rows={4}
                                 value={address}
                                 onChange={(e) => setAddress(e.target.value)}
-                                className="mt-1 block w-full shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm border-gray-300 rounded-md p-2 border"
-                                placeholder="Enter your full address"
+                                className="w-full px-4 py-3 bg-black border border-white/20 rounded-none text-white font-bold tracking-wide focus:outline-none focus:border-accent skew-box transition-colors resize-none placeholder-gray-600"
+                                placeholder="ENTER YOUR FULL ADDRESS HERE..."
                             />
                         </div>
-                        <div className="flex justify-end space-x-3">
+                        <div className="flex justify-end gap-4 border-t border-white/10 pt-6">
                             <button
                                 type="button"
                                 onClick={() => setIsEditing(false)}
-                                className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                className="px-6 py-2 border border-white/20 text-white font-bold uppercase tracking-wider hover:bg-white/10 skew-box transition-colors"
                             >
                                 Cancel
                             </button>
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="bg-blue-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-blue-700"
+                                className="px-6 py-2 bg-accent text-black font-black uppercase italic tracking-wider hover:bg-white hover:text-black skew-box transition-colors"
                             >
-                                Save Address
+                                {isLoading ? "Saving..." : "Save Coordinates //"}
                             </button>
                         </div>
                     </form>
                 ) : (
-                    <div className="border rounded-md p-4 flex items-start space-x-4">
-                        <MapPin className="w-6 h-6 text-gray-400 mt-1" />
-                        <div>
-                            <h4 className="text-sm font-medium text-gray-900">Default Address</h4>
-                            <p className="mt-1 text-sm text-gray-500 whitespace-pre-wrap">
-                                {user?.address || "No address saved."}
+                    <div className="bg-black border border-white/10 p-6 flex items-start space-x-4 skew-box relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <MapPin className="w-24 h-24 text-white" />
+                        </div>
+                        <div className="p-3 bg-neutral-900 border border-white/10 skew-box-sm">
+                            <MapPin className="w-6 h-6 text-accent" />
+                        </div>
+                        <div className="relative z-10">
+                            <h4 className="text-sm font-black uppercase italic tracking-wide text-white mb-2">Default Zone</h4>
+                            <p className="text-sm font-bold text-gray-400 whitespace-pre-wrap uppercase tracking-wide leading-relaxed">
+                                {user?.address || "NO ADDRESS ASSIGNED TO THIS LOCKER."}
                             </p>
                         </div>
                     </div>

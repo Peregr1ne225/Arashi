@@ -40,31 +40,31 @@ export default function CreateBlogPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <main className="container py-8">
+        <div className="min-h-screen bg-background text-white">
+            <main className="container py-12">
                 <div className="max-w-3xl mx-auto">
                     {/* Back Link */}
                     <Link
                         href="/blogs"
-                        className="inline-flex items-center gap-2 text-gray-600 hover:text-purple-600 mb-6 transition-colors pt-6"
+                        className="inline-flex items-center gap-2 text-gray-500 hover:text-accent font-bold uppercase tracking-wider mb-8 transition-colors"
                     >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                            <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={2} d="M15 19l-7-7 7-7" />
                         </svg>
-                        Back to Blog
+                        Back to Playbook
                     </Link>
 
-                    <div className="mb-8">
-                        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                            Create New Post
+                    <div className="mb-10 border-b border-white/10 pb-8">
+                        <h1 className="text-5xl font-black uppercase italic tracking-tighter text-white mb-4">
+                            Draft Strategy //
                         </h1>
-                        <p className="text-gray-600">
-                            Share your thoughts with the community. Your post will be published with a random pseudonym for privacy.
+                        <p className="text-gray-400 font-bold uppercase tracking-wider text-sm">
+                            Share your thoughts with the community. Privacy guaranteed via random pseudonym assignment.
                         </p>
                     </div>
 
                     {/* Form */}
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                    <div className="bg-neutral-900 border border-white/10 skew-box p-8 shadow-[0_0_30px_rgba(0,0,0,0.5)]">
                         <PostForm />
                     </div>
                 </div>

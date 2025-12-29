@@ -14,20 +14,20 @@ export default function ProductInfo({ product }: ProductInfoProps) {
     return (
         <div className="space-y-8">
             {/* Header */}
-            <div className="space-y-4 border-b border-gray-100 pb-6">
-                <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-gray-900 leading-tight">
+            <div className="space-y-6 border-b border-white/10 pb-8">
+                <h1 className="text-5xl md:text-7xl font-black uppercase italic tracking-tighter text-white drop-shadow-md leading-none">
                     {product.name}
                 </h1>
 
                 {/* Rating */}
-                <div className="flex items-center gap-2">
-                    <div className="flex items-center">
+                <div className="flex items-center gap-3">
+                    <div className="flex items-center space-x-1">
                         {[1, 2, 3, 4, 5].map((star) => (
                             <svg
                                 key={star}
-                                className={`w-5 h-5 ${(product.rating || 0) >= star
-                                        ? "text-yellow-400 fill-current"
-                                        : "text-gray-300 fill-current"
+                                className={`w-5 h-5 clip-corner ${(product.rating || 0) >= star
+                                    ? "text-accent fill-current"
+                                    : "text-neutral-800 fill-current"
                                     }`}
                                 viewBox="0 0 20 20"
                             >
@@ -35,26 +35,26 @@ export default function ProductInfo({ product }: ProductInfoProps) {
                             </svg>
                         ))}
                     </div>
-                    <span className="text-sm font-medium text-gray-500">
-                        {product.rating || 0} ({product.reviewCount || 0} reviews)
+                    <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">
+                        {product.rating || 0} // {product.reviewCount || 0} REVIEWS
                     </span>
                 </div>
 
-                <div className="flex items-baseline gap-3">
+                <div className="flex items-baseline gap-4">
                     {hasDiscount ? (
                         <>
-                            <span className="text-3xl font-bold text-gray-900">
+                            <span className="text-5xl font-black text-white italic tracking-tighter text-outline-sm">
                                 ฿{displayPrice.toLocaleString()}
                             </span>
-                            <span className="text-lg text-gray-500 line-through decoration-gray-400">
+                            <span className="text-2xl text-gray-600 line-through decoration-accent decoration-2 font-bold rotate-[-6deg]">
                                 ฿{originalPrice?.toLocaleString()}
                             </span>
-                            <span className="px-3 py-1 rounded-full bg-red-50 text-red-600 text-sm font-bold tracking-wide uppercase">
+                            <span className="px-3 py-1 bg-accent/20 text-accent text-sm font-black tracking-widest uppercase border border-accent/50 transform -skew-x-12">
                                 Save {product.discount}%
                             </span>
                         </>
                     ) : (
-                        <span className="text-3xl font-bold text-gray-900">
+                        <span className="text-5xl font-black text-white italic tracking-tighter">
                             ฿{displayPrice.toLocaleString()}
                         </span>
                     )}
@@ -62,19 +62,19 @@ export default function ProductInfo({ product }: ProductInfoProps) {
             </div>
 
             {/* Description */}
-            <div className="prose prose-lg max-w-none text-gray-600 leading-relaxed">
+            <div className="prose prose-invert prose-lg max-w-none text-gray-400 leading-relaxed font-medium">
                 {product.description ? (
                     <p className="whitespace-pre-line">{product.description}</p>
                 ) : (
-                    <p className="italic text-gray-400">No description available for this product.</p>
+                    <p className="italic text-gray-500">No description available.</p>
                 )}
             </div>
 
             {/* Availability Badge */}
-            <div className="flex items-center gap-2 pt-2">
-                <div className={`w-2.5 h-2.5 rounded-full ring-4 ${product.stock > 0 ? 'bg-green-500 ring-green-50' : 'bg-red-500 ring-red-50'}`} />
-                <span className={`text-base font-medium ${product.stock > 0 ? 'text-green-700' : 'text-red-700'}`}>
-                    {product.stock > 0 ? `In Stock (${product.stock} available)` : 'Out of Stock'}
+            <div className="flex items-center gap-3 pt-2">
+                <div className={`w-3 h-3 transform skew-x-12 border ${product.stock > 0 ? 'bg-accent border-accent shadow-[0_0_10px_rgba(204,255,0,0.5)]' : 'bg-red-600 border-red-600'}`} />
+                <span className={`text-base font-black uppercase tracking-wider ${product.stock > 0 ? 'text-white' : 'text-red-500'}`}>
+                    {product.stock > 0 ? `In Stock / ${product.stock} Units` : 'Out of Stock'}
                 </span>
             </div>
         </div>

@@ -15,7 +15,7 @@ function AboutContent() {
                     <h2 className="text-2xl font-bold text-gray-900">About Us</h2>
                     <div className="prose prose-gray max-w-none text-gray-600 space-y-4">
                         <p>
-                            Welcome to KawJaw, where style meets enhanced comfort. We are dedicated to providing
+                            Welcome to Arashi, where style meets enhanced comfort. We are dedicated to providing
                             premium essentials that elevate your everyday wardrobe. Our journey began with a simple
                             idea: to create clothing that looks good and feels even better.
                         </p>
@@ -38,34 +38,34 @@ function AboutContent() {
                     <div className="prose prose-gray max-w-none text-gray-600 space-y-4">
                         <p><strong>Last Updated: December 2025</strong></p>
                         <p>
-                            Welcome to KawJaw. By accessing our website, you agree to be bound by these terms of service, all applicable laws and regulations, and agree that you are responsible for compliance with any applicable local laws.
+                            Welcome to Arashi. By accessing our website, you agree to be bound by these terms of service, all applicable laws and regulations, and agree that you are responsible for compliance with any applicable local laws.
                         </p>
 
                         <h3 className="text-lg font-semibold text-gray-900">1. Use License</h3>
                         <p>
-                            Permission is granted to temporarily download one copy of the materials (information or software) on KawJaw's website for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not:
+                            Permission is granted to temporarily download one copy of the materials (information or software) on Arashi&apos;s website for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not:
                         </p>
                         <ul className="list-disc pl-5 space-y-2">
                             <li>Modify or copy the materials;</li>
                             <li>Use the materials for any commercial purpose, or for any public display (commercial or non-commercial);</li>
-                            <li>Attempt to decompile or reverse engineer any software contained on KawJaw's website;</li>
+                            <li>Attempt to decompile or reverse engineer any software contained on Arashi&apos;s website;</li>
                             <li>Remove any copyright or other proprietary notations from the materials; or</li>
                             <li>Transfer the materials to another person or "mirror" the materials on any other server.</li>
                         </ul>
 
                         <h3 className="text-lg font-semibold text-gray-900">2. Disclaimer</h3>
                         <p>
-                            The materials on KawJaw's website are provided on an 'as is' basis. KawJaw makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.
+                            The materials on Arashi&apos;s website are provided on an &apos;as is&apos; basis. Arashi makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.
                         </p>
 
                         <h3 className="text-lg font-semibold text-gray-900">3. Limitations</h3>
                         <p>
-                            In no event shall KawJaw or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on KawJaw's website, even if KawJaw or a KawJaw authorized representative has been notified orally or in writing of the possibility of such damage.
+                            In no event shall Arashi or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on Arashi&apos;s website, even if Arashi or a Arashi authorized representative has been notified orally or in writing of the possibility of such damage.
                         </p>
 
                         <h3 className="text-lg font-semibold text-gray-900">4. Accuracy of Materials</h3>
                         <p>
-                            The materials appearing on KawJaw's website could include technical, typographical, or photographic errors. KawJaw does not warrant that any of the materials on its website are accurate, complete or current. KawJaw may make changes to the materials contained on its website at any time without notice.
+                            The materials appearing on Arashi&apos;s website could include technical, typographical, or photographic errors. Arashi does not warrant that any of the materials on its website are accurate, complete or current. Arashi may make changes to the materials contained on its website at any time without notice.
                         </p>
                     </div>
                 </div>
@@ -77,7 +77,7 @@ function AboutContent() {
                     <div className="prose prose-gray max-w-none text-gray-600 space-y-4">
                         <p><strong>Last Updated: December 2025</strong></p>
                         <p>
-                            Your privacy is important to us. It is KawJaw's policy to respect your privacy regarding any information we may collect from you across our website.
+                            Your privacy is important to us. It is Arashi&apos;s policy to respect your privacy regarding any information we may collect from you across our website.
                         </p>
 
                         <h3 className="text-lg font-semibold text-gray-900">1. Information We Collect</h3>

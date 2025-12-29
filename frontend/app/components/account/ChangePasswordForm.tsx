@@ -42,35 +42,35 @@ export default function ChangePasswordForm() {
     };
 
     return (
-        <div className="bg-white shadow rounded-lg overflow-hidden mt-8">
-            <div className="px-4 py-5 border-b border-gray-200 sm:px-6">
-                <h3 className="text-lg leading-6 font-medium text-gray-900">Security</h3>
-                <p className="mt-1 text-sm text-gray-500">Update your password.</p>
+        <div className="bg-neutral-900 border border-white/10 skew-box overflow-hidden mt-8">
+            <div className="px-6 py-5 border-b border-white/10 bg-black/20">
+                <h3 className="text-2xl font-black uppercase italic tracking-tighter text-white">Locker Security</h3>
+                <p className="mt-1 text-xs font-bold uppercase tracking-widest text-gray-500">Secure your account access.</p>
             </div>
 
-            <div className="p-6">
+            <div className="px-6 py-8">
                 {message && (
-                    <div className={`mb-4 p-3 rounded-md text-sm ${message.type === "success" ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
+                    <div className={`mb-6 p-4 skew-box text-sm font-bold uppercase tracking-wider ${message.type === "success" ? "bg-accent/10 text-accent border border-accent/20" : "bg-red-900/20 text-red-500 border border-red-900/50"
                         }`}>
                         {message.text}
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
+                <form onSubmit={handleSubmit} className="space-y-6 max-w-lg">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">Current Password</label>
+                        <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Current Password</label>
                         <input
                             type="password"
                             name="old_password"
                             value={formData.old_password}
                             onChange={handleChange}
                             required
-                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            className="w-full px-4 py-3 bg-black border border-white/20 rounded-none text-white font-bold tracking-wide focus:outline-none focus:border-accent skew-box transition-colors"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">New Password</label>
+                        <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">New Password (8+ CHARS)</label>
                         <input
                             type="password"
                             name="new_password"
@@ -78,29 +78,29 @@ export default function ChangePasswordForm() {
                             onChange={handleChange}
                             required
                             minLength={8}
-                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            className="w-full px-4 py-3 bg-black border border-white/20 rounded-none text-white font-bold tracking-wide focus:outline-none focus:border-accent skew-box transition-colors"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">Confirm New Password</label>
+                        <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Confirm New Password</label>
                         <input
                             type="password"
                             name="confirm_new_password"
                             value={formData.confirm_new_password}
                             onChange={handleChange}
                             required
-                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            className="w-full px-4 py-3 bg-black border border-white/20 rounded-none text-white font-bold tracking-wide focus:outline-none focus:border-accent skew-box transition-colors"
                         />
                     </div>
 
-                    <div>
+                    <div className="pt-4">
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-300"
+                            className="btn-primary w-full py-3 text-lg font-black uppercase italic tracking-wider skew-box"
                         >
-                            {isSubmitting ? "Updating..." : "Change Password"}
+                            {isSubmitting ? "Updating..." : "Update Security //"}
                         </button>
                     </div>
                 </form>

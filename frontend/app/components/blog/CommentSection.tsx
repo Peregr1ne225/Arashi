@@ -153,26 +153,28 @@ export default function CommentSection({ postId, postSlug, initialComments = [] 
     };
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="bg-neutral-900 border border-white/10 skew-box overflow-hidden shadow-[0_0_20px_rgba(0,0,0,0.3)]">
             {/* Header */}
-            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                <h3 className="text-lg font-bold text-gray-900">
-                    Comments ({comments.length})
+            <div className="px-6 py-5 border-b border-white/10 flex items-center justify-between bg-black/20">
+                <h3 className="text-xl font-black uppercase italic tracking-tighter text-white">
+                    Locker Room Talk ({comments.length})
                 </h3>
                 {connected && (
-                    <span className="flex items-center gap-1 text-xs text-green-600">
-                        <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                        Live
+                    <span className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-accent">
+                        <span className="w-2 h-2 bg-accent rounded-none skew-box-sm animate-pulse shadow-[0_0_5px_rgba(204,255,0,0.8)]" />
+                        Live Feed
                     </span>
                 )}
             </div>
 
             {/* Comments List */}
-            <div className="max-h-96 overflow-y-auto p-4 space-y-3">
+            <div className="max-h-[500px] overflow-y-auto p-6 space-y-4 no-scrollbar">
                 {comments.length === 0 ? (
-                    <p className="text-center text-gray-500 py-8">
-                        No comments yet. Be the first to comment!
-                    </p>
+                    <div className="text-center py-12 border border-dashed border-white/10 bg-white/5 skew-box">
+                        <p className="text-gray-400 font-bold uppercase tracking-wider text-sm">
+                            No plays called yet. Start the strategy discussion!
+                        </p>
+                    </div>
                 ) : (
                     comments.map((comment) => (
                         <CommentItem
@@ -187,39 +189,39 @@ export default function CommentSection({ postId, postSlug, initialComments = [] 
             </div>
 
             {/* Comment Form */}
-            <div className="p-4 border-t border-gray-100 bg-gray-50">
+            <div className="p-6 border-t border-white/10 bg-black/30">
                 {isAuthenticated ? (
-                    <form onSubmit={handleSubmit} className="space-y-3">
+                    <form onSubmit={handleSubmit} className="space-y-4">
                         {error && (
-                            <div className="text-red-600 text-sm bg-red-50 px-3 py-2 rounded">
+                            <div className="text-red-500 text-xs font-bold uppercase tracking-wider bg-red-900/10 border border-red-900/50 px-3 py-2 skew-box">
                                 {error}
                             </div>
                         )}
 
-                        <div className="flex gap-3">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold flex-shrink-0">
+                        <div className="flex gap-4">
+                            <div className="w-10 h-10 bg-white/10 border border-white/20 flex items-center justify-center text-accent font-black skew-box-sm flex-shrink-0">
                                 {user?.username?.charAt(0).toUpperCase() || "?"}
                             </div>
-                            <div className="flex-1 space-y-2">
+                            <div className="flex-1 space-y-3">
                                 <textarea
                                     value={newComment}
                                     onChange={(e) => setNewComment(e.target.value)}
-                                    placeholder="Write a comment..."
+                                    placeholder="CALL THE NEXT PLAY..."
                                     rows={2}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-sm"
+                                    className="w-full px-4 py-3 bg-black border border-white/20 rounded-none text-white placeholder-gray-600 focus:border-accent focus:ring-1 focus:ring-accent skew-box font-medium uppercase tracking-wide text-sm resize-none transition-all"
                                 />
 
                                 {/* Image Preview */}
                                 {previewUrl && (
-                                    <div className="relative inline-block">
-                                        <img src={previewUrl} alt="Preview" className="h-20 w-auto rounded-lg border border-gray-200" />
+                                    <div className="relative inline-block mt-2">
+                                        <img src={previewUrl} alt="Preview" className="h-24 w-auto border border-white/20 skew-box-sm" />
                                         <button
                                             type="button"
                                             onClick={removeImage}
-                                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-0.5 hover:bg-red-600 shadow-sm"
+                                            className="absolute -top-2 -right-2 bg-red-600 text-white p-1 hover:bg-red-700 skew-box-sm shadow-lg transition-colors"
                                         >
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
                                             </svg>
                                         </button>
                                     </div>
@@ -240,11 +242,11 @@ export default function CommentSection({ postId, postSlug, initialComments = [] 
                                 />
                                 <label
                                     htmlFor="comment-image-upload"
-                                    className="cursor-pointer text-gray-500 hover:text-purple-600 transition-colors p-2 rounded-full hover:bg-purple-50 inline-flex items-center"
+                                    className="cursor-pointer text-gray-500 hover:text-accent transition-colors p-2 inline-flex items-center group"
                                     title="Attach image"
                                 >
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    <svg className="w-5 h-5 group-hover:drop-shadow-[0_0_5px_rgba(204,255,0,0.5)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
                                 </label>
                             </div>
@@ -252,25 +254,25 @@ export default function CommentSection({ postId, postSlug, initialComments = [] 
                             <button
                                 type="submit"
                                 disabled={loading || (!newComment.trim() && !image)}
-                                className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg text-sm font-medium hover:from-purple-700 hover:to-pink-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                className="px-6 py-2 bg-accent text-black font-black uppercase italic tracking-widest text-xs hover:bg-white hover:text-black transition-all skew-box disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-[0_0_10px_rgba(204,255,0,0.2)]"
                             >
                                 {loading ? (
                                     <>
-                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                        <div className="w-3 h-3 border-2 border-black border-t-transparent rounded-full animate-spin" />
                                         Posting...
                                     </>
                                 ) : (
-                                    "Post"
+                                    "Post Comment //"
                                 )}
                             </button>
                         </div>
                     </form>
                 ) : (
-                    <div className="text-center py-4">
-                        <p className="text-gray-600 mb-3">You need to log in to comment</p>
+                    <div className="text-center py-6 border border-dashed border-white/10 bg-white/5 skew-box">
+                        <p className="text-gray-400 mb-4 font-bold uppercase tracking-wider text-xs">Join the locker room discussion</p>
                         <Link
                             href={`/login?redirect=/blogs/${postId}`}
-                            className="inline-block px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg text-sm font-medium hover:from-purple-700 hover:to-pink-700 transition-all"
+                            className="inline-block px-5 py-2 bg-white text-black font-bold uppercase tracking-wider text-xs hover:bg-accent transition-colors skew-box"
                         >
                             Log In to Comment
                         </Link>
@@ -281,23 +283,23 @@ export default function CommentSection({ postId, postSlug, initialComments = [] 
             {/* Image Zoom Modal */}
             {selectedImage && (
                 <div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 transition-all animate-in fade-in"
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-4 transition-all animate-in fade-in"
                     onClick={() => setSelectedImage(null)}
                 >
                     <div className="relative max-w-7xl max-h-[90vh] w-full flex items-center justify-center">
                         <button
                             type="button"
                             onClick={() => setSelectedImage(null)}
-                            className="absolute -top-12 right-0 text-white hover:text-gray-300 transition-colors p-2"
+                            className="absolute -top-12 right-0 text-white hover:text-accent transition-colors p-2"
                         >
                             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
                         <img
                             src={selectedImage}
                             alt="Full size"
-                            className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
+                            className="max-w-full max-h-[85vh] object-contain border border-white/20 skew-box shadow-[0_0_50px_rgba(0,0,0,0.8)]"
                             onClick={(e) => e.stopPropagation()} // Prevent closing when clicking image
                         />
                     </div>

@@ -48,22 +48,22 @@ export default function ProductInfo({
   originalPrice,
 }: ProductInfoProps) {
   return (
-    <div className="p-2 pb-0">
+    <div className="p-3 pb-0">
       {/* Product Name */}
-      <h3 className="text-sm font-semibold text-black line-clamp-2 mb-1 min-h-[2.5em]">
-        <Link href={`/product/${productId}`} className="hover:text-blue-600">
+      <h3 className="text-sm font-bold uppercase italic tracking-wider text-white line-clamp-2 mb-1 min-h-[2.5em]">
+        <Link href={`/product/${productId}`} className="hover:text-accent transition-colors">
           {name}
         </Link>
       </h3>
 
       {/* Rating and Price Stack */}
-      <div className="mt-0.5">
+      <div className="mt-1">
         <RatingStars rating={rating} reviewCount={reviewCount} />
 
-        <div className="flex items-center space-x-1 mt-0.5">
-          <span className={`text-base font-bold ${originalPrice ? "text-red-600" : "text-black"}`}>฿{price}</span>
+        <div className="flex items-center space-x-2 mt-1">
+          <span className={`text-base font-black italic ${originalPrice ? "text-accent" : "text-white"}`}>฿{price}</span>
           {originalPrice && (
-            <span className="text-sm text-gray-400 line-through">
+            <span className="text-sm text-gray-400 line-through decoration-red-500">
               ฿{originalPrice}
             </span>
           )}

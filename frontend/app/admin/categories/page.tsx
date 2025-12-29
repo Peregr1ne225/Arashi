@@ -136,96 +136,113 @@ export default function AdminCategoriesPage() {
 
     return (
         <main className="container mx-auto px-4 py-8 flex-1">
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold">Category Management</h1>
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4 border-b border-white/10 pb-6">
+                <div>
+                    <h1 className="text-3xl font-black uppercase italic tracking-tighter text-white">Category Management</h1>
+                    <p className="text-gray-400 font-bold uppercase tracking-wider text-xs mt-1">Organize Team Divisions</p>
+                </div>
                 <button
                     onClick={() => handleOpenModal()}
-                    className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
+                    className="px-6 py-3 bg-accent text-black font-black uppercase italic tracking-widest hover:bg-white hover:text-black transition-all skew-box shadow-[0_0_15px_rgba(204,255,0,0.3)] text-xs"
                 >
-                    + Create New Category
+                    + New Division
                 </button>
             </div>
 
-            <div className="bg-white shadow-md rounded-lg overflow-hidden">
-                <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                        <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Slug</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Parent</th>
-                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                        {categories.map((category) => (
-                            <tr key={category.id}>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="h-10 w-10 relative bg-gray-100 rounded">
-                                        {category.image && (
-                                            <Image
-                                                src={getImageUrl(category.image)}
-                                                alt={category.name}
-                                                fill
-                                                className="object-cover rounded"
-                                            />
-                                        )}
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4 text-sm font-medium text-gray-900">{category.name}</td>
-                                <td className="px-6 py-4 text-sm text-gray-500">{category.slug}</td>
-                                <td className="px-6 py-4 text-sm text-gray-500">
-                                    {category.parent ? `ID: ${category.parent}` : "-"}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <button
-                                        onClick={() => handleOpenModal(category)}
-                                        className="text-indigo-600 hover:text-indigo-900 mr-4"
-                                    >
-                                        Edit
-                                    </button>
-                                    <button
-                                        onClick={() => handleDelete(category.id)}
-                                        className="text-red-600 hover:text-red-900"
-                                    >
-                                        Delete
-                                    </button>
-                                </td>
+            <div className="bg-neutral-900 border border-white/10 skew-box overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.3)]">
+                <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-white/10">
+                        <thead className="bg-black/40">
+                            <tr>
+                                <th className="px-6 py-4 text-left text-[10px] font-black uppercase italic tracking-widest text-accent">Image</th>
+                                <th className="px-6 py-4 text-left text-[10px] font-black uppercase italic tracking-widest text-accent">Name</th>
+                                <th className="px-6 py-4 text-left text-[10px] font-black uppercase italic tracking-widest text-accent">Slug</th>
+                                <th className="px-6 py-4 text-left text-[10px] font-black uppercase italic tracking-widest text-accent">Parent</th>
+                                <th className="px-6 py-4 text-right text-[10px] font-black uppercase italic tracking-widest text-accent">Actions</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody className="bg-transparent divide-y divide-white/5">
+                            {categories.map((category) => (
+                                <tr key={category.id} className="hover:bg-white/5 transition-colors group">
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <div className="h-10 w-10 relative bg-black/50 skew-box-sm border border-white/10 overflow-hidden">
+                                            {category.image ? (
+                                                <Image
+                                                    src={getImageUrl(category.image)}
+                                                    alt={category.name}
+                                                    fill
+                                                    className="object-cover"
+                                                />
+                                            ) : (
+                                                <div className="flex items-center justify-center h-full text-gray-600 text-[10px]">N/A</div>
+                                            )}
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 text-sm font-bold uppercase tracking-wide text-white group-hover:text-accent transition-colors">{category.name}</td>
+                                    <td className="px-6 py-4 text-xs text-gray-500 font-mono">{category.slug}</td>
+                                    <td className="px-6 py-4 text-xs text-gray-500">
+                                        {category.parent ? <span className="bg-white/10 px-2 py-1 rounded-sm text-white">ID: {category.parent}</span> : "-"}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <div className="flex justify-end gap-3">
+                                            <button
+                                                onClick={() => handleOpenModal(category)}
+                                                className="text-gray-400 hover:text-accent transition-colors"
+                                            >
+                                                <span className="sr-only">Edit</span>
+                                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(category.id)}
+                                                className="text-gray-400 hover:text-red-500 transition-colors"
+                                            >
+                                                <span className="sr-only">Delete</span>
+                                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             {/* Modal */}
             {isModalOpen && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
-                        <div className="p-6">
-                            <h2 className="text-xl font-bold mb-4">
-                                {editingCategory ? "Edit Category" : "Create Category"}
+                <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+                    <div className="bg-neutral-900 border border-white/10 w-full max-w-lg skew-box shadow-2xl relative">
+                        <div className="p-8">
+                            <h2 className="text-2xl font-black uppercase italic tracking-tighter text-white mb-6 border-b border-white/10 pb-4">
+                                {editingCategory ? "Edit Division" : "New Division"}
                             </h2>
-                            <form onSubmit={handleSubmit} className="space-y-4">
+                            <form onSubmit={handleSubmit} className="space-y-6">
                                 {/* Image Upload */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Image</label>
+                                    <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Cover Image</label>
                                     <div
-                                        className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:bg-gray-50"
+                                        className="border-2 border-dashed border-white/20 bg-black/20 hover:bg-white/5 hover:border-accent transition-all cursor-pointer h-40 flex flex-col items-center justify-center group skew-box-sm relative overflow-hidden"
                                         onClick={() => fileInputRef.current?.click()}
                                     >
                                         {imagePreview ? (
-                                            <div className="relative h-32 w-full">
+                                            <div className="relative h-full w-full">
                                                 <Image
                                                     src={imagePreview}
                                                     alt="Preview"
                                                     fill
-                                                    className="object-contain"
+                                                    className="object-cover opacity-50 group-hover:opacity-100 transition-opacity"
                                                 />
+                                                <div className="absolute inset-0 flex items-center justify-center">
+                                                    <span className="bg-black/50 text-white px-2 py-1 text-xs font-bold uppercase tracking-wider backdrop-blur-sm">Change Image</span>
+                                                </div>
                                             </div>
                                         ) : (
-                                            <div className="text-gray-500 text-sm">
-                                                <p>Click to upload</p>
-                                            </div>
+                                            <>
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-500 group-hover:text-accent transition-colors mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                                </svg>
+                                                <span className="text-xs font-bold uppercase tracking-wider text-gray-500 group-hover:text-white transition-colors">Select Visual //</span>
+                                            </>
                                         )}
                                         <input
                                             type="file"
@@ -238,58 +255,65 @@ export default function AdminCategoriesPage() {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">Name</label>
+                                    <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Name</label>
                                     <input
                                         type="text"
                                         required
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2"
+                                        className="w-full px-4 py-3 bg-black border border-white/20 text-white focus:border-accent focus:ring-1 focus:ring-accent skew-box font-bold uppercase tracking-wide outline-none transition-all"
+                                        placeholder="DIVISION NAME..."
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">Description</label>
+                                    <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Description</label>
                                     <textarea
                                         value={description}
                                         onChange={(e) => setDescription(e.target.value)}
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2"
-                                        rows={2}
+                                        className="w-full px-4 py-3 bg-black border border-white/20 text-white placeholder-gray-600 focus:border-accent focus:ring-1 focus:ring-accent skew-box font-medium text-sm leading-relaxed outline-none transition-all resize-none"
+                                        rows={3}
+                                        placeholder="Brief description..."
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">Parent Category</label>
-                                    <select
-                                        value={parentId}
-                                        onChange={(e) => setParentId(e.target.value)}
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2"
-                                    >
-                                        <option value="">None (Top Level)</option>
-                                        {categories
-                                            .filter(c => c.id !== editingCategory?.id) // Prevent selecting self as parent
-                                            .map((cat) => (
-                                                <option key={cat.id} value={cat.id}>
-                                                    {cat.name}
-                                                </option>
-                                            ))}
-                                    </select>
+                                    <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Parent Division</label>
+                                    <div className="relative">
+                                        <select
+                                            value={parentId}
+                                            onChange={(e) => setParentId(e.target.value)}
+                                            className="w-full px-4 py-3 bg-black border border-white/20 text-white focus:border-accent focus:ring-1 focus:ring-accent skew-box font-bold uppercase tracking-wide outline-none appearance-none transition-all custom-select"
+                                        >
+                                            <option value="">None (Top Level)</option>
+                                            {categories
+                                                .filter(c => c.id !== editingCategory?.id)
+                                                .map((cat) => (
+                                                    <option key={cat.id} value={cat.id}>
+                                                        {cat.name}
+                                                    </option>
+                                                ))}
+                                        </select>
+                                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-accent">
+                                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 9l-7 7-7-7" /></svg>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <div className="flex justify-end space-x-2 pt-4 border-t mt-4">
+                                <div className="flex justify-end gap-3 pt-6 border-t border-white/10">
                                     <button
                                         type="button"
                                         onClick={() => setIsModalOpen(false)}
-                                        className="bg-white py-2 px-4 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                                        className="px-6 py-2 bg-transparent border border-white/20 text-white hover:bg-white/5 transition-colors skew-box font-bold uppercase tracking-wider text-xs"
                                     >
                                         Cancel
                                     </button>
                                     <button
                                         type="submit"
                                         disabled={isSubmitting}
-                                        className="bg-blue-600 py-2 px-4 rounded-md text-white hover:bg-blue-700 disabled:opacity-50"
+                                        className="px-8 py-2 bg-accent text-black font-black uppercase italic tracking-widest hover:bg-white hover:text-black transition-all skew-box shadow-[0_0_15px_rgba(204,255,0,0.4)] text-xs disabled:opacity-50"
                                     >
-                                        {isSubmitting ? "Saving..." : "Save"}
+                                        {isSubmitting ? "SAVING..." : "SAVE"}
                                     </button>
                                 </div>
                             </form>

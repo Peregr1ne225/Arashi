@@ -76,24 +76,43 @@ export default function AdminDashboard() {
     ];
 
     return (
-        <main className="container mx-auto px-4 py-8 flex-1">
-            <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
-            <p className="text-gray-600 mb-8">Welcome back, {user?.username}!</p>
+        <main className="container mx-auto px-4 py-12 flex-1">
+            <div className="mb-12 border-b border-white/10 pb-8">
+                <h1 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter text-white mb-2">
+                    Locker Room // <span className="text-accent">Admin</span>
+                </h1>
+                <p className="text-gray-400 font-bold uppercase tracking-wider">
+                    Welcome back, Coach {user?.username}. Manage the team assets.
+                </p>
+            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {sections.map((section) => (
                     <Link
                         key={section.title}
                         href={section.href}
-                        className={`block p-6 rounded-lg border-2 transition-all duration-200 ${section.color}`}
+                        className={`block p-8 border border-white/10 bg-neutral-900 skew-box group relative overflow-hidden transition-all duration-300 hover:border-accent hover:shadow-[0_0_20px_rgba(204,255,0,0.2)] ${section.href === '#' ? 'opacity-50 grayscale cursor-not-allowed pointer-events-none' : ''}`}
                     >
-                        <div className="flex items-center space-x-4 mb-4">
-                            <div className="p-3 bg-white rounded-full shadow-sm">
+                        {/* Hover Overlay */}
+                        <div className="absolute inset-0 bg-accent/5 translate-y-full group-hover:translate-y-0 transition-transform duration-300 pointer-events-none" />
+
+                        <div className="flex items-start justify-between mb-8 relative z-10">
+                            <div className="p-4 bg-black border border-white/20 skew-box-sm text-accent group-hover:bg-accent group-hover:text-black transition-colors">
                                 {section.icon}
                             </div>
-                            <h2 className="text-xl font-semibold text-gray-900">{section.title}</h2>
+                            <span className="text-xs font-black uppercase italic tracking-widest text-white/30 group-hover:text-accent transition-colors">
+                                Access //
+                            </span>
                         </div>
-                        <p className="text-gray-600">{section.description}</p>
+
+                        <div className="relative z-10">
+                            <h2 className="text-2xl font-black uppercase italic tracking-tighter text-white mb-4 group-hover:text-accent transition-colors">
+                                {section.title}
+                            </h2>
+                            <p className="text-gray-400 font-medium text-sm leading-relaxed group-hover:text-gray-300 transition-colors">
+                                {section.description}
+                            </p>
+                        </div>
                     </Link>
                 ))}
             </div>

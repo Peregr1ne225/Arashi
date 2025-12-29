@@ -19,19 +19,19 @@ export default function ProductDetail({ product }: ProductDetailProps) {
   return (
     <div className="container mx-auto px-4 md:px-8 py-8 md:py-12 max-w-7xl">
       {/* Breadcrumb */}
-      <nav className="flex items-center text-sm font-medium text-gray-500 mb-8 overflow-x-auto whitespace-nowrap pb-2">
-        <Link href="/" className="hover:text-black transition-colors">
+      <nav className="flex items-center text-sm font-bold uppercase tracking-widest text-gray-500 mb-8 overflow-x-auto whitespace-nowrap pb-2">
+        <Link href="/" className="hover:text-accent transition-colors">
           Home
         </Link>
-        <span className="mx-3 text-gray-300">/</span>
+        <span className="mx-3 text-white/20">/</span>
         <Link
-          href={`/category/${product.category?.slug || product.category?.id || ""}`}
-          className="hover:text-black transition-colors capitalize"
+          href={`/products?category=${product.category?.slug || product.category?.id || ""}`}
+          className="hover:text-accent transition-colors"
         >
           {getCategoryName()}
         </Link>
-        <span className="mx-3 text-gray-300">/</span>
-        <span className="text-black truncate">{product.name}</span>
+        <span className="mx-3 text-white/20">/</span>
+        <span className="text-white truncate">{product.name}</span>
       </nav>
 
       {/* Main Grid Layout */}

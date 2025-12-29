@@ -128,11 +128,11 @@ export default function NewArrivalsContent({ initialProducts, initialCount }: Ne
             {/* Products */}
             <div className="flex-1">
                 {/* Header */}
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-                    <h2 className="text-2xl font-bold text-black">New Arrivals</h2>
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 border-b border-white/10 pb-4">
+                    <h2 className="text-2xl font-black uppercase italic tracking-tighter text-white">Full Roster</h2>
                     <div className="flex items-center">
-                        <span className="text-sm text-gray-600 mr-2">
-                            {total} products
+                        <span className="text-xs font-bold uppercase tracking-widest text-accent mr-2">
+                            {total} units
                         </span>
                     </div>
                 </div>
@@ -146,9 +146,9 @@ export default function NewArrivalsContent({ initialProducts, initialCount }: Ne
                         <button
                             onClick={handleLoadMore}
                             disabled={loading}
-                            className="bg-white border border-gray-300 text-gray-700 py-2 px-8 rounded-full hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                            className="px-8 py-3 bg-accent text-black font-black uppercase italic tracking-widest hover:bg-white hover:text-black transition-all skew-box shadow-[0_0_15px_rgba(204,255,0,0.4)] text-sm disabled:opacity-50"
                         >
-                            {loading ? "Loading..." : "Load More"}
+                            {loading ? "LOADING..." : "LOAD MORE"}
                         </button>
                     </div>
                 )}

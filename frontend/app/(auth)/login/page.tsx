@@ -9,15 +9,24 @@ function LoginContent() {
   const redirectUrl = searchParams.get("redirect") || "/";
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
-      <div className="w-full max-w-md space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
-            Sign in to your account
+    <div className="flex min-h-screen flex-col items-center justify-center p-4 bg-background relative overflow-hidden">
+      {/* Background Texture */}
+      <div className="absolute inset-0 bg-[url('/grid-pattern.png')] opacity-10 pointer-events-none"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black pointer-events-none"></div>
+
+      <div className="w-full max-w-md space-y-8 relative z-10">
+        <div className="text-center">
+          <h2 className="text-5xl font-black uppercase italic tracking-tighter text-white mb-2 drop-shadow-lg">
+            Member <span className="text-accent text-outline">Login</span>
           </h2>
+          <p className="text-gray-400 font-bold uppercase tracking-widest text-sm">
+            Access your locker
+          </p>
         </div>
 
-        <LoginForm redirectTo={redirectUrl} />
+        <div className="bg-neutral-900/80 backdrop-blur-md p-8 border border-white/10 skew-box">
+          <LoginForm redirectTo={redirectUrl} />
+        </div>
       </div>
     </div>
   );
