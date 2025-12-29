@@ -80,7 +80,7 @@ export default function ProductImage({
         <div className="aspect-w-3 aspect-h-4 w-full overflow-hidden relative">
           {/* Primary Image */}
           <Image
-            src={getImageUrl(images[0])}
+            src={getImageUrl(images[0]) || "/placeholder-product.svg"}
             alt={`Product ${productId}`}
             width={500}
             height={650}
@@ -111,13 +111,6 @@ export default function ProductImage({
 
       {/* Bestseller Badge */}
       {isBestseller && <BestsellerBadge />}
-
-      {/* Quick Actions */}
-      {/* <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-75 text-white p-2 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-        <div className="flex justify-around">
-          <WishlistButton productId={productId} />
-        </div>
-      </div> */}
     </div>
   );
 }
