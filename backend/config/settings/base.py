@@ -55,7 +55,7 @@ INSTALLED_APPS = [
     # Third party apps
     "rest_framework",
     "corsheaders",
-    "channels",
+    # "channels",
     # Local apps
     "apps.products",
     "apps.catalog",
@@ -204,14 +204,14 @@ CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
 # CORS_ALLOW_ALL_ORIGINS = True
 
 # Django Channels configuration
-ASGI_APPLICATION = "config.asgi.application"
+# ASGI_APPLICATION = "config.asgi.application"
 
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [(env("REDIS_HOST", default="redis"), env.int("REDIS_PORT", default=6379))],
-        },
-    },
-}
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels_redis.core.RedisChannelLayer",
+#         "CONFIG": {
+#             "hosts": [(env("REDIS_HOST", default="redis"), env.int("REDIS_PORT", default=6379))],
+#         },
+#     },
+# }
 
