@@ -21,11 +21,14 @@ fi
 echo "Running migrations..."
 uv run python manage.py migrate --noinput
 
-# Collect static files
-echo "Collecting static files..."
-uv run python manage.py collectstatic --noinput
-
-# Start Daphne (ASGI)
+# Start Gunicorn (WSGI/ASGI with Uvicorn workers)
 # We bind to 0.0.0.0:8000
-echo "Starting Daphne..."
-exec uv run daphne -b 0.0.0.0 -p 8000 config.asgi:application
+echo "Starting Gunicorn..."
+exec uv run gunicorn config.wsgi:application \
+    --bind 0.0.0.0:8000 \
+    --workers 4 \
+    --worker-class gthread \
+    --threads 4 \
+    --timeout 120 \
+    --access-logfile - \
+    --error-logfile -

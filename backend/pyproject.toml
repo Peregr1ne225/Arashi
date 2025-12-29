@@ -16,5 +16,7 @@ dependencies = [
     "requests>=2.31.0",
     "google-genai>=0.2.0",
     "stripe>=11.1.0",
-    "whitenoise>=6.5.0"
+    "whitenoise>=6.5.0",
+    "gunicorn>=23.0.0",
+    "uvicorn>=0.34.0"
 ]
