@@ -7,6 +7,10 @@ from .models import Product, ProductImage
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(
+        use_url=True
+    )  # Return full URL instead of relative path
+
     class Meta:
         model = ProductImage
         fields = ["id", "image", "display_order"]
@@ -16,15 +20,17 @@ class ProductSerializer(serializers.ModelSerializer):
     category = SimpleCategorySerializer(read_only=True)
     category_id = serializers.IntegerField(write_only=True)
     discounted_price = serializers.SerializerMethodField()
-    
+
     # Nested images for reading
     images = ProductImageSerializer(many=True, read_only=True)
-    
+
     # Field for uploading multiple images (write-only)
     uploaded_images = serializers.ListField(
-        child=serializers.ImageField(max_length=1000000, allow_empty_file=False, use_url=False),
+        child=serializers.ImageField(
+            max_length=1000000, allow_empty_file=False, use_url=False
+        ),
         write_only=True,
-        required=False
+        required=False,
     )
 
     # Backward compatibility field (read-only)
@@ -52,7 +58,14 @@ class ProductSerializer(serializers.ModelSerializer):
             "rating",
             "review_count",
         ]
-        read_only_fields = ["id", "created_at", "updated_at", "sold_count", "rating", "review_count"]
+        read_only_fields = [
+            "id",
+            "created_at",
+            "updated_at",
+            "sold_count",
+            "rating",
+            "review_count",
+        ]
 
     def get_main_image(self, obj):
         if obj.main_image:
@@ -87,47 +100,59 @@ class ProductSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         uploaded_images = validated_data.pop("uploaded_images", [])
         product = super().create(validated_data)
-        
+
         # Create ProductImage entries
         for index, image in enumerate(uploaded_images):
-            ProductImage.objects.create(product=product, image=image, display_order=index)
-            
+            ProductImage.objects.create(
+                product=product, image=image, display_order=index
+            )
+
         return product
 
     def update(self, instance, validated_data):
         uploaded_images = validated_data.pop("uploaded_images", [])
         product = super().update(instance, validated_data)
-        
+
         # Append new images if any
         if uploaded_images:
             current_count = instance.images.count()
             for index, image in enumerate(uploaded_images):
                 ProductImage.objects.create(
-                    product=product, 
-                    image=image, 
-                    display_order=current_count + index
+                    product=product, image=image, display_order=current_count + index
                 )
-                
+
         return product
 
 
 class ProductDetailSerializer(ProductSerializer):
     """Detailed serializer for single product view with additional fields if needed"""
+
     pass
 
 
-from .models import ProductReview
 from apps.orders.models import Order
 
+from .models import ProductReview
+
+
 class ProductReviewSerializer(serializers.ModelSerializer):
-    user_username = serializers.ReadOnlyField(source='user.username')
+    user_username = serializers.ReadOnlyField(source="user.username")
     order = serializers.PrimaryKeyRelatedField(queryset=Order.objects.all())
 
     class Meta:
         model = ProductReview
-        fields = ['id', 'user', 'user_username', 'product', 'order', 'rating', 'comment', 'created_at']
-        read_only_fields = ['id', 'user', 'created_at']
-        
+        fields = [
+            "id",
+            "user",
+            "user_username",
+            "product",
+            "order",
+            "rating",
+            "comment",
+            "created_at",
+        ]
+        read_only_fields = ["id", "user", "created_at"]
+
     def validate_rating(self, value):
         if not (1 <= value <= 5):
             raise serializers.ValidationError("Rating must be between 1 and 5.")

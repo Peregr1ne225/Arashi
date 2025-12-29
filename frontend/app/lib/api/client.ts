@@ -5,7 +5,7 @@ import {
   CategoryListResponse,
   SearchParams,
 } from "@/app/types";
-import { api } from "../api";
+import { api } from "../api/index";
 
 /**
  * API client with Next.js caching options
@@ -63,12 +63,14 @@ export const categoriesApi = {
   /**
    * Get all categories
    */
-  async getCategories(config: { revalidate?: number } = {}): Promise<Category[]> {
+  async getCategories(
+    config: { revalidate?: number } = {},
+  ): Promise<Category[]> {
     return cachedApiFetch<CategoryListResponse>("/categories/", {
       revalidate: config.revalidate ?? 3600, // Default 1 hour
       tags: ["categories"],
     }).then((res: any) => {
-      const categories = Array.isArray(res) ? res : (res.results || []);
+      const categories = Array.isArray(res) ? res : res.results || [];
 
       // Add fallback slug for categories that don't have one
       const processedCategories = categories.map((category: Category) => ({
@@ -156,7 +158,6 @@ export const categoriesApi = {
  * Products API client
  */
 
-
 /**
  * Products API client
  */
@@ -184,7 +185,7 @@ export function mapProducts(products: any[]): Product[] {
     // product.images is now an array of objects: [{id, image, display_order}, ...]
     if (Array.isArray(product.images)) {
       imageUrls = product.images.map((img: any) =>
-        typeof img === "object" && img.image ? img.image : img
+        typeof img === "object" && img.image ? img.image : img,
       );
     }
 
@@ -243,7 +244,35 @@ export const productsApi = {
   async createProduct(data: FormData | any): Promise<Product> {
     const response = await api.post("/products/", data);
     if (!response.ok) {
-      throw new Error("Failed to create product");
+      // Parse error response for detailed information
+      let errorData;
+      let rawText = "";
+
+      try {
+        // Try to parse as JSON first
+        errorData = await response.json();
+      } catch (e) {
+        // If JSON fails, get raw text
+        try {
+          rawText = await response.text();
+          console.error("Non-JSON error response:", rawText);
+          errorData = {
+            detail: `Server error (400): ${rawText.substring(0, 200)}${rawText.length > 200 ? "..." : ""}`,
+          };
+        } catch (textError) {
+          errorData = { detail: "Failed to parse error response" };
+        }
+      }
+
+      // Create enhanced error with response details
+      const error: any = new Error(
+        errorData.detail || errorData.message || "Failed to create product",
+      );
+      error.response = response;
+      error.data = errorData;
+      error.status = response.status;
+      error.rawText = rawText;
+      throw error;
     }
     return response.json();
   },
@@ -271,7 +300,10 @@ export const productsApi = {
   /**
    * Get a list of products with optional filtering
    */
-  async getProducts(params: SearchParams = {}, config: { revalidate?: number } = {}): Promise<ProductListResponse> {
+  async getProducts(
+    params: SearchParams = {},
+    config: { revalidate?: number } = {},
+  ): Promise<ProductListResponse> {
     const searchParams = new URLSearchParams();
 
     // Special handling for category_slug parameter
@@ -326,7 +358,7 @@ export const productsApi = {
             count: response.length,
             next: null,
             previous: null,
-            results: mapProducts(response)
+            results: mapProducts(response),
           };
         }
         response.results = [];
@@ -336,7 +368,6 @@ export const productsApi = {
       response.results = mapProducts(response.results);
       return response;
     });
-
   },
 
   /**
@@ -348,7 +379,7 @@ export const productsApi = {
     return cachedApiFetch<Product[]>(endpoint, {
       revalidate: 3600, // 1 hour
       tags: ["products", "featured"],
-    }).then(products => mapProducts(products));
+    }).then((products) => mapProducts(products));
   },
 
   /**
@@ -437,7 +468,11 @@ export const productsApi = {
   /**
    * Get product statistics (min/max price) for current filters
    */
-  async getProductStats(params: SearchParams = {}): Promise<{ min_price: number; max_price: number; category_ids?: number[] }> {
+  async getProductStats(params: SearchParams = {}): Promise<{
+    min_price: number;
+    max_price: number;
+    category_ids?: number[];
+  }> {
     const searchParams = new URLSearchParams();
     Object.entries(params).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
@@ -445,10 +480,25 @@ export const productsApi = {
       }
     });
 
-    return cachedApiFetch<{ min_price: number; max_price: number; category_ids: number[] }>(`/products/stats/?${searchParams.toString()}`, {
+    return cachedApiFetch<{
+      min_price: number;
+      max_price: number;
+      category_ids?: number[];
+    }>(`/products/stats/?${searchParams.toString()}`, {
       revalidate: 60, // Cache stats for 1 minute
       tags: ["products-stats"],
     });
+  },
+
+  /**
+   * Health check - verify backend connection
+   */
+  async healthCheck(): Promise<{ status: string; message: string }> {
+    const response = await api.get("/health/");
+    if (!response.ok) {
+      throw new Error("Backend health check failed");
+    }
+    return response.json();
   },
 };
 
@@ -467,7 +517,7 @@ export const reviewsApi = {
       // If it's a list of errors (validation errors), join them
       const messages = Object.values(errorData).flat();
       if (messages.length > 0) {
-        throw new Error(messages.join(', ') as string);
+        throw new Error(messages.join(", ") as string);
       }
       throw new Error("Failed to submit review");
     }

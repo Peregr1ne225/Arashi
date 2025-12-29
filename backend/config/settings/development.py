@@ -31,14 +31,17 @@ ALLOWED_HOSTS = ["*"]
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 # CORS settings for development with Next.js frontend - override from environment
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = False  # Must be False when using credentials mode
 CORS_ALLOWED_ORIGINS = env.list(
     "CORS_ALLOWED_ORIGINS",
     default=[
         "http://localhost:3000",
         "http://127.0.0.1:3000",
+        "http://localhost:8000",  # For direct backend access
+        "http://127.0.0.1:8000",  # For direct backend access
     ],
 )
+CORS_ALLOW_CREDENTIALS = True  # Required for cookies/auth
 
 # CSRF settings - override from environment
 CSRF_TRUSTED_ORIGINS = env.list(
@@ -46,7 +49,7 @@ CSRF_TRUSTED_ORIGINS = env.list(
     default=[
         "http://localhost:3000",
         "http://127.0.0.1:3000",
-        "https://*.ngrok-free.app", 
+        "https://*.ngrok-free.app",
     ],
 )
 

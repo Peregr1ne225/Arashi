@@ -1,44 +1,68 @@
 /**
  * Normalizes an image URL to ensure it points to the correct backend location.
- * If the path starts with '/', it prepends the backend API base URL.
- * Otherwise, it returns the path as is (assuming it's already absolute or external).
+ *
+ * This utility function handles different URL formats:
+ * 1. Static assets (placeholders) - returned as-is
+ * 2. Absolute URLs (http/https) - returned with Docker hostname fixes
+ * 3. Relative backend paths (/media/*) - handled by Next.js proxy
+ * 4. Relative API paths (/api/*) - prepended with backend base URL
+ *
+ * @param path - The image URL path to normalize. Can be null, undefined, or a string.
+ * @returns Normalized image URL as a string.
  */
 export const getImageUrl = (path: string | null | undefined): string => {
-    if (!path) return "/placeholder-product.svg";
+  // Guard clause: Handle null, undefined, or non-string values
+  if (!path || typeof path !== "string") {
+    return "/placeholder-product.svg";
+  }
 
-    // STAGE 1: Handle static assets (placeholder)
-    // If it's a known static asset, return as is (relative to frontend root)
-    if (path === "/placeholder-product.jpg" || path === "/placeholder.jpg" || path === "/placeholder-product.svg") {
-        return path;
-    }
-
-    // STAGE 2: Handle absolute URLs
-    if (path.startsWith("http://") || path.startsWith("https://")) {
-        // Fix for Docker networking issue: client cannot resolve 'backend' hostname
-        return path.replace("http://backend:8000", "http://localhost:8000");
-    }
-
-    // STAGE 3: Handle relative backend paths
-    // If path starts with /, assume it's relative to the backend ROOT (not API root)
-    if (path.startsWith("/")) {
-        // If it's a media path, let Next.js proxy handle it (don't prepend backend URL)
-        if (path.startsWith("/media/")) {
-            return path;
-        }
-
-        let backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-
-        // Strip '/api/v1' or '/api' suffixes to get the root URL
-        // e.g. 'http://localhost:8000/api/v1' -> 'http://localhost:8000'
-        backendUrl = backendUrl.replace(/\/api\/v1\/?$/, "").replace(/\/api\/?$/, "");
-
-        // Remove trailing slash if present to avoid double slashes
-        if (backendUrl.endsWith("/")) {
-            backendUrl = backendUrl.slice(0, -1);
-        }
-
-        return `${backendUrl}${path}`;
-    }
-
+  // STAGE 1: Handle static assets (placeholders)
+  // Known static assets should be returned relative to frontend root
+  if (
+    path === "/placeholder-product.jpg" ||
+    path === "/placeholder.jpg" ||
+    path === "/placeholder-product.svg"
+  ) {
     return path;
+  }
+
+  // STAGE 2: Handle absolute URLs (http:// or https://)
+  // For absolute URLs, only fix Docker hostname issues
+  if (path.startsWith("http://") || path.startsWith("https://")) {
+    // Fix for Docker networking: client cannot resolve 'backend' hostname
+    // Replace internal Docker hostname with localhost for development
+    return path.replace("http://backend:8000", "http://localhost:8000");
+  }
+
+  // STAGE 3: Handle relative backend paths starting with '/'
+  // If path starts with '/', it's a relative path to backend
+  if (path.startsWith("/")) {
+    // Media files should go through Next.js proxy (no backend URL needed)
+    // This allows caching and proper handling in both dev and production
+    if (path.startsWith("/media/")) {
+      return path;
+    }
+
+    // API paths need the backend base URL prepended
+    // Get backend URL from environment or use localhost as fallback
+    const backendUrl =
+      process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+    // Strip '/api/v1' or '/api' suffix to get the root URL
+    // This prevents duplicate paths like: http://localhost:8000/api/v1/api/v1/products
+    let normalizedBackendUrl = backendUrl
+      .replace(/\/api\/v1\/?$/, "")
+      .replace(/\/api\/?$/, "");
+
+    // Remove trailing slash if present to avoid double slashes when concatenating
+    if (normalizedBackendUrl.endsWith("/")) {
+      normalizedBackendUrl = normalizedBackendUrl.slice(0, -1);
+    }
+
+    // Concatenate backend URL with the relative path
+    return `${normalizedBackendUrl}${path}`;
+  }
+
+  // Fallback: Return path as-is for any other format
+  return path;
 };
