@@ -1,0 +1,84 @@
+services:
+  backend:
+    build: ./backend
+    container_name: django_backend_dev
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app # Hot reloading
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.development
+      - PYTHONUNBUFFERED=1
+      # Local DB
+      - SQL_ENGINE=django.db.backends.postgresql
+      - SQL_DATABASE=app_db
+      - SQL_USER=${POSTGRES_USER}
+      - SQL_PASSWORD=${POSTGRES_PASSWORD}
+      - SQL_HOST=db
+      - SQL_PORT=5432
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    container_name: nextjs_frontend_dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app # Hot reloading
+      - /app/node_modules # Prevent host node_modules clashing
+      - /app/.next # Persist build cache
+    environment:
+      - NEXT_PRIVATE_TURBOPACK=true
+      - WATCHPACK_POLLING=true
+      - INTERNAL_API_URL=http://backend:8000/api/v1
+      - NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1 # Browser accesses backend locally
+    depends_on:
+      - backend
+
+  db:
+    image: postgres:15-alpine
+    container_name: postgres_db_dev
+    environment:
+      - POSTGRES_DB=app_db
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d app_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis_cache_dev
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: ngrok_main_dev
+    depends_on:
+      - backend
+      - frontend
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+    volumes:
+      - ./ngrok.yml:/etc/ngrok.yml
+    command: "start --all --config /etc/ngrok.yml"
+    ports:
+      - "4040:4040"
+
+volumes:
+  postgres_data:
+  redis_data:

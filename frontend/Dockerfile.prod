@@ -1,0 +1,52 @@
+# Stage 1: Install dependencies
+FROM oven/bun:alpine AS deps
+WORKDIR /app
+
+# Copy package files
+COPY package.json bun.lock ./
+
+# Install dependencies
+RUN bun install
+
+# Stage 2: Build the app
+FROM oven/bun:alpine AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+# Set environment variables for build
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
+# Next.js requires NEXT_PUBLIC_ variables at build time
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
+# Run build
+RUN bun run build
+
+# Stage 3: Runner
+# Stage 3: Runner
+FROM oven/bun:alpine AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Bun image comes with a "bun" user
+# We'll use that instead of creating a new one
+
+# Copy necessary files from builder
+# Next.js standalone build automatically isolates dependencies
+COPY --from=builder /app/public ./public
+# Set permission for bun user
+COPY --from=builder --chown=bun:bun /app/.next/standalone ./
+COPY --from=builder --chown=bun:bun /app/.next/static ./.next/static
+
+USER bun
+
+EXPOSE 3000
+
+ENV PORT=3000
+
+# CMD to start the standalone server
+CMD ["bun", "server.js"]

@@ -1,0 +1,38 @@
+# General
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+.zed/
+.ropeproject/
+
+# Python / Backend
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+*.sqlite3
+*.log
+local_settings.py
+.env
+plans/
+
+# Frontend (Next.js / Node)
+node_modules/
+.next/
+build/
+out/
+.vercel/
+coverage/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.bun/
+
+# Docker
+.docker/
