@@ -34,9 +34,13 @@ export default function ProductForm({
     ); // Handle both flat ID and nested object
 
     // Image State
-    const [existingImages, setExistingImages] = useState<string[]>(
-        initialData?.images || (initialData?.image ? [initialData.image] : [])
+    // Format: { id?: number, url: string }
+    const [existingImages, setExistingImages] = useState<{ id?: number; url: string }[]>(
+        initialData?.images_data?.map(img => ({ id: img.id, url: img.image })) ||
+        (initialData?.images?.map(url => ({ url })) || []) ||
+        (initialData?.image ? [{ url: initialData.image }] : [])
     );
+    const [deletedImageIds, setDeletedImageIds] = useState<number[]>([]);
     const [newFiles, setNewFiles] = useState<File[]>([]);
     const [newPreviews, setNewPreviews] = useState<string[]>([]);
 
@@ -52,7 +56,12 @@ export default function ProductForm({
                 initialData.category_id?.toString() ||
                 (initialData.category?.id?.toString() || "")
             );
-            setExistingImages(initialData.images || (initialData.image ? [initialData.image] : []));
+            setExistingImages(
+                initialData.images_data?.map(img => ({ id: img.id, url: img.image })) ||
+                (initialData?.images?.map(url => ({ url })) || []) ||
+                (initialData?.image ? [{ url: initialData.image }] : [])
+            );
+            setDeletedImageIds([]);
             setNewFiles([]);
             setNewPreviews([]);
         } else {
@@ -64,6 +73,7 @@ export default function ProductForm({
             setStock("");
             setCategoryId("");
             setExistingImages([]);
+            setDeletedImageIds([]);
             setNewFiles([]);
             setNewPreviews([]);
         }
@@ -90,6 +100,15 @@ export default function ProductForm({
         });
     };
 
+    // Remove existing image
+    const removeExistingImage = (index: number) => {
+        const image = existingImages[index];
+        if (image.id) {
+            setDeletedImageIds(prev => [...prev, image.id!]);
+        }
+        setExistingImages(prev => prev.filter((_, i) => i !== index));
+    };
+
     // Note: We don't implement removing existing images (from backend) in this form yet
     // because API requires a separate endpoint or complex logic (delete vs update).
     // For now, only adding new images is supported.
@@ -114,6 +133,11 @@ export default function ProductForm({
             formData.append("uploaded_images", file);
         });
 
+        // Append deleted image IDs
+        deletedImageIds.forEach((id) => {
+            formData.append("deleted_image_ids", id.toString());
+        });
+
         await onSubmit(formData);
     };
 
@@ -128,10 +152,10 @@ export default function ProductForm({
                 {/* Image Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                     {/* Existing Images */}
-                    {existingImages.map((url, index) => (
-                        <div key={`existing-${index}`} className="relative h-32 w-full border border-white/20 skew-box-sm overflow-hidden group">
+                    {existingImages.map((img, index) => (
+                        <div key={`existing-${img.url || index}`} className="relative h-32 w-full border border-white/20 skew-box-sm overflow-hidden group">
                             <Image
-                                src={getImageUrl(url)}
+                                src={getImageUrl(img.url)}
                                 alt={`Existing ${index}`}
                                 fill
                                 className="object-cover transition-transform duration-500 group-hover:scale-110"
@@ -139,6 +163,17 @@ export default function ProductForm({
                             <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                 <span className="text-white text-xs font-bold uppercase tracking-wider">Existing</span>
                             </div>
+                            {img.id && (
+                                <button
+                                    type="button"
+                                    onClick={() => removeExistingImage(index)}
+                                    className="absolute top-1 right-1 bg-red-600 text-white p-1 hover:bg-red-700 transition-colors z-10 skew-box-sm opacity-0 group-hover:opacity-100"
+                                >
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            )}
                         </div>
                     ))}
 

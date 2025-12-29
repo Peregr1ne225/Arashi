@@ -25,6 +25,7 @@ export interface Product {
   sizes?: string[];
   subcategory?: string;
   images: string[];         // Array of image URLs
+  images_data?: { id: number; image: string; display_order: number }[]; // Full image data with IDs
 }
 
 export interface Category {

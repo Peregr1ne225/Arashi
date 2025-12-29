@@ -33,6 +33,12 @@ class ProductSerializer(serializers.ModelSerializer):
         required=False,
     )
 
+    deleted_image_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        write_only=True,
+        required=False
+    )
+
     # Backward compatibility field (read-only)
     main_image = serializers.SerializerMethodField()
 
@@ -48,6 +54,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "stock",
             "images",
             "uploaded_images",
+            "deleted_image_ids",
             "main_image",
             "category",
             "category_id",
@@ -99,6 +106,9 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         uploaded_images = validated_data.pop("uploaded_images", [])
+        # Remove deleted_image_ids if present (not used in create)
+        validated_data.pop("deleted_image_ids", None)
+        
         product = super().create(validated_data)
 
         # Create ProductImage entries
@@ -111,10 +121,21 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         uploaded_images = validated_data.pop("uploaded_images", [])
+        deleted_image_ids = validated_data.pop("deleted_image_ids", [])
+        
         product = super().update(instance, validated_data)
+
+        # Handle deletions first
+        if deleted_image_ids:
+            # Only delete images belonging to this product
+            ProductImage.objects.filter(
+                product=product, 
+                id__in=deleted_image_ids
+            ).delete()
 
         # Append new images if any
         if uploaded_images:
+            # Re-count after deletion
             current_count = instance.images.count()
             for index, image in enumerate(uploaded_images):
                 ProductImage.objects.create(

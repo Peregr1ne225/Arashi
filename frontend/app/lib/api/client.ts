@@ -223,6 +223,7 @@ export function mapProducts(products: any[]): Product[] {
       // Deprecated field
       image_url: mainImage,
       images: imageUrls,
+      images_data: Array.isArray(product.images) ? product.images : [],
 
       // Add default UI properties if they don't exist
       isNew: product.isNew || false,
