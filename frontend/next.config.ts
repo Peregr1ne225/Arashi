@@ -33,7 +33,8 @@ const nextConfig: NextConfig = {
   },
   // Proxy API requests to the backend
   async rewrites() {
-    const rawBackendUrl = process.env.BACKEND_URL || "http://backend:8000/api/v1";
+    const rawBackendUrl =
+      process.env.BACKEND_URL || "http://backend:8000/api/v1";
     // Normalize: remove trailing slash
     const normalizedUrl = rawBackendUrl.replace(/\/$/, "");
     // Extract base URL (remove /api/v1 if present to avoid duplication)
@@ -74,11 +75,6 @@ const nextConfig: NextConfig = {
       {
         source: "/media/:path*",
         destination: `${baseUrl}/media/:path*`,
-      },
-      // Proxy WebSocket connections
-      {
-        source: "/ws/:path*",
-        destination: `${baseUrl}/ws/:path*`,
       },
     ];
   },
