@@ -18,7 +18,9 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.ModelSerializer):
     category = SimpleCategorySerializer(read_only=True)
-    category_id = serializers.IntegerField(write_only=True)
+    category_id = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.all(), source="category", write_only=True
+    )
     discounted_price = serializers.SerializerMethodField()
 
     # Nested images for reading

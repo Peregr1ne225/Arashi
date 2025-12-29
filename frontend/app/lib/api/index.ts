@@ -13,8 +13,8 @@ const getApiUrl = (useDirectUrl = false) => {
   // Server-side (SSR/RSC) or direct URL bypassing proxy: Use backend URL
   // Try environment variables first, fallback to localhost
   const url =
-    process.env.NEXT_PUBLIC_API_URL ||
     process.env.INTERNAL_API_URL ||
+    process.env.NEXT_PUBLIC_API_URL ||
     "http://127.0.0.1:8000/api/v1";
   return url.replace(/\/$/, "");
 };
