@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import { getImageUrl } from "@/app/lib/utils/image";
 
@@ -65,8 +66,8 @@ export default function ProductGallery({ images, name }: ProductGalleryProps) {
                 </div>
             )}
 
-            {/* Zoom Modal */}
-            {isZoomOpen && (
+            {/* Zoom Modal - Rendered via Portal */}
+            {isZoomOpen && typeof document !== 'undefined' && createPortal(
                 <div
                     className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/95 backdrop-blur-md p-4 animate-in fade-in duration-200"
                     onClick={() => setIsZoomOpen(false)}
@@ -90,7 +91,8 @@ export default function ProductGallery({ images, name }: ProductGalleryProps) {
                             priority
                         />
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
         </div>
     );
