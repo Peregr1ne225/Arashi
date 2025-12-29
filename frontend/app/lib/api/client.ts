@@ -274,7 +274,7 @@ export const productsApi = {
       error.rawText = rawText;
       throw error;
     }
-    return response.json();
+    return response.json().then((product) => mapProducts([product])[0]);
   },
 
   /**
@@ -285,7 +285,7 @@ export const productsApi = {
     if (!response.ok) {
       throw new Error("Failed to update product");
     }
-    return response.json();
+    return response.json().then((product) => mapProducts([product])[0]);
   },
 
   /**
