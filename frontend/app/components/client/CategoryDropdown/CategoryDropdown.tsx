@@ -156,7 +156,10 @@ export default function CategoryDropdown({
       >
         <button
           ref={buttonRef}
-          className="flex items-center text-sm font-medium text-black hover:text-gray-700 focus:outline-none py-1"
+          className={`flex items-center text-sm font-medium focus:outline-none py-1 ${isNavigationItem
+              ? "text-foreground hover:text-accent"
+              : "text-black hover:text-gray-700"
+            }`}
           onMouseEnter={handleButtonMouseEnter}
         >
           <span>
