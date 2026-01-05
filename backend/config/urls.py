@@ -23,7 +23,7 @@ from django.urls import include, path, re_path
 from django.views.static import serve
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    path("superuser/", admin.site.urls),
     # API endpoints with versioning
     path("api/v1/", include("config.api.urls")),
 ]

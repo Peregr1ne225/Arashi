@@ -25,28 +25,27 @@ ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 RUN bun run build
 
 # Stage 3: Runner
-# Stage 3: Runner
-FROM oven/bun:alpine AS runner
+FROM node:24-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Bun image comes with a "bun" user
-# We'll use that instead of creating a new one
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
 
 # Copy necessary files from builder
-# Next.js standalone build automatically isolates dependencies
 COPY --from=builder /app/public ./public
-# Set permission for bun user
-COPY --from=builder --chown=bun:bun /app/.next/standalone ./
-COPY --from=builder --chown=bun:bun /app/.next/static ./.next/static
 
-USER bun
+# Set permission for nextjs user
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
 
 EXPOSE 3000
 
 ENV PORT=3000
 
 # CMD to start the standalone server
-CMD ["bun", "server.js"]
+CMD node server.js
