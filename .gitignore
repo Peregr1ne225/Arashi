@@ -20,6 +20,8 @@ env/
 local_settings.py
 .env
 plans/
+media/
+staticfiles/
 
 # Frontend (Next.js / Node)
 node_modules/
@@ -36,3 +38,10 @@ pnpm-debug.log*
 
 # Docker
 .docker/
+
+#Agent
+.agent/
+.claude/
+.gemini/
+.agents/
+.opencode/

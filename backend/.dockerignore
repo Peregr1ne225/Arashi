@@ -20,3 +20,7 @@ db.sqlite3
 
 # Docker metadata
 Dockerfile
+
+# Generated static and media files
+staticfiles/
+media/
