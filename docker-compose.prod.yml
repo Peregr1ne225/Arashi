@@ -9,6 +9,7 @@ services:
       # Overrides or container-specific settings can stay here
       - SQL_HOST=db
       - SQL_PORT=5432
+      - TZ=Asia/Bangkok
     volumes:
       - ./staticfiles:/app/staticfiles
       - ./media:/app/media
