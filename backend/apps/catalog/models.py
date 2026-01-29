@@ -13,7 +13,8 @@ def category_image_path(instance, filename):
     If ID is not available (creation), use: categories/category_new_{timestamp}_{filename}
     """
     import time
-    ext = filename.split('.')[-1]
+
+    ext = filename.split(".")[-1]
     if instance.pk:
         filename = f"category_{instance.pk}.{ext}"
     else:
@@ -37,6 +38,7 @@ class Category(models.Model):
     class Meta:
         verbose_name_plural = "Categories"
         ordering = ["name"]
+        unique_together = (("parent", "slug"),)
 
     def __str__(self):
         return self.name
@@ -50,7 +52,24 @@ class Category(models.Model):
         if not self.slug or (
             self.pk and self.name != Category.objects.get(pk=self.pk).name
         ):
-            self.slug = slugify(self.name)
+            base_slug = slugify(self.name)
+            slug = base_slug
+            counter = 1
+
+            # Check for collisions among siblings (same parent)
+            # Exclude self from check if updating
+            qs = Category.objects.filter(parent=self.parent, slug=slug)
+            if self.pk:
+                qs = qs.exclude(pk=self.pk)
+
+            while qs.exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+                qs = Category.objects.filter(parent=self.parent, slug=slug)
+                if self.pk:
+                    qs = qs.exclude(pk=self.pk)
+
+            self.slug = slug
 
         super().save(*args, **kwargs)
 
@@ -63,3 +82,51 @@ def cleanup_category_image(sender, instance, **kwargs):
     if instance.image:
         instance.image.delete(save=False)
 
+
+class Tag(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    slug = models.SlugField(max_length=50, unique=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+
+class Color(models.Model):
+    name = models.CharField(max_length=50)
+    code = models.CharField(max_length=20, help_text="Hex code, e.g. #FF0000")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return f"{self.name} ({self.code})"
+
+
+class Size(models.Model):
+    name = models.CharField(max_length=50)
+    slug = models.SlugField(max_length=50, unique=True, blank=True)
+    ordering = models.IntegerField(
+        default=0, help_text="Order for sorting (e.g. 0 for S, 10 for M)"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["ordering", "name"]
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)

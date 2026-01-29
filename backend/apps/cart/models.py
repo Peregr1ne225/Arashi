@@ -2,13 +2,14 @@ from django.db import models
 from django.conf import settings
 from apps.products.models import Product
 
+
 class Cart(models.Model):
     user = models.OneToOneField(
-        settings.AUTH_USER_MODEL, 
-        on_delete=models.CASCADE, 
-        related_name='cart', 
-        null=True, 
-        blank=True
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="cart",
+        null=True,
+        blank=True,
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -26,24 +27,28 @@ class Cart(models.Model):
 
 
 class CartItem(models.Model):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="items")
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    color = models.ForeignKey(
+        "catalog.Color", on_delete=models.SET_NULL, null=True, blank=True
+    )
+    size = models.ForeignKey(
+        "catalog.Size", on_delete=models.SET_NULL, null=True, blank=True
+    )
     quantity = models.PositiveIntegerField(default=1)
-    
+
     class Meta:
-        unique_together = ('cart', 'product')
-        ordering = ['id']
-    
+        unique_together = ("cart", "product", "color", "size")
+        ordering = ["id"]
+
     def __str__(self):
-        return f"{self.quantity} x {self.product.name}"
-    
+        variant = ""
+        if self.color:
+            variant += f" {self.color.name}"
+        if self.size:
+            variant += f" {self.size.name}"
+        return f"{self.quantity} x {self.product.name}{variant}"
+
     @property
     def total_price(self):
-        # Use simple calculation if discounted_price returns a float, 
-        # or decimal if it returns decimal for accuracy.
-        # Assuming product.discounted_price is a property that computes it.
-        # Ideally we fetch the logic from Product model.
-        # Product.discounted_price returns float in current impl (checked earlier), 
-        # but Product.get_discounted_price() returns Decimal.
-        # We should use Decimal for money.
         return self.quantity * self.product.get_discounted_price()

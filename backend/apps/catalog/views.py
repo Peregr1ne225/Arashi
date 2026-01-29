@@ -1,11 +1,16 @@
-from django.shortcuts import render
 from rest_framework import filters, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from apps.products.permissions import IsAdminOrReadOnly
 from rest_framework.response import Response
 
-from .models import Category
-from .serializers import CategorySerializer
+from .models import Category, Color, Size, Tag
+from django.db.models import Count
+from .serializers import (
+    CategorySerializer,
+    ColorSerializer,
+    SizeSerializer,
+    TagSerializer,
+)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -15,11 +20,12 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = []  # Public access for categories
+    permission_classes = [IsAdminOrReadOnly]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["name", "description"]
     ordering_fields = ["name", "created_at"]
     ordering = ["name"]
+    pagination_class = None
 
     def get_serializer_class(self):
         """
@@ -54,13 +60,21 @@ class CategoryViewSet(viewsets.ModelViewSet):
         serializer = ProductSerializer(products, many=True)
         return Response(serializer.data)
 
-    @action(detail=False, methods=["get"], url_path="by-slug/(?P<slug>[^/.]+)")
+    @action(detail=False, methods=["get"], url_path="by-slug/(?P<slug>.+)")
     def by_slug(self, request, slug=None):
         """
-        Get a category by its slug.
+        Get a category by its slug path (e.g. parent/child).
         """
         try:
-            category = Category.objects.get(slug=slug)
+            # specialized logic to handle hierarchical slugs
+            slug_parts = [p for p in slug.split("/") if p]
+            parent = None
+            category = None
+
+            for part in slug_parts:
+                category = Category.objects.get(slug=part, parent=parent)
+                parent = category
+
             serializer = CategorySerializer(category)
             return Response(serializer.data)
         except Category.DoesNotExist:
@@ -69,3 +83,36 @@ class CategoryViewSet(viewsets.ModelViewSet):
             return Response(
                 {"error": "Category not found"}, status=status.HTTP_404_NOT_FOUND
             )
+
+
+class ColorViewSet(viewsets.ModelViewSet):
+    queryset = Color.objects.annotate(product_count=Count("product_colors"))
+    serializer_class = ColorSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ["name", "code"]
+    ordering = ["name"]
+    pagination_class = None
+
+
+class SizeViewSet(viewsets.ModelViewSet):
+    queryset = Size.objects.annotate(
+        product_count=Count("variants__product", distinct=True)
+    )
+    serializer_class = SizeSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    serializer_class = SizeSerializer
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ["name", "slug"]
+    ordering = ["ordering", "name"]
+    pagination_class = None
+
+
+class TagViewSet(viewsets.ModelViewSet):
+    queryset = Tag.objects.annotate(product_count=Count("products"))
+    serializer_class = TagSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ["name", "slug"]
+    ordering = ["name"]
+    pagination_class = None
