@@ -3,7 +3,7 @@ from pathlib import Path
 
 import environ
 
-from .base import *
+from .base import *  # noqa: F403
 
 # Get BASE_DIR from base settings
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -16,16 +16,6 @@ env.read_env(os.path.join(BASE_DIR, ".env"))
 DEBUG = env.bool("DEBUG", default=True)
 
 ALLOWED_HOSTS = ["*"]
-
-# Database settings
-# PostgreSQL is already configured in base.py
-# For development, we could use SQLite if needed:
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#     }
-# }
 
 # Email backend for development
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
@@ -49,7 +39,6 @@ CSRF_TRUSTED_ORIGINS = env.list(
     default=[
         "http://localhost:3000",
         "http://127.0.0.1:3000",
-        "https://*.ngrok-free.app",
     ],
 )
 

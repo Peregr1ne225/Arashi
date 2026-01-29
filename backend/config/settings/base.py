@@ -55,14 +55,11 @@ INSTALLED_APPS = [
     # Third party apps
     "rest_framework",
     "corsheaders",
-    # "channels",
     # Local apps
     "apps.products",
     "apps.catalog",
     "apps.authentication",
     "apps.orders",
-    # "apps.blogs",
-    # "apps.users",
     "apps.cart",
 ]
 
@@ -151,7 +148,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Additional locations of static files
