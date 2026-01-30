@@ -2,23 +2,48 @@ import { Suspense } from "react";
 import ProductGrid from "@/app/components/product/ProductGrid";
 import CategorySection from "@/app/components/ui/CategorySection";
 import ProductSkeleton from "@/app/components/product/ProductSkeleton";
-
+import HeroSection from "@/app/components/home/HeroSection";
 import { productsApi, categoriesApi } from "@/app/lib/api/client";
-import { Product } from "@/app/types";
+import { Product } from "@/app/types/product";
+import { cmsApi } from "@/app/lib/api/client";
+import { Category } from "@/app/types/category";
 
 // --- Async Components for Streaming ---
+async function HeroSectionFetcher() {
+  let heroImages: string[] = [];
+
+  try {
+    const heroData = await cmsApi.getHeroImages(true);
+    if (heroData?.length > 0) {
+      heroImages = heroData.map((img) => img.image);
+    }
+  } catch (error) {
+    console.warn("Failed to fetch hero images:", error);
+  }
+
+  if (heroImages.length === 0) {
+    // Fallback
+    heroImages = [
+      "https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2070&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2070&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=2071&auto=format&fit=crop",
+    ];
+  }
+
+  return <HeroSection heroImages={heroImages} />;
+}
 
 async function CategoriesFetcher() {
+  let categories: Category[] = [];
   try {
-    const categories = await categoriesApi.getCategories();
-    // Randomize categories and take only 8
-    const shuffled = [...categories].sort(() => 0.5 - Math.random());
-    const selectedCategories = shuffled.slice(0, 8);
-    return <CategorySection categories={selectedCategories} />;
+    categories = await categoriesApi.getCategories();
   } catch (error) {
     console.warn("Failed to fetch categories:", error);
-    return <CategorySection categories={[]} />;
   }
+
+  // Take first 8 categories for stability
+  const selectedCategories = (categories || []).slice(0, 8);
+  return <CategorySection categories={selectedCategories} />;
 }
 
 async function FeaturedSection() {
@@ -92,8 +117,14 @@ async function SaleSection() {
 export default function Home() {
   return (
     <div className="min-h-screen bg-background">
+      {/* Hero Section - Streamed (Full Width) */}
+      <Suspense
+        fallback={<div className="h-150 bg-gray-100 animate-pulse" />}
+      >
+        <HeroSectionFetcher />
+      </Suspense>
 
-      <main className="container mx-auto px-4 py-12 space-y-24">
+      <main className="container mx-auto px-4 md:px-8 py-8 space-y-16">
         {/* Categories - Streamed */}
         <Suspense fallback={<div className="h-40 bg-secondary animate-pulse m-4 rounded-none"></div>}>
           <CategoriesFetcher />
