@@ -1,95 +1,16 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
-interface HeaderMainProps {
-  setMobileCategoryMenuOpen: (value: boolean) => void;
-}
-
-export default function HeaderMain({
-  setMobileCategoryMenuOpen,
-}: HeaderMainProps) {
-  const [searchQuery, setSearchQuery] = useState("");
-  const router = useRouter();
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-    }
-  };
-
+export default function HeaderMain() {
   return (
-    <div className="container mx-auto px-4 py-4">
-      <div className="flex items-center justify-between gap-8">
-        {/* Logo */}
-        <div className="shrink-0 skew-box">
-          <button
-            className="lg:hidden mr-4"
-            onClick={() => setMobileCategoryMenuOpen(true)}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-8 w-8"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-          </button>
-          <Link href="/" className="text-4xl font-black uppercase text-foreground italic tracking-tighter">
-            Ara<span className="text-accent">shi</span>
-          </Link>
-        </div>
-
-        {/* Search Bar - Hidden on Mobile */}
-        <div className="hidden lg:flex flex-1 max-w-2xl mx-auto">
-          <form onSubmit={handleSearch} className="relative w-full group">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  if (searchQuery.trim()) {
-                    router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-                  }
-                }
-              }}
-              placeholder="SEARCH PRODUCTS..."
-              className="w-full py-3 px-6 pr-12 bg-secondary border-2 border-transparent focus:border-accent text-white placeholder-gray-500 uppercase font-bold focus:outline-none transition-all duration-300 skew-box"
-            />
-            <button
-              type="submit"
-              className="absolute right-0 top-0 h-full px-5 text-gray-400 group-hover:text-accent transition-colors skew-box"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={3}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </button>
-          </form>
-        </div>
-      </div>
+    <div className="h-full flex items-center">
+      <Link
+        href="/"
+        className="font-mrs-sheppards text-[40px] text-(--header-logo)"
+      >
+        Arashi
+      </Link>
     </div>
   );
 }

@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { Oswald, Inter, Mrs_Sheppards, Plus_Jakarta_Sans, Istok_Web } from "next/font/google";
-import "./globals.css";
-import { AuthProvider } from "./contexts/AuthContext";
-import { CartProvider } from "./contexts/CartContext";
-import Header from "./components/layout/Header";
-import Footer from "./components/layout/Footer";
-import ClientLayout from "./components/layout/ClientLayout";
+import "@/app/globals.css";
+import { AuthProvider } from "@/app/contexts/AuthContext";
+import { CartProvider } from "@/app/contexts/CartContext";
+import Header from "@/app/components/layout/Header";
+import Footer from "@/app/components/layout/Footer";
+import ClientLayout from "@/app/components/layout/ClientLayout";
 
 const oswald = Oswald({
   variable: "--font-oswald",

@@ -1,39 +1,21 @@
 @import "tailwindcss";
 
 :root {
-  /* Sport Palette - Dark Mode Focus */
-  --background: #0a0a0a;
-  --foreground: #ffffff;
-  
-  --primary: #ffffff;
-  --primary-foreground: #000000;
-  
-  --secondary: #1a1a1a;
-  --secondary-foreground: #ffffff;
-  
-  --accent: #d4ff00; /* Volt Green */
-  --accent-foreground: #000000;
-  
-  --destructive: #ff3b3b;
-  --destructive-foreground: #ffffff;
-  
-  --muted: #262626;
-  --muted-foreground: #a3a3a3;
-  
-  --border: #333333;
-  --input: #333333;
-  --ring: #d4ff00;
-  
-  /* Fonts */
-  --font-base: var(--font-inter);
-  --font-display: var(--font-oswald);
-  --font-handwriting: var(--font-mrs-sheppards);
-  --font-plus-jakarta: var(--font-plus-jakarta);
-  --font-istok: var(--font-istok);
-  --font-times: "Times New Roman", Times, serif;
+  --background: #fdfbf7;
+  --foreground: #000000;
+  --primary-color: #222222;
+  --secondary-color: #f5f5f5;
+  --accent-color: #ff5252;
+  --text-color: #000000;
+  --text-light: #000000;
+  --header-bg: #B3C8CF;
+  --header-text: #262626;
+  --header-logo: #000000;
+  --header-height: 72px;
 }
 
 @theme inline {
+  --font-mrs-sheppards: var(--font-mrs-sheppards);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
@@ -49,7 +31,7 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  
+
   --font-sans: var(--font-base);
   --font-display: var(--font-display);
   --font-handwriting: var(--font-handwriting);
@@ -64,7 +46,12 @@ body {
   font-family: var(--font-base);
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-display);
   text-transform: uppercase;
   letter-spacing: 0.02em;
@@ -76,7 +63,7 @@ h1, h2, h3, h4, h5, h6 {
     -webkit-text-stroke: 1px currentColor;
     color: transparent;
   }
-  
+
   .text-outline-sm {
     -webkit-text-stroke: 0.5px currentColor;
     color: transparent;
@@ -85,19 +72,19 @@ h1, h2, h3, h4, h5, h6 {
   .skew-box {
     transform: skewX(-12deg);
   }
-  
+
   .skew-box-reverse {
     transform: skewX(12deg);
   }
-  
+
   .clip-corner {
     clip-path: polygon(0 0, 100% 0, 100% 85%, 95% 100%, 0 100%);
   }
-  
+
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
-  
+
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -120,8 +107,9 @@ h1, h2, h3, h4, h5, h6 {
   justify-content: center;
 }
 
-.btn-primary > * {
-  transform: skewX(12deg); /* Counter skew text */
+.btn-primary>* {
+  transform: skewX(12deg);
+  /* Counter skew text */
 }
 
 .btn-primary:hover {
@@ -143,7 +131,7 @@ h1, h2, h3, h4, h5, h6 {
   transition: all 0.2s ease;
 }
 
-.btn-secondary > * {
+.btn-secondary>* {
   transform: skewX(12deg);
 }
 

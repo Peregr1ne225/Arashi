@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Category } from "@/app/types";
+import { Category } from "@/app/types/category";
 import CategoryDropdown from "@/app/components/client/CategoryDropdown/CategoryDropdown";
 
 interface HeaderNavigationProps {
@@ -17,46 +17,29 @@ export default function HeaderNavigation({
   );
 
   return (
-    <nav className="hidden lg:block py-2">
+    <nav className="hidden lg:block">
       <div className="container mx-auto px-4">
-        <div className="relative flex justify-center items-center">
-          <ul className="flex items-center space-x-8 text-lg font-bold uppercase tracking-wider overflow-visible">
-            <li>
-              <Link
-                href="/sale"
-                className="whitespace-nowrap text-accent hover:text-white transition-colors skew-box inline-block"
-              >
-                Sale
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/new"
-                className="whitespace-nowrap text-foreground hover:text-accent transition-colors skew-box inline-block"
-              >
-                New Arrivals
-              </Link>
-            </li>
-            {topLevelCategories.map((category) => (
-              <li key={category.id} className="skew-box">
-                <CategoryDropdown
-                  categories={topLevelCategories}
-                  navCategory={category}
-                  isNavigationItem={true}
-                />
-              </li>
-            ))}
-          </ul>
-
-          <div className="absolute right-0">
+        <ul className="flex items-center justify-start space-x-8">
+          <li>
+            <CategoryDropdown categories={topLevelCategories} />
+          </li>
+          <li>
+            <Link
+              href="/new"
+              className="font-istok text-[16px] text-(--header-text) hover:scale-105 hover:text-black transition-all inline-block font-normal"
+            >
+              New Arrivals
+            </Link>
+          </li>
+          <li>
             <Link
               href="/model"
-              className="btn-secondary text-sm"
+              className="font-istok text-[16px] text-(--header-text) hover:scale-105 hover:text-black transition-all inline-block font-normal"
             >
-              <span>Model</span>
+              Model
             </Link>
-          </div>
-        </div>
+          </li>
+        </ul>
       </div>
     </nav>
   );

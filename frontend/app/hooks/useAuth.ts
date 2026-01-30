@@ -1,3 +1,3 @@
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '@/app/contexts/AuthContext';
 
 export { useAuth };
