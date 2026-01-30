@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 3000
 
 # Start dev server
-CMD ["bun", "run", "dev"]
+CMD ["bun", "run", "dev", "--", "--webpack"]

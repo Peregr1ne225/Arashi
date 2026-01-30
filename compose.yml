@@ -31,10 +31,9 @@ services:
       - /app/.next # Persist build cache
     env_file: .env
     environment:
-      - NEXT_PRIVATE_TURBOPACK=true
       - WATCHPACK_POLLING=true
       - INTERNAL_API_URL=http://backend:8000/api/v1
-      - NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1 # Browser accesses backend locally
+      - NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
     depends_on:
       - backend
 
