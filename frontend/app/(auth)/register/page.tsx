@@ -4,47 +4,42 @@ import RegisterForm from "@/app/components/auth/RegisterForm";
 
 export default function RegisterPage() {
   return (
-    <div className="min-h-screen bg-background text-white">
-      <div className="flex flex-col lg:flex-row min-h-screen">
-        {/* Left Panel - Desktop only */}
-        <div className="hidden lg:flex lg:w-1/2 bg-neutral-900 items-center justify-center relative overflow-hidden border-r-4 border-accent">
-          {/* Background Texture */}
-          <div className="absolute inset-0 bg-[url('/grid-pattern.png')] opacity-5"></div>
-          <div className="absolute inset-0 bg-black/50"></div>
+    <div className="min-h-screen w-full flex items-center justify-center relative pb-10 bg-[#FDFDFB]">
+      {/* Split Card Container */}
+      <div className="relative w-full max-w-6xl min-h-[800px] bg-white rounded-4xl shadow-2xl flex flex-col lg:flex-row overflow-hidden border border-gray-100 mx-4">
+        {/* Left Panel - Original Content with Pastel Sport Twist */}
+        <div className="hidden lg:flex lg:w-1/2 bg-[#0e4d80] items-center justify-center relative p-12 overflow-hidden">
+          {/* Decorative elements */}
+          <div className="absolute inset-0 opacity-20">
+            <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl" />
+            <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#ff6b6b] rounded-full translate-x-1/2 translate-y-1/2 blur-3xl" />
+          </div>
 
           {/* Content */}
-          <div className="relative z-10 text-center px-12 transform -skew-x-6">
-            <h1 className="text-8xl font-black uppercase italic text-white mb-6 tracking-tighter drop-shadow-xl">
-              Join <br /><span className="text-transparent text-outline">The Team</span>
+          <div className="relative z-10 text-center">
+            <h1 className="text-6xl font-koulen text-white mb-4 tracking-wider uppercase">
+              Welcome
             </h1>
-            <p className="text-2xl text-accent font-bold uppercase tracking-widest mb-12 border-b-2 border-accent inline-block pb-2">
-              Unlock Exclusive Gear
+            <p className="text-xl text-blue-100 font-istok font-light mb-12 max-w-sm mx-auto">
+              Join the squad. Discover your perfect fit and train like a pro.
             </p>
-            <div className="space-y-4 text-gray-300 font-bold uppercase tracking-wide text-left mx-auto max-w-md">
-              <p className="flex items-center"><span className="text-accent mr-4 text-xl">⚡</span> Early Access to Drops</p>
-              <p className="flex items-center"><span className="text-accent mr-4 text-xl">⚡</span> Member-Only Discounts</p>
-              <p className="flex items-center"><span className="text-accent mr-4 text-xl">⚡</span> Global Community</p>
+            <div className="space-y-6 text-white text-left inline-block">
+              <p className="text-lg font-istok font-bold flex items-center gap-3 bg-white/10 px-6 py-3 rounded-full backdrop-blur-sm">
+                <span className="text-[#ff6b6b]">✓</span> PREMIUM QUALITY
+              </p>
+              <p className="text-lg font-istok font-bold flex items-center gap-3 bg-white/10 px-6 py-3 rounded-full backdrop-blur-sm">
+                <span className="text-[#ff6b6b]">✓</span> EXCLUSIVE DROPS
+              </p>
+              <p className="text-lg font-istok font-bold flex items-center gap-3 bg-white/10 px-6 py-3 rounded-full backdrop-blur-sm">
+                <span className="text-[#ff6b6b]">✓</span> SECURE CHECKOUT
+              </p>
             </div>
           </div>
         </div>
 
-        {/* Right Panel - Form */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12 bg-black bg-[url('/grid-pattern.png')] bg-fixed relative">
-          <div className="absolute inset-0 bg-black/80"></div>
-          <div className="w-full max-w-md space-y-8 relative z-10 bg-neutral-900/90 p-8 border border-white/10 skew-box backdrop-blur-sm">
-            {/* Header */}
-            <div className="text-center mb-8">
-              <h2 className="text-4xl lg:text-5xl font-black uppercase italic tracking-tighter text-white mb-2">
-                Create <span className="text-accent">Account</span>
-              </h2>
-              <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">
-                Start your journey
-              </p>
-            </div>
-
-            {/* Register Form */}
-            <RegisterForm />
-          </div>
+        {/* Right Panel - Register Form */}
+        <div className="w-full lg:w-1/2 flex items-center justify-center py-12 px-8 bg-white">
+          <RegisterForm />
         </div>
       </div>
     </div>

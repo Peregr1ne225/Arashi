@@ -111,7 +111,7 @@ export default function UserDropdown() {
                                         </svg>
                                     </div>
                                     <p className="text-[10px] text-gray-400 font-istok font-bold uppercase tracking-widest">Member Access</p>
-                                    <h4 className="text-xl font-normal text-[#0e4d80] font-koulen uppercase tracking-wide">Welcome to Arashi</h4>
+                                    <h4 className="text-4xl text-[#0e4d80] font-mrs-sheppards leading-none mt-1">Arashi</h4>
                                 </div>
 
                                 <button

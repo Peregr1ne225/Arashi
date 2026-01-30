@@ -254,22 +254,45 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
       }
     } catch (err: unknown) {
       // Handle backend errors
-      if (err instanceof Error) {
-        // Parse backend error messages
-        const errorMap: FormErrors = {};
-        const errorString = err.message;
+      const errorMap: FormErrors = {};
 
-        if (errorString.includes("username")) {
-          errorMap.username = errorString;
-        } else if (errorString.includes("email")) {
-          errorMap.email = errorString;
-        } else {
-          // General error
-          errorMap.username = errorString;
+      // If it's a structured validation error object from backend (often returning Record<string, string[]>)
+      if (
+        typeof err === "object" &&
+        err !== null &&
+        !("message" in err && err instanceof Error)
+      ) {
+        // Assertion for looser typing on the error object to access potential fields safely
+        const errorObj = err as Record<string, string | string[]>;
+
+        if (errorObj.username) {
+          errorMap.username = Array.isArray(errorObj.username)
+            ? errorObj.username[0]
+            : errorObj.username;
+        }
+        if (errorObj.email) {
+          errorMap.email = Array.isArray(errorObj.email)
+            ? errorObj.email[0]
+            : errorObj.email;
         }
 
-        setErrors(errorMap);
+        // Handle other standard DRF errors
+        if (errorObj.detail) {
+          errorMap.username = Array.isArray(errorObj.detail)
+            ? errorObj.detail[0]
+            : errorObj.detail;
+        } else if (Object.keys(errorMap).length === 0) {
+          // If we have an object but no known fields, try to show something
+          errorMap.username = "Registration failed. Please check your details.";
+        }
+      } else if (err instanceof Error) {
+        // Fallback for network errors or other JS exceptions
+        errorMap.username = err.message;
+      } else {
+        errorMap.username = "An unexpected error occurred.";
       }
+
+      setErrors(errorMap);
     } finally {
       setLoading(false);
     }
@@ -278,149 +301,127 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
   const passwordStrength = getPasswordStrength(formData.password);
 
   return (
-    <div className="w-full">
-      <form className="space-y-6" onSubmit={handleSubmit}>
-        <div className="space-y-5">
+    <div className="w-full flex flex-col items-center">
+      {/* Header */}
+      <div className="text-center mb-12 px-8">
+        <h1 className="font-mrs-sheppards text-[40px] md:text-[56px] leading-none text-[#0e4d80] mb-3">
+          Arashi
+        </h1>
+        <p className="font-istok text-sm md:text-base text-gray-500 max-w-md mx-auto">
+          One account, across all apps, just to make things a little easier.
+        </p>
+      </div>
+
+      <form
+        className="w-full space-y-6 flex flex-col items-center px-4"
+        onSubmit={handleSubmit}
+      >
+        <div className="space-y-4 w-full max-w-sm">
           {/* Username */}
-          <div>
-            <label
-              htmlFor="username"
-              className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-1"
-            >
-              Username
-            </label>
-            <div className="mt-1 relative">
-              <input
-                id="username"
-                name="username"
-                type="text"
-                required
-                autoComplete="username"
-                className={`block w-full bg-black/50 border-2 text-white placeholder-gray-600 px-4 py-3 font-bold uppercase tracking-wider outline-none transition-all duration-300 skew-box ${errors.username
-                  ? "border-red-500 focus:border-red-500"
-                  : "border-transparent focus:border-accent"
-                  } ${touched.has("username") && !errors.username ? "border-green-500/50" : ""}`}
-                placeholder="CHOOSE USERNAME"
-                value={formData.username}
-                onChange={(e) => handleFieldChange("username", e.target.value)}
-                onBlur={() => handleFieldBlur("username")}
-              />
-              {errors.username && (
-                <p className="mt-1 text-xs text-red-500 font-bold uppercase tracking-wide">{errors.username}</p>
-              )}
+          <div className="relative group">
+            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+              <span className="text-gray-400 font-istok text-xs font-bold uppercase tracking-wider">User</span>
             </div>
+            <input
+              id="username"
+              name="username"
+              type="text"
+              required
+              className="block w-full h-14 pl-16 pr-6 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-[#0e4d80]/20 focus:bg-white text-base font-istok font-bold text-[#0e4d80] focus:outline-none placeholder-gray-300 transition-all uppercase tracking-wide shadow-inner"
+              placeholder="USERNAME"
+              value={formData.username}
+              onChange={(e) => handleFieldChange("username", e.target.value)}
+              onBlur={() => handleFieldBlur("username")}
+            />
+            {errors.username && (
+              <p className="mt-1 text-xs text-red-500 font-bold uppercase tracking-wider pl-4">
+                {errors.username}
+              </p>
+            )}
           </div>
 
           {/* Email */}
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-1"
-            >
-              Email
-            </label>
-            <div className="mt-1 relative">
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                autoComplete="email"
-                className={`block w-full bg-black/50 border-2 text-white placeholder-gray-600 px-4 py-3 font-bold uppercase tracking-wider outline-none transition-all duration-300 skew-box ${errors.email
-                  ? "border-red-500 focus:border-red-500"
-                  : "border-transparent focus:border-accent"
-                  } ${touched.has("email") && !errors.email ? "border-green-500/50" : ""}`}
-                placeholder="ENTER EMAIL"
-                value={formData.email}
-                onChange={(e) => handleFieldChange("email", e.target.value)}
-                onBlur={() => handleFieldBlur("email")}
-              />
-              {errors.email && (
-                <p className="mt-1 text-xs text-red-500 font-bold uppercase tracking-wide">{errors.email}</p>
-              )}
+          <div className="relative group">
+            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+              <span className="text-gray-400 font-istok text-xs font-bold uppercase tracking-wider">Email</span>
             </div>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              className="block w-full h-14 pl-16 pr-6 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-[#0e4d80]/20 focus:bg-white text-base font-istok font-bold text-[#0e4d80] focus:outline-none placeholder-gray-300 transition-all uppercase tracking-wide shadow-inner"
+              placeholder="EMAIL ADDRESS"
+              value={formData.email}
+              onChange={(e) => handleFieldChange("email", e.target.value)}
+              onBlur={() => handleFieldBlur("email")}
+            />
+            {errors.email && (
+              <p className="mt-1 text-xs text-red-500 font-bold uppercase tracking-wider pl-4">
+                {errors.email}
+              </p>
+            )}
           </div>
 
-          {/* First Name */}
-          <div>
-            <label
-              htmlFor="firstName"
-              className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-1"
-            >
-              First Name
-            </label>
-            <div className="mt-1 relative">
+          {/* First Name & Last Name */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                <span className="text-gray-400 font-istok text-[10px] font-bold uppercase tracking-wider">First</span>
+              </div>
               <input
                 id="firstName"
                 name="firstName"
                 type="text"
                 required
-                autoComplete="given-name"
-                className={`block w-full bg-black/50 border-2 text-white placeholder-gray-600 px-4 py-3 font-bold uppercase tracking-wider outline-none transition-all duration-300 skew-box ${errors.firstName
-                  ? "border-red-500 focus:border-red-500"
-                  : "border-transparent focus:border-accent"
-                  } ${touched.has("firstName") && !errors.firstName ? "border-green-500/50" : ""}`}
-                placeholder="FIRST NAME"
+                className="block w-full h-14 pl-14 pr-4 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-[#0e4d80]/20 focus:bg-white text-base font-istok font-bold text-[#0e4d80] focus:outline-none placeholder-gray-300 transition-all uppercase tracking-wide shadow-inner"
+                placeholder="NAME"
                 value={formData.firstName}
                 onChange={(e) => handleFieldChange("firstName", e.target.value)}
                 onBlur={() => handleFieldBlur("firstName")}
               />
               {errors.firstName && (
-                <p className="mt-1 text-xs text-red-500 font-bold uppercase tracking-wide">{errors.firstName}</p>
+                <p className="mt-1 text-[10px] text-red-500 font-bold uppercase tracking-wider pl-2">
+                  {errors.firstName}
+                </p>
               )}
             </div>
-          </div>
-
-          {/* Last Name */}
-          <div>
-            <label
-              htmlFor="lastName"
-              className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-1"
-            >
-              Last Name
-            </label>
-            <div className="mt-1 relative">
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                <span className="text-gray-400 font-istok text-[10px] font-bold uppercase tracking-wider">Last</span>
+              </div>
               <input
                 id="lastName"
                 name="lastName"
                 type="text"
                 required
-                autoComplete="family-name"
-                className={`block w-full bg-black/50 border-2 text-white placeholder-gray-600 px-4 py-3 font-bold uppercase tracking-wider outline-none transition-all duration-300 skew-box ${errors.lastName
-                  ? "border-red-500 focus:border-red-500"
-                  : "border-transparent focus:border-accent"
-                  } ${touched.has("lastName") && !errors.lastName ? "border-green-500/50" : ""}`}
-                placeholder="LAST NAME"
+                className="block w-full h-14 pl-14 pr-4 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-[#0e4d80]/20 focus:bg-white text-base font-istok font-bold text-[#0e4d80] focus:outline-none placeholder-gray-300 transition-all uppercase tracking-wide shadow-inner"
+                placeholder="NAME"
                 value={formData.lastName}
                 onChange={(e) => handleFieldChange("lastName", e.target.value)}
                 onBlur={() => handleFieldBlur("lastName")}
               />
               {errors.lastName && (
-                <p className="mt-1 text-xs text-red-500 font-bold uppercase tracking-wide">{errors.lastName}</p>
+                <p className="mt-1 text-[10px] text-red-500 font-bold uppercase tracking-wider pl-2">
+                  {errors.lastName}
+                </p>
               )}
             </div>
           </div>
 
           {/* Password */}
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-1"
-            >
-              Password
-            </label>
-            <div className="mt-1 relative">
+          <div className="relative group">
+            <div className="relative">
+              <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                <span className="text-gray-400 font-istok text-xs font-bold uppercase tracking-wider">Pass</span>
+              </div>
               <input
                 id="password"
                 name="password"
                 type={showPassword ? "text" : "password"}
                 required
-                autoComplete="new-password"
-                className={`block w-full bg-black/50 border-2 text-white placeholder-gray-600 px-4 py-3 font-bold uppercase tracking-wider outline-none transition-all duration-300 skew-box ${errors.password
-                  ? "border-red-500 focus:border-red-500"
-                  : "border-transparent focus:border-accent"
-                  } ${touched.has("password") && !errors.password ? "border-green-500/50" : ""}`}
-                placeholder="CREATE PASSWORD"
+                className="block w-full h-14 pl-16 pr-12 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-[#0e4d80]/20 focus:bg-white text-base font-istok font-bold text-[#0e4d80] focus:outline-none placeholder-gray-300 transition-all uppercase tracking-wide shadow-inner"
+                placeholder="PASSWORD"
                 value={formData.password}
                 onChange={(e) => handleFieldChange("password", e.target.value)}
                 onBlur={() => handleFieldBlur("password")}
@@ -428,7 +429,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-4 text-gray-400 hover:text-white focus:outline-none"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#0e4d80] focus:outline-none transition-colors"
               >
                 {showPassword ? (
                   <EyeOff className="w-5 h-5" />
@@ -436,32 +437,19 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
                   <Eye className="w-5 h-5" />
                 )}
               </button>
-              {errors.password && (
-                <p className="mt-1 text-xs text-red-500 font-bold uppercase tracking-wide">{errors.password}</p>
-              )}
             </div>
+            {errors.password && (
+              <p className="mt-1 text-xs text-red-500 font-bold uppercase tracking-wider pl-4">
+                {errors.password}
+              </p>
+            )}
 
-            {/* Password Strength Meter */}
+            {/* Password Strength Meter - Simplified */}
             {formData.password && (
-              <div className="mt-2">
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-xs text-gray-400 font-bold uppercase tracking-widest">
-                    Strength
-                  </span>
-                  {passwordStrength.label && (
-                    <span
-                      className="text-xs font-bold uppercase tracking-widest"
-                      style={{
-                        color: passwordStrength.label === "Strong" ? "#ccff00" : passwordStrength.color.replace("bg-", ""),
-                      }}
-                    >
-                      {passwordStrength.label}
-                    </span>
-                  )}
-                </div>
-                <div className="h-1 w-full bg-white/10 overflow-hidden transform skew-x-[-20deg]">
+              <div className="mt-2 w-full px-4">
+                <div className="h-1 w-full bg-gray-100 rounded-full overflow-hidden">
                   <div
-                    className={`h-full transition-all duration-300 ${passwordStrength.color}`}
+                    className={`h-full transition-all duration-500 ease-out ${passwordStrength.color}`}
                     style={{ width: passwordStrength.width }}
                   />
                 </div>
@@ -470,25 +458,18 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
           </div>
 
           {/* Confirm Password */}
-          <div>
-            <label
-              htmlFor="confirmPassword"
-              className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-1"
-            >
-              Confirm Password
-            </label>
-            <div className="mt-1 relative">
+          <div className="relative group">
+            <div className="relative">
+              <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                <span className="text-gray-400 font-istok text-xs font-bold uppercase tracking-wider">Confirm</span>
+              </div>
               <input
                 id="confirmPassword"
                 name="confirmPassword"
                 type={showConfirmPassword ? "text" : "password"}
                 required
-                autoComplete="new-password"
-                className={`block w-full bg-black/50 border-2 text-white placeholder-gray-600 px-4 py-3 font-bold uppercase tracking-wider outline-none transition-all duration-300 skew-box ${errors.confirmPassword
-                  ? "border-red-500 focus:border-red-500"
-                  : "border-transparent focus:border-accent"
-                  } ${touched.has("confirmPassword") && !errors.confirmPassword ? "border-green-500/50" : ""}`}
-                placeholder="CONFIRM PASSWORD"
+                className="block w-full h-14 pl-24 pr-12 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-[#0e4d80]/20 focus:bg-white text-base font-istok font-bold text-[#0e4d80] focus:outline-none placeholder-gray-300 transition-all uppercase tracking-wide shadow-inner"
+                placeholder="PASSWORD"
                 value={formData.confirmPassword}
                 onChange={(e) =>
                   handleFieldChange("confirmPassword", e.target.value)
@@ -498,7 +479,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-4 text-gray-400 hover:text-white focus:outline-none"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#0e4d80] focus:outline-none transition-colors"
               >
                 {showConfirmPassword ? (
                   <EyeOff className="w-5 h-5" />
@@ -506,64 +487,38 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
                   <Eye className="w-5 h-5" />
                 )}
               </button>
-              {errors.confirmPassword && (
-                <p className="mt-1 text-xs text-red-500 font-bold uppercase tracking-wide">
-                  {errors.confirmPassword}
-                </p>
-              )}
             </div>
+            {errors.confirmPassword && (
+              <p className="mt-1 text-xs text-red-500 font-bold uppercase tracking-wider pl-4">
+                {errors.confirmPassword}
+              </p>
+            )}
           </div>
         </div>
 
-        {/* Submit Button */}
-        <div>
+        <div className="mt-8">
           <button
             type="submit"
             disabled={loading}
-            className="btn-primary w-full py-4 text-lg"
+            className="w-full md:w-64 h-14 rounded-full bg-[#0e4d80] text-white font-istok text-sm font-bold uppercase tracking-[0.2em] hover:bg-[#b90326] hover:shadow-lg hover:shadow-red-900/20 hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
           >
-            {loading ? (
-              <span className="flex items-center justify-center">
-                <svg
-                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-black"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  />
-                </svg>
-                JOINING TEAM...
-              </span>
-            ) : (
-              "CREATE ACCOUNT //"
-            )}
+            {loading ? "Creating..." : "Sign Up"}
           </button>
         </div>
       </form>
 
-      {/* Link to Login */}
-      <div className="mt-8 text-center border-t border-white/10 pt-6">
-        <span className="text-sm text-gray-400 font-medium uppercase tracking-wide">
-          Already on the roster?{" "}
+      <div className="mt-8 text-center">
+        <p className="font-istok text-xs text-gray-400 uppercase tracking-wider">
+          <span className="text-gray-500">
+            Already have an account?&nbsp;
+          </span>
           <Link
             href="/login"
-            className="font-bold text-accent hover:text-white uppercase tracking-wider transition-colors ml-1"
+            className="font-bold text-[#0e4d80] hover:underline decoration-2 underline-offset-4 cursor-pointer hover:text-[#0b3d66] transition-colors"
           >
-            Sign in
+            Log in
           </Link>
-        </span>
+        </p>
       </div>
     </div>
   );
