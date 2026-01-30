@@ -1,20 +1,5 @@
 import { api } from "../api";
-import { Product } from "@/app/types";
-
-export interface CartItem {
-  id: number;
-  product_id: number;
-  product: Product;
-  quantity: number;
-  total_price: string;
-}
-
-export interface Cart {
-  id: number;
-  items: CartItem[];
-  total_price: string;
-  total_items: number;
-}
+import { Cart, AddToCartPayload } from "@/app/types/cart";
 
 export const cartApi = {
   getCart: async (): Promise<Cart> => {
@@ -22,11 +7,24 @@ export const cartApi = {
     return response.json();
   },
 
-  addItem: async (productId: number, quantity: number = 1): Promise<Cart> => {
-    const response = await api.post("/cart/items/", {
+  addItem: async (
+    productId: number,
+    quantity: number = 1,
+    color_id?: number,
+    size_id?: number,
+  ): Promise<Cart> => {
+    const payload: AddToCartPayload = {
       product_id: productId,
       quantity,
-    });
+    };
+
+    if (color_id) payload.color_id = color_id;
+    if (size_id) payload.size_id = size_id;
+
+    const response = await api.post("/cart/items/", payload);
+    if (!response.ok) {
+      throw new Error("Failed to add item");
+    }
     return response.json();
   },
 

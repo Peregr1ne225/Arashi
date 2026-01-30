@@ -27,6 +27,10 @@
   /* Fonts */
   --font-base: var(--font-inter);
   --font-display: var(--font-oswald);
+  --font-handwriting: var(--font-mrs-sheppards);
+  --font-plus-jakarta: var(--font-plus-jakarta);
+  --font-istok: var(--font-istok);
+  --font-times: "Times New Roman", Times, serif;
 }
 
 @theme inline {
@@ -48,6 +52,10 @@
   
   --font-sans: var(--font-base);
   --font-display: var(--font-display);
+  --font-handwriting: var(--font-handwriting);
+  --font-plus-jakarta: var(--font-plus-jakarta);
+  --font-istok: var(--font-istok);
+  --font-times: var(--font-times);
 }
 
 body {

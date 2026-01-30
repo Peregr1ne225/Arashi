@@ -1,11 +1,8 @@
-import {
-  Product,
-  Category,
-  ProductListResponse,
-  CategoryListResponse,
-  SearchParams,
-} from "@/app/types";
-import { api } from "../api/index";
+import { Product, ProductListResponse, SearchParams, RawProduct } from "@/app/types/product";
+import { Category } from "@/app/types/category";
+import { Color, Size, Tag } from "@/app/types/attributes";
+import { User } from "@/app/types/user";
+import { api } from "../api";
 
 /**
  * API client with Next.js caching options
@@ -48,8 +45,9 @@ async function cachedApiFetch<T>(
   return data as T;
 }
 
-// Helper function to fetch category by slug
+// Helper function to fetch category by slug or path
 async function getCategoryBySlug(slug: string): Promise<Category> {
+  // If slug contains slashes (hierarchical path), we rely on the backend's catch-all regex
   return cachedApiFetch<Category>(`/categories/by-slug/${slug}/`, {
     revalidate: 3600, // 1 hour
     tags: ["category", slug],
@@ -64,25 +62,37 @@ export const categoriesApi = {
    * Get all categories
    */
   async getCategories(
+    params: SearchParams = {},
     config: { revalidate?: number } = {},
   ): Promise<Category[]> {
-    return cachedApiFetch<CategoryListResponse>("/categories/", {
-      revalidate: config.revalidate ?? 3600, // Default 1 hour
-      tags: ["categories"],
-    }).then((res: any) => {
-      const categories = Array.isArray(res) ? res : res.results || [];
+    const searchParams = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        searchParams.append(key, String(value));
+      }
+    });
 
-      // Add fallback slug for categories that don't have one
-      const processedCategories = categories.map((category: Category) => ({
+    return cachedApiFetch<Category[]>(
+      `/categories/?${searchParams.toString()}`,
+      {
+        revalidate: config.revalidate ?? 3600,
+        tags: ["categories"],
+      },
+    ).then((results) => {
+      // Add fallback slug and process children
+      // The backend now returns a flat array since pagination is disabled
+      if (!Array.isArray(results)) {
+        return [];
+      }
+
+      return results.map((category: Category) => ({
         ...category,
         slug: category.slug || category.name.toLowerCase().replace(/\s+/g, "-"),
-        // Process children recursively
         children: (category.children || []).map((child: Category) => ({
           ...child,
           slug: child.slug || child.name.toLowerCase().replace(/\s+/g, "-"),
         })),
       }));
-      return processedCategories;
     });
   },
 
@@ -116,15 +126,17 @@ export const categoriesApi = {
   async getTopLevelCategories(): Promise<Category[]> {
     // This would need to be implemented on the backend as a filter
     // For now, we'll fetch all and filter on the client
-    return this.getCategories().then((categories) =>
-      categories.filter((category) => category.parent === null),
+    return this.getCategories().then((res) =>
+      res.filter((category: Category) => category.parent === null),
     );
   },
 
   /**
    * Create a new category
    */
-  async createCategory(data: FormData | any): Promise<Category> {
+  async createCategory(
+    data: FormData | Record<string, unknown>,
+  ): Promise<Category> {
     const response = await api.post("/categories/", data);
     if (!response.ok) {
       throw new Error("Failed to create category");
@@ -135,7 +147,10 @@ export const categoriesApi = {
   /**
    * Update a category
    */
-  async updateCategory(id: number, data: FormData | any): Promise<Category> {
+  async updateCategory(
+    id: number,
+    data: FormData | Record<string, unknown>,
+  ): Promise<Category> {
     const response = await api.patch(`/categories/${id}/`, data);
     if (!response.ok) {
       throw new Error("Failed to update category");
@@ -157,10 +172,6 @@ export const categoriesApi = {
 /**
  * Products API client
  */
-
-/**
- * Products API client
- */
 /**
  * Helper to map API product (backend) to UI product
  */
@@ -177,15 +188,17 @@ function fixImageUrl(url: string): string {
   return url;
 }
 
-export function mapProducts(products: any[]): Product[] {
+export function mapProducts(products: RawProduct[]): Product[] {
   return products.map((product) => {
-    // Collect all potential image sources from the new backend structure
+    // Collect all image URLs from the backend structure
+    // product.images is an array of objects: [{id, image, display_order}, ...] or strings
     let imageUrls: string[] = [];
 
-    // product.images is now an array of objects: [{id, image, display_order}, ...]
     if (Array.isArray(product.images)) {
-      imageUrls = product.images.map((img: any) =>
-        typeof img === "object" && img.image ? img.image : img,
+      imageUrls = product.images.map((img: unknown) =>
+        typeof img === "object" && img !== null && "image" in img
+          ? (img as { image: string }).image
+          : (img as string),
       );
     }
 
@@ -194,18 +207,10 @@ export function mapProducts(products: any[]): Product[] {
       .filter((url) => typeof url === "string" && url.length > 0)
       .map((url) => fixImageUrl(url));
 
-    // Determine main image
-    let mainImage = "";
-    if (product.main_image) {
-      mainImage = fixImageUrl(product.main_image);
-    } else if (imageUrls.length > 0) {
-      mainImage = imageUrls[0];
-    }
-
     // Calculate pricing logic
     const rawPrice = Number(product.price);
     // TRUST BACKEND: Use the explicitly provided discounted_price if available.
-    let discountedPrice = product.discounted_price
+    const discountedPrice = product.discounted_price
       ? Number(product.discounted_price)
       : rawPrice;
 
@@ -213,26 +218,46 @@ export function mapProducts(products: any[]): Product[] {
     const hasDiscount = discountedPrice < rawPrice;
 
     return {
-      ...product,
-      // Map to UI properties
+      ...(product as unknown as Product), // Cast via unknown to baseline remaining fields
+      // Ensure key properties are correctly typed and present
+      id: product.id || 0,
+      name: product.name || "",
+      description: product.description || "",
+      stock: product.stock || 0,
+      is_active: product.is_active ?? true,
+      created_at: product.created_at || new Date().toISOString(),
+      updated_at: product.updated_at || new Date().toISOString(),
       price: hasDiscount ? discountedPrice : rawPrice,
       originalPrice: hasDiscount ? rawPrice : undefined,
       discount: product.discount ? Number(product.discount) : undefined,
 
-      image: mainImage,
-      // Deprecated field
-      image_url: mainImage,
       images: imageUrls,
-      images_data: Array.isArray(product.images) ? product.images : [],
+      product_images: Array.isArray(product.images)
+        ? product.images
+          .map((img: unknown) => {
+            const imgObj =
+              typeof img === "object" && img !== null
+                ? (img as { id: number; image: string })
+                : { id: 0, image: String(img) };
+            return {
+              id: imgObj.id || 0,
+              image: fixImageUrl(imgObj.image),
+            };
+          })
+          .filter((img) => img.image)
+        : [],
 
       // Add default UI properties if they don't exist
       isNew: product.isNew || false,
       isBestseller: product.isBestseller || false,
       rating: Number(product.rating) || 0,
-      reviewCount: (product as any).review_count || 0,
+      category: product.category as Category,
+      category_id: product.category_id || product.category?.id || 0,
+      reviewCount:
+        ((product as Record<string, unknown>).review_count as number) || 0,
       tags: product.tags || [],
       colors: product.colors || [],
-      sizes: product.sizes || [],
+      variants: product.variants || [],
       subcategory: product.subcategory || "",
     };
   });
@@ -242,38 +267,21 @@ export const productsApi = {
   /**
    * Create a new product
    */
-  async createProduct(data: FormData | any): Promise<Product> {
+  async createProduct(
+    data: FormData | Record<string, unknown>,
+  ): Promise<Product> {
     const response = await api.post("/products/", data);
     if (!response.ok) {
-      // Parse error response for detailed information
-      let errorData;
-      let rawText = "";
-
-      try {
-        // Try to parse as JSON first
-        errorData = await response.json();
-      } catch (e) {
-        // If JSON fails, get raw text
-        try {
-          rawText = await response.text();
-          console.error("Non-JSON error response:", rawText);
-          errorData = {
-            detail: `Server error (400): ${rawText.substring(0, 200)}${rawText.length > 200 ? "..." : ""}`,
-          };
-        } catch (textError) {
-          errorData = { detail: "Failed to parse error response" };
-        }
+      const errorData = await response.json().catch(() => ({}));
+      if (errorData.detail) {
+        throw new Error(errorData.detail);
       }
-
-      // Create enhanced error with response details
-      const error: any = new Error(
-        errorData.detail || errorData.message || "Failed to create product",
-      );
-      error.response = response;
-      error.data = errorData;
-      error.status = response.status;
-      error.rawText = rawText;
-      throw error;
+      // Handle validation errors (dict of lists)
+      const messages = Object.values(errorData).flat();
+      if (messages.length > 0) {
+        throw new Error(messages.join(", ") as string);
+      }
+      throw new Error("Failed to create product");
     }
     return response.json().then((product) => mapProducts([product])[0]);
   },
@@ -281,22 +289,90 @@ export const productsApi = {
   /**
    * Update a product
    */
-  async updateProduct(id: number, data: FormData | any): Promise<Product> {
+  async updateProduct(
+    id: number,
+    data: FormData | Record<string, unknown>,
+  ): Promise<Product> {
     const response = await api.patch(`/products/${id}/`, data);
     if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      if (errorData.detail) {
+        throw new Error(errorData.detail);
+      }
+      // Handle validation errors
+      const messages = Object.values(errorData).flat();
+      if (messages.length > 0) {
+        throw new Error(messages.join(", ") as string);
+      }
       throw new Error("Failed to update product");
     }
     return response.json().then((product) => mapProducts([product])[0]);
   },
 
   /**
-   * Delete a product
+   * Update a product variant (stock or is_active)
    */
+  async updateVariant(
+    productId: number,
+    colorId: number,
+    sizeId: number,
+    data: { stock?: number; is_active?: boolean },
+  ): Promise<unknown> {
+    const response = await api.post(`/products/${productId}/add_variant/`, {
+      color_id: colorId,
+      size_id: sizeId,
+      ...data,
+    });
+    if (!response.ok) {
+      throw new Error("Failed to update variant");
+    }
+    return response.json();
+  },
+
   async deleteProduct(id: number): Promise<void> {
     const response = await api.delete(`/products/${id}/`);
     if (!response.ok) {
       throw new Error("Failed to delete product");
     }
+  },
+
+  /**
+   * Delete a product variant
+   */
+  async deleteVariant(
+    productId: number,
+    colorId: number,
+    sizeId: number,
+  ): Promise<void> {
+    const response = await api.post(`/products/${productId}/remove_variant/`, {
+      color_id: colorId,
+      size_id: sizeId,
+    });
+    if (!response.ok) {
+      throw new Error("Failed to delete variant");
+    }
+  },
+
+  /**
+   * Update a product color image
+   */
+  async updateColorImage(
+    productId: number,
+    colorId: number,
+    image: File,
+  ): Promise<unknown> {
+    const formData = new FormData();
+    formData.append("color_id", String(colorId));
+    formData.append("image", image);
+
+    const response = await api.post(
+      `/products/${productId}/update_color_image/`,
+      formData,
+    );
+    if (!response.ok) {
+      throw new Error("Failed to update color image");
+    }
+    return response.json();
   },
   /**
    * Get a list of products with optional filtering
@@ -313,9 +389,6 @@ export const productsApi = {
       try {
         const category = await getCategoryBySlug(params.category_slug);
         searchParams.append("category", String(category.id));
-        // Remove category_slug from params to avoid adding it as a query param
-        const { category_slug, ...restParams } = params;
-        params = restParams;
       } catch (error) {
         console.error(
           `Failed to find category with slug ${params.category_slug}:`,
@@ -334,40 +407,48 @@ export const productsApi = {
     else if (params.category) {
       // Ensure category is a string for URLSearchParams
       searchParams.append("category", String(params.category));
-      // Remove category from params to avoid duplicate
-      const { category, ...restParams } = params;
-      params = restParams;
     }
 
+    const excludeFromLoop = ["category_slug", "category"];
     Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
+      if (
+        !excludeFromLoop.includes(key) &&
+        value !== undefined &&
+        value !== null
+      ) {
         searchParams.append(key, String(value));
       }
     });
 
     const endpoint = `/products/?${searchParams.toString()}`;
 
-    return cachedApiFetch<ProductListResponse>(endpoint, {
+    return cachedApiFetch<
+      Record<string, unknown> | { results: Record<string, unknown>[] }
+    >(endpoint, {
       revalidate: config.revalidate ?? 1800, // Default 30 minutes
       tags: ["products"],
-    }).then((response) => {
+    }).then((response: unknown) => {
+      const resp = response as { results?: Record<string, unknown>[] };
       // Ensure results exist
-      if (!response.results) {
+      if (!resp.results) {
         // If response is an array, it might be a flat list
         if (Array.isArray(response)) {
           return {
-            count: response.length,
+            count: response.length as number,
             next: null,
             previous: null,
-            results: mapProducts(response),
+            results: mapProducts(response as Record<string, unknown>[]),
           };
         }
-        response.results = [];
+        resp.results = [];
       }
 
       // Add UI-specific properties to products
-      response.results = mapProducts(response.results);
-      return response;
+      const results = mapProducts(resp.results as Record<string, unknown>[]);
+      return {
+        ...resp,
+        results,
+      } as unknown as ProductListResponse;
     });
   },
 
@@ -377,22 +458,25 @@ export const productsApi = {
   async getFeaturedProducts(limit = 10): Promise<Product[]> {
     const endpoint = `/products/featured/?limit=${limit}`;
 
-    return cachedApiFetch<Product[]>(endpoint, {
+    return cachedApiFetch<Record<string, unknown>[]>(endpoint, {
       revalidate: 3600, // 1 hour
       tags: ["products", "featured"],
-    }).then((products) => mapProducts(products));
+    }).then((products) => mapProducts(products as Record<string, unknown>[]));
   },
 
   /**
    * Get a single product by ID
    */
-  async getProduct(id: number): Promise<Product> {
-    return cachedApiFetch<Product>(`/products/${id}/`, {
-      revalidate: 1800, // 30 minutes
-      tags: ["product", String(id)],
+  async getProduct(
+    id: number,
+    config: { revalidate?: number } = {},
+  ): Promise<Product> {
+    return cachedApiFetch<Record<string, unknown>>(`/products/${id}/`, {
+      revalidate: config.revalidate ?? 3600, // Default 1 hour
+      tags: ["product", String(id), "v2"],
     }).then((product) => {
       // Use shared mapper (wrapping single product in array and taking first result)
-      return mapProducts([product])[0];
+      return mapProducts([product] as Record<string, unknown>[])[0];
     });
   },
 
@@ -400,13 +484,13 @@ export const productsApi = {
    * Search products by query
    */
   async searchProducts(query: string): Promise<Product[]> {
-    return cachedApiFetch<Product[]>(
+    return cachedApiFetch<Record<string, unknown>[]>(
       `/products/search/?q=${encodeURIComponent(query)}`,
       {
         revalidate: 1800, // 30 minutes
         tags: ["products", "search"],
       },
-    ).then((products) => mapProducts(products));
+    ).then((products) => mapProducts(products as Record<string, unknown>[]));
   },
 
   /**
@@ -473,31 +557,86 @@ export const productsApi = {
     min_price: number;
     max_price: number;
     category_ids?: number[];
+    total_count: number;
+    total_stock: number;
+    total_value: number;
+    avg_price: number;
+    active_count: number;
+    low_stock_count: number;
   }> {
     const searchParams = new URLSearchParams();
+
+    // Special handling for category_slug parameter matching getProducts behavior
+    if (params.category_slug) {
+      try {
+        const category = await getCategoryBySlug(params.category_slug);
+        searchParams.append("category", String(category.id));
+      } catch (error) {
+        console.error(
+          `Failed to find category with slug ${params.category_slug}:`,
+          error,
+        );
+        return {
+          min_price: 0,
+          max_price: 1000,
+          category_ids: [],
+          total_count: 0,
+          total_stock: 0,
+          total_value: 0,
+          avg_price: 0,
+          active_count: 0,
+          low_stock_count: 0,
+        };
+      }
+    }
+    // Handle numeric category ID directly
+    else if (params.category) {
+      searchParams.append("category", String(params.category));
+    }
+
+    const exclude = [
+      "category_slug",
+      "category",
+      "page",
+      "page_size",
+      "ordering",
+    ];
     Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
+      if (!exclude.includes(key) && value !== undefined && value !== null) {
         searchParams.append(key, String(value));
       }
     });
 
+    const queryString = searchParams.toString();
+    const url = `/products/stats/${queryString ? `?${queryString}` : ""}`;
+
     return cachedApiFetch<{
       min_price: number;
       max_price: number;
-      category_ids?: number[];
-    }>(`/products/stats/?${searchParams.toString()}`, {
+      category_ids: number[];
+      total_count: number;
+      total_stock: number;
+      total_value: number;
+      avg_price: number;
+      active_count: number;
+      low_stock_count: number;
+    }>(url, {
       revalidate: 60, // Cache stats for 1 minute
       tags: ["products-stats"],
     });
   },
 
-  /**
-   * Health check - verify backend connection
-   */
-  async healthCheck(): Promise<{ status: string; message: string }> {
-    const response = await api.get("/health/");
+  async getLowStock(): Promise<
+    Array<{
+      id: number;
+      name: string;
+      stock: number;
+      image: string | null;
+    }>
+  > {
+    const response = await api.get("/products/low_stock/");
     if (!response.ok) {
-      throw new Error("Backend health check failed");
+      throw new Error("Failed to fetch low stock products");
     }
     return response.json();
   },
@@ -507,7 +646,7 @@ export const productsApi = {
  * Reviews API client
  */
 export const reviewsApi = {
-  async createReview(data: any): Promise<any> {
+  async createReview(data: Record<string, unknown>): Promise<unknown> {
     const response = await api.post("/reviews/", data);
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
@@ -527,20 +666,256 @@ export const reviewsApi = {
 };
 
 /**
+ * Attributes API client (Colors, Sizes, Tags)
+ */
+export const attributesApi = {
+  // --- Colors ---
+  async getColors(): Promise<Color[]> {
+    const response = await api.get("/colors/");
+    if (!response.ok) return [];
+    return response.json();
+  },
+
+  async createColor(data: { name: string; code: string }): Promise<Color> {
+    const response = await api.post("/colors/", data);
+    if (!response.ok) throw new Error("Failed to create color");
+    return response.json();
+  },
+
+  async updateColor(
+    id: number,
+    data: { name: string; code: string },
+  ): Promise<Color> {
+    const response = await api.patch(`/colors/${id}/`, data);
+    if (!response.ok) throw new Error("Failed to update color");
+    return response.json();
+  },
+
+  async deleteColor(id: number): Promise<void> {
+    const response = await api.delete(`/colors/${id}/`);
+    if (!response.ok) throw new Error("Failed to delete color");
+  },
+
+  // --- Sizes ---
+  async getSizes(): Promise<Size[]> {
+    const response = await api.get("/sizes/");
+    if (!response.ok) return [];
+    return response.json();
+  },
+
+  async createSize(data: { name: string; slug: string }): Promise<Size> {
+    const response = await api.post("/sizes/", data);
+    if (!response.ok) throw new Error("Failed to create size");
+    return response.json();
+  },
+
+  async updateSize(
+    id: number,
+    data: { name: string; slug: string },
+  ): Promise<Size> {
+    const response = await api.patch(`/sizes/${id}/`, data);
+    if (!response.ok) throw new Error("Failed to update size");
+    return response.json();
+  },
+
+  async deleteSize(id: number): Promise<void> {
+    const response = await api.delete(`/sizes/${id}/`);
+    if (!response.ok) throw new Error("Failed to delete size");
+  },
+
+  // --- Tags ---
+  async getTags(): Promise<Tag[]> {
+    const response = await api.get("/tags/");
+    if (!response.ok) return [];
+    return response.json();
+  },
+
+  async createTag(data: { name: string; slug: string }): Promise<Tag> {
+    const response = await api.post("/tags/", data);
+    if (!response.ok) throw new Error("Failed to create tag");
+    return response.json();
+  },
+
+  async updateTag(
+    id: number,
+    data: { name: string; slug: string },
+  ): Promise<Tag> {
+    const response = await api.patch(`/tags/${id}/`, data);
+    if (!response.ok) throw new Error("Failed to update tag");
+    return response.json();
+  },
+
+  async deleteTag(id: number): Promise<void> {
+    const response = await api.delete(`/tags/${id}/`);
+    if (!response.ok) throw new Error("Failed to delete tag");
+  },
+};
+
+export interface HeroImage {
+  id: number;
+  title: string;
+  image: string;
+  is_active: boolean;
+  order: number;
+}
+
+/**
+ * CMS API client
+ */
+export const cmsApi = {
+  async getHeroImages(activeOnly = true): Promise<HeroImage[]> {
+    // If public/activeOnly, we might not need auth, but api.get handles it naturally.
+    // The backend ViewSet filters by is_active for non-staff anyway.
+    const queryString = activeOnly ? "?is_active=true" : "";
+    const response = await api.get(`/hero/${queryString}`);
+    if (!response.ok) return [];
+    const data = await response.json();
+
+    // Process image URLs
+    const images = (Array.isArray(data) ? data : data.results || []).map(
+      (img: HeroImage) => ({
+        ...img,
+        image: fixImageUrl(img.image),
+      }),
+    );
+
+    return images;
+  },
+
+  async uploadHeroImage(formData: FormData): Promise<HeroImage> {
+    const response = await api.post("/hero/", formData);
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      const message = errorData.detail || "Failed to upload hero image";
+      throw new Error(message);
+    }
+    const img = await response.json();
+    return { ...img, image: fixImageUrl(img.image) };
+  },
+
+  async deleteHeroImage(id: number): Promise<void> {
+    const response = await api.delete(`/hero/${id}/`);
+    if (!response.ok) throw new Error("Failed to delete hero image");
+  },
+
+  async updateHeroImage(
+    id: number,
+    data: Partial<HeroImage>,
+  ): Promise<HeroImage> {
+    // For simple updates like order/is_active
+    const response = await api.patch(`/hero/${id}/`, data);
+    if (!response.ok) throw new Error("Failed to update hero image");
+    const img = await response.json();
+    return { ...img, image: fixImageUrl(img.image) };
+  },
+};
+
+/**
+ * Users API client for admin management
+ */
+export const usersApi = {
+  async getUsers(
+    params: {
+      search?: string;
+      is_staff?: boolean;
+      is_active?: boolean;
+      page?: number;
+      page_size?: number;
+      ordering?: string;
+    } = {},
+  ): Promise<{ count: number; next: string | null; previous: string | null; results: User[] }> {
+    const searchParams = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        searchParams.append(key, String(value));
+      }
+    });
+
+    const queryString = searchParams.toString();
+    const response = await api.get(
+      `/auth/users/${queryString ? `?${queryString}` : ""}`,
+    );
+    if (!response.ok) throw new Error("Failed to fetch users");
+    const data = await response.json();
+
+    // Normalize response to always be paginated structure
+    if (Array.isArray(data)) {
+      return {
+        count: data.length,
+        next: null,
+        previous: null,
+        results: data
+      };
+    }
+    return data;
+  },
+
+  async getStats(): Promise<{
+    total_users: number;
+    active_users: number;
+    admin_users: number;
+    superuser_users: number;
+  }> {
+    const response = await api.get("/auth/users/stats/");
+    if (!response.ok) throw new Error("Failed to fetch user stats");
+    return response.json();
+  },
+
+  async updateUser(id: number, data: Partial<User>): Promise<User> {
+    const response = await api.patch(`/auth/users/${id}/`, data);
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.detail || "Failed to update user");
+    }
+    return response.json();
+  },
+
+  async toggleUserStatus(id: number, is_active: boolean): Promise<User> {
+    return this.updateUser(id, { is_active });
+  },
+
+  async makeAdmin(id: number): Promise<User> {
+    return this.updateUser(id, { is_staff: true });
+  },
+
+  async removeAdmin(id: number): Promise<User> {
+    return this.updateUser(id, { is_staff: false });
+  },
+
+  async makeSuperuser(id: number): Promise<User> {
+    return this.updateUser(id, { is_superuser: true });
+  },
+
+  async removeSuperuser(id: number): Promise<User> {
+    return this.updateUser(id, { is_superuser: false });
+  },
+
+  async deleteUser(id: number): Promise<void> {
+    const response = await api.delete(`/auth/users/${id}/`);
+    if (!response.ok) throw new Error("Failed to delete user");
+  },
+
+  async getUser(id: number): Promise<User> {
+    const response = await api.get(`/auth/users/${id}/`);
+    if (!response.ok) throw new Error("Failed to fetch user");
+    return response.json();
+  },
+};
+
+/**
  * Utility function to revalidate cache for specific tags
  */
 export async function revalidateCache(tags: string[]): Promise<void> {
   try {
-    // In a real deployment, you would call the revalidation endpoint
-    // This is a placeholder function for demonstration
-    console.log(`Revalidating cache for tags: ${tags.join(", ")}`);
-
-    // Example of how you might call a revalidation endpoint in a production environment:
-    // await fetch('/api/revalidate', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ tags }),
-    // });
+    // In a real deployment, we use Server Actions to invalidate cache
+    if (tags.length > 0) {
+      // Dynamically import to avoid server-only module issues in some contexts if needed,
+      // but typically direct import works in Next.js Client Components.
+      // We assume actions.ts is "use server" and safe to import.
+      const { revalidateCacheTags } = await import("@/app/lib/actions");
+      await revalidateCacheTags(tags);
+      console.log(`Revalidated cache for tags: ${tags.join(", ")}`);
+    }
   } catch (error) {
     console.error("Failed to revalidate cache:", error);
   }

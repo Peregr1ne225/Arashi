@@ -6,6 +6,7 @@ import {
   useState,
   useEffect,
   ReactNode,
+  useCallback,
 } from "react";
 import { api } from "../lib/api";
 import { useRouter } from "next/navigation";
@@ -23,10 +24,25 @@ interface User {
   is_superuser?: boolean;
 }
 
+interface LoginCredentials {
+  username: string;
+  password: string;
+}
+
+interface RegisterData {
+  username: string;
+  email: string;
+  password: string;
+  first_name?: string;
+  last_name?: string;
+  phone_number?: string;
+  address?: string;
+}
+
 interface AuthContextType {
   user: User | null;
-  login: (credentials: any, redirectUrl?: string) => Promise<void>;
-  register: (data: any) => Promise<void>;
+  login: (credentials: LoginCredentials, redirectUrl?: string) => Promise<void>;
+  register: (data: RegisterData) => Promise<void>;
   logout: () => void;
   loading: boolean;
   isAuthenticated: boolean;
@@ -40,30 +56,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
+  const logout = useCallback(() => {
+    Cookies.remove("accessToken");
+    Cookies.remove("refreshToken");
+    setUser(null);
+    router.push("/login");
+  }, [router]);
+
+  const checkAuth = useCallback(async () => {
+    const token = Cookies.get("accessToken");
+
+    try {
+      if (!token) {
+        setUser(null);
+        return;
+      }
+
+      const res = await api.get("/auth/profile/");
+
+      if (!res.ok) {
+        throw new Error("Unauthorized");
+      }
+
+      const userData = await res.json();
+      setUser(userData);
+    } catch (error) {
+      console.error("Auth check failed", error);
+      Cookies.remove("accessToken");
+      Cookies.remove("refreshToken");
+      setUser(null);
+      router.push("/login");
+    } finally {
+      setLoading(false);
+    }
+  }, [router]);
+
   useEffect(() => {
     checkAuth();
-  }, []);
+  }, [checkAuth]);
 
-  const checkAuth = async () => {
-    const token = Cookies.get("accessToken");
-    if (token) {
-      try {
-        const res = await api.get("/auth/profile/");
-        if (res.ok) {
-          const userData = await res.json();
-          setUser(userData);
-        } else {
-          logout();
-        }
-      } catch (error) {
-        console.error("Auth check failed", error);
-        logout();
-      }
-    }
-    setLoading(false);
-  };
-
-  const login = async (credentials: any, redirectUrl?: string) => {
+  const login = async (credentials: LoginCredentials, redirectUrl?: string) => {
     const res = await api.post("/auth/token/", credentials);
     if (!res.ok) {
       const errorData = await res.json();
@@ -72,11 +104,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const data = await res.json();
 
     // Set cookies with 7 days expiry, secure, strict sameSite
-    Cookies.set("accessToken", data.access, { expires: 7, secure: window.location.protocol === 'https:', sameSite: 'Strict' });
-    Cookies.set("refreshToken", data.refresh, { expires: 7, secure: window.location.protocol === 'https:', sameSite: 'Strict' });
+    Cookies.set("accessToken", data.access, {
+      expires: 7,
+      secure: window.location.protocol === 'https:',
+      sameSite: 'Lax'
+    }); // Stripe redirect back
+    Cookies.set("refreshToken", data.refresh, {
+      expires: 7,
+      secure: window.location.protocol === 'https:',
+      sameSite: 'Strict'
+    });
 
     // Fetch user profile immediately after login if not provided in token response
-    // The current backend view returns { access, refresh, user } so we can use that
     if (data.user) {
       setUser(data.user);
     } else {
@@ -96,34 +135,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     router.push(finalRedirectUrl);
   };
 
-  const register = async (data: any) => {
+  const register = async (data: RegisterData) => {
     const res = await api.post("/auth/register/", data);
     if (!res.ok) {
       const errorData = await res.json();
-      // Format errors into a string or object
-      let errorMessage = "Registration failed";
-      if (typeof errorData === "object") {
-        errorMessage = Object.entries(errorData)
-          .map(([key, val]) => `${key}: ${val}`)
-          .join(", ");
-      }
-      throw new Error(errorMessage);
+      throw errorData;
     }
     const responseData = await res.json();
     // Auto login after register
-    Cookies.set("accessToken", responseData.access, { expires: 7, secure: window.location.protocol === 'https:', sameSite: 'Strict' });
-    Cookies.set("refreshToken", responseData.refresh, { expires: 7, secure: window.location.protocol === 'https:', sameSite: 'Strict' });
+    Cookies.set("accessToken", responseData.access, {
+      expires: 7,
+      secure: window.location.protocol === 'https:',
+      sameSite: 'Lax'
+    });
+    Cookies.set("refreshToken", responseData.refresh, {
+      expires: 7, secure: window.location.protocol === 'https:',
+      sameSite: 'Lax'
+    });
     setUser(responseData.user);
 
     // Redirect to main page after successful registration
     router.push("/");
-  };
-
-  const logout = () => {
-    Cookies.remove("accessToken");
-    Cookies.remove("refreshToken");
-    setUser(null);
-    router.push("/login");
   };
 
   const updateUser = (userData: Partial<User>) => {

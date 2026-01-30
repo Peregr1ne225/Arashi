@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import AvatarScene from "@/components/AvatarScene";
-import ConfiguratorPanel from "@/components/ConfiguratorPanel";
+import AvatarScene from "@/app/components/avatar/AvatarScene";
+import ConfiguratorPanel from "@/app/components/avatar/ConfiguratorPanel";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 

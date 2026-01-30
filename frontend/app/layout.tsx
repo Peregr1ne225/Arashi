@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
-import { Oswald, Inter } from "next/font/google";
+import { Oswald, Inter, Mrs_Sheppards, Plus_Jakarta_Sans, Istok_Web } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "./contexts/AuthContext";
 import { CartProvider } from "./contexts/CartContext";
-import CartSheet from "./components/cart/CartSheet";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
-import CookieConsent from "./components/common/CookieConsent";
+import ClientLayout from "./components/layout/ClientLayout";
 
 const oswald = Oswald({
   variable: "--font-oswald",
@@ -15,6 +14,23 @@ const oswald = Oswald({
 
 const inter = Inter({
   variable: "--font-inter",
+  subsets: ["latin"],
+});
+
+const mrsSheppards = Mrs_Sheppards({
+  weight: "400",
+  variable: "--font-mrs-sheppards",
+  subsets: ["latin"],
+});
+
+const plusJakarta = Plus_Jakarta_Sans({
+  variable: "--font-plus-jakarta",
+  subsets: ["latin"],
+});
+
+const istokWeb = Istok_Web({
+  weight: ["400", "700"],
+  variable: "--font-istok",
   subsets: ["latin"],
 });
 
@@ -34,19 +50,18 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${oswald.variable} ${inter.variable} antialiased bg-background text-foreground`}
+        className={`${oswald.variable} ${inter.variable} ${mrsSheppards.variable} ${plusJakarta.variable} ${istokWeb.variable} antialiased`}
       >
         <AuthProvider>
           <CartProvider>
             <div className="flex flex-col min-h-screen">
               <Header />
-              <main className="flex-grow">
+              <main className="grow">
                 {children}
               </main>
               <Footer />
             </div>
-            <CartSheet />
-            <CookieConsent />
+            <ClientLayout />
           </CartProvider>
         </AuthProvider>
       </body>

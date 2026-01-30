@@ -20,7 +20,39 @@ db.sqlite3
 
 # Docker metadata
 Dockerfile
+Dockerfile.prod
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor directories
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
 # Generated static and media files
 staticfiles/
 media/
+
+# Test and Coverage
+.coverage
+htmlcov/
+.pytest_cache/
+nosetests.xml
+coverage.xml
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# Pip
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Documentation
+README.md

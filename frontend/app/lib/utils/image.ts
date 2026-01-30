@@ -31,7 +31,16 @@ export const getImageUrl = (path: string | null | undefined): string => {
   if (path.startsWith("http://") || path.startsWith("https://")) {
     // Fix for Docker networking: client cannot resolve 'backend' hostname
     // Replace internal Docker hostname with localhost for development
-    return path.replace("http://backend:8000", "http://localhost:8000");
+    const fixedPath = path.replace("http://backend:8000", "http://localhost:8000");
+
+    // If it's a media URL, convert to relative path to leverage Next.js rewrites
+    // This avoids "url parameter not allowed in production" issues
+    if (fixedPath.includes("/media/")) {
+      const mediaIndex = fixedPath.indexOf("/media/");
+      return fixedPath.substring(mediaIndex);
+    }
+
+    return fixedPath;
   }
 
   // STAGE 3: Handle relative backend paths starting with '/'

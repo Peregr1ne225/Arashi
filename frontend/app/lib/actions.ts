@@ -9,3 +9,9 @@ export async function revalidateCategories() {
 export async function revalidateProducts() {
     revalidateTag("products", "max");
 }
+
+export async function revalidateCacheTags(tags: string[]) {
+    tags.forEach((tag) => {
+        revalidateTag(tag, "max");
+    });
+}

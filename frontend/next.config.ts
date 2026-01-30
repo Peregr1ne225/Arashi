@@ -18,9 +18,21 @@ const nextConfig: NextConfig = {
         hostname: "img.ltwebstatic.com",
         pathname: "/**",
       },
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "8000",
+        pathname: "/media/**",
+      },
+      {
+        protocol: "http",
+        hostname: "127.0.0.1",
+        port: "8000",
+        pathname: "/media/**",
+      },
     ],
     // Disable image optimization for external images to speed up build
-    unoptimized: true,
+    unoptimized: process.env.NODE_ENV === "development",
   },
   devIndicators: {
     position: "bottom-left",
@@ -28,7 +40,7 @@ const nextConfig: NextConfig = {
   // Allow all ngrok domains for Server Actions
   experimental: {
     serverActions: {
-      allowedOrigins: ["localhost:3000", "*.ngrok-free.app"],
+      allowedOrigins: ["localhost:3000"],
     },
   },
   // Proxy API requests to the backend

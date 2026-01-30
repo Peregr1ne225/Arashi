@@ -26,7 +26,7 @@ export const api = {
     return request(endpoint, { ...options, method: "GET" });
   },
 
-  post: async (endpoint: string, body: any, options: FetchOptions = {}) => {
+  post: async (endpoint: string, body: unknown, options: FetchOptions = {}) => {
     const isFormData = body instanceof FormData;
     // For FormData, bypass Next.js proxy to avoid corruption
     const apiUrl = isFormData ? getApiUrl(true) : API_URL;
@@ -42,7 +42,7 @@ export const api = {
     });
   },
 
-  put: async (endpoint: string, body: any, options: FetchOptions = {}) => {
+  put: async (endpoint: string, body: unknown, options: FetchOptions = {}) => {
     const isFormData = body instanceof FormData;
     // For FormData, bypass Next.js proxy to avoid corruption
     const apiUrl = isFormData ? getApiUrl(true) : API_URL;
@@ -58,7 +58,7 @@ export const api = {
     });
   },
 
-  patch: async (endpoint: string, body: any, options: FetchOptions = {}) => {
+  patch: async (endpoint: string, body: unknown, options: FetchOptions = {}) => {
     const isFormData = body instanceof FormData;
     // For FormData, bypass Next.js proxy to avoid corruption
     const apiUrl = isFormData ? getApiUrl(true) : API_URL;

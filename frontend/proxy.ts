@@ -6,10 +6,12 @@ export function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
     // Define protected routes
-    const protectedRoutes = ['/account', '/checkout'];
+    const protectedRoutes = ['/account', '/checkout', '/orders'];
 
     // Check if the current route is protected
-    const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
+    const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route)) &&
+        !pathname.startsWith('/checkout/success') &&
+        !pathname.startsWith('/checkout/cancel');
 
     if (isProtectedRoute && !token) {
         // Redirect to login page if no token is found
@@ -30,8 +32,8 @@ export const config = {
          * - _next/static (static files)
          * - _next/image (image optimization files)
          * - favicon.ico (favicon file)
-         * - auth (auth routes if any)
+         * - public folder files (images, etc)
          */
-        '/((?!api|_next/static|_next/image|favicon.ico).*)',
+        '/((?!api|_next/static|_next/image|favicon.ico|images|placeholder.jpg).*)',
     ],
 };

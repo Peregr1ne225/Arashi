@@ -109,7 +109,7 @@ export default function CartSheet({ className = "" }: CartSheetProps) {
               {items.map((item) => (
                 <div key={item.id} className="group relative flex gap-4 bg-black border border-white/10 hover:border-accent/40 col-span-1 p-3 skew-box transition-all">
                   {/* Product Image */}
-                  <div className="relative w-20 h-24 flex-shrink-0 bg-neutral-800 border border-white/5 overflow-hidden">
+                  <div className="relative w-20 h-24 shrink-0 bg-neutral-800 border border-white/5 overflow-hidden">
                     <Image
                       src={getImageUrl(item.product.image || item.product.image_url || "/placeholder-product.svg")}
                       alt={item.product.name}
