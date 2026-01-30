@@ -19,14 +19,14 @@ export default function HeaderNavigation({
   return (
     <nav className="hidden lg:block">
       <div className="container mx-auto px-4">
-        <ul className="flex items-center justify-start space-x-8">
+        <ul className="flex items-center justify-start space-x-2">
           <li>
             <CategoryDropdown categories={topLevelCategories} />
           </li>
           <li>
             <Link
               href="/new"
-              className="font-istok text-[16px] text-(--header-text) hover:scale-105 hover:text-black transition-all inline-block font-normal"
+              className="font-istok text-[12px] uppercase tracking-[0.2em] font-bold text-gray-500 hover:text-[#0e4d80] px-6 py-3 rounded-full hover:bg-gray-50 transition-all inline-block"
             >
               New Arrivals
             </Link>
@@ -34,7 +34,7 @@ export default function HeaderNavigation({
           <li>
             <Link
               href="/model"
-              className="font-istok text-[16px] text-(--header-text) hover:scale-105 hover:text-black transition-all inline-block font-normal"
+              className="font-istok text-[12px] uppercase tracking-[0.2em] font-bold text-gray-500 hover:text-[#0e4d80] px-6 py-3 rounded-full hover:bg-gray-50 transition-all inline-block"
             >
               Model
             </Link>

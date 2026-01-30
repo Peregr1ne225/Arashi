@@ -181,7 +181,7 @@ export default function CategoryDropdown({
       >
         <button
           ref={buttonRef}
-          className="font-istok text-[16px] text-(--header-text) hover:scale-105 hover:text-black transition-all inline-block font-normal"
+          className="font-istok text-[12px] uppercase tracking-[0.2em] font-bold text-gray-500 hover:text-[#0e4d80] px-6 py-3 rounded-full hover:bg-gray-50 transition-all inline-block"
           onMouseEnter={handleButtonMouseEnter}
         >
           <span>{buttonLabel}</span>
@@ -191,7 +191,7 @@ export default function CategoryDropdown({
       {isDropdownOpen && (
         <div
           ref={dropdownRef}
-          className="fixed z-50 bg-white shadow-2xl shadow-black/5 border-t border-gray-100 flex flex-col md:flex-row overflow-hidden animate-in fade-in slide-in-from-top-1 duration-200 rounded-b-3xl"
+          className="fixed z-50 bg-white/95 backdrop-blur-md shadow-2xl shadow-blue-900/5 border-t border-gray-100 flex flex-col md:flex-row overflow-hidden animate-in fade-in slide-in-from-top-1 duration-300 rounded-b-4xl"
           style={{
             left: 0,
             top: `var(--header-height)`,
@@ -207,12 +207,12 @@ export default function CategoryDropdown({
           {/* Desktop Mega Menu */}
           <div className="hidden md:flex flex-row h-[500px] max-h-full w-full">
             {/* Navigation Columns area */}
-            <div className="flex flex-row shrink-0 bg-white overflow-x-auto custom-scrollbar pl-8 py-8">
+            <div className="flex flex-row shrink-0 overflow-x-auto custom-scrollbar pl-8 py-8 w-full max-w-4xl">
               {columns.length > 0 ? (
                 columns.map((col, level) => (
                   <div
                     key={level}
-                    className="flex flex-col w-72 overflow-y-auto border-r border-gray-50 last:border-0 px-2"
+                    className="flex flex-col w-72 overflow-y-auto border-r border-gray-100 last:border-0 px-4"
                   >
                     {col.items.map((cat) => {
                       const isActive = activePath[level] === cat.id;
@@ -225,12 +225,14 @@ export default function CategoryDropdown({
                         <Link
                           key={cat.id}
                           href={`/category/${itemPath}`}
-                          className="group flex items-center justify-between px-4 py-3 rounded-xl transition-all cursor-pointer hover:bg-gray-50 mb-1"
+                          className={`group flex items-center justify-between px-4 py-3 rounded-2xl transition-all cursor-pointer mb-2
+                            ${isActive ? "bg-blue-50/50" : "hover:bg-gray-50"}
+                          `}
                           onMouseEnter={() => handleItemHover(cat, level)}
                         >
                           <div className="flex items-center gap-4">
-                            <div className={`w-10 h-10 relative overflow-hidden bg-gray-100 shrink-0 rounded-xl transition-all duration-300
-                                ${isActive ? "ring-2 ring-black" : "group-hover:ring-1 group-hover:ring-gray-200"}
+                            <div className={`w-10 h-10 relative overflow-hidden shrink-0 rounded-full transition-all duration-300
+                                ${isActive ? "bg-[#0e4d80] text-white" : "bg-gray-100 text-gray-400 group-hover:bg-blue-100 group-hover:text-[#0e4d80]"}
                             `}>
                               {cat.image ? (
                                 <Image
@@ -240,20 +242,20 @@ export default function CategoryDropdown({
                                   className="object-cover"
                                 />
                               ) : (
-                                <div className="w-full h-full flex items-center justify-center text-[10px] font-bold uppercase text-gray-300 font-istok">
+                                <div className="w-full h-full flex items-center justify-center text-[10px] font-bold uppercase font-istok">
                                   {cat.name.substring(0, 2)}
                                 </div>
                               )}
                             </div>
-                            <span className={`text-[12px] font-istok uppercase tracking-[0.2em] transition-colors
-                                ${isActive ? "font-normal text-black" : "font-light text-gray-500 group-hover:text-black"}
+                            <span className={`text-[11px] font-istok uppercase tracking-[0.2em] transition-colors font-bold
+                                ${isActive ? "text-[#0e4d80]" : "text-gray-500 group-hover:text-[#0e4d80]"}
                             `}>
                               {cat.name}
                             </span>
                           </div>
                           {hasChildren && (
                             <div className={`w-1.5 h-1.5 rounded-full transition-all duration-300 
-                                ${isActive ? "bg-black opacity-100" : "bg-gray-300 opacity-0 group-hover:opacity-100"}
+                                ${isActive ? "bg-[#0e4d80] opacity-100 scale-125" : "bg-gray-300 opacity-0 group-hover:opacity-100"}
                             `} />
                           )}
                         </Link>
