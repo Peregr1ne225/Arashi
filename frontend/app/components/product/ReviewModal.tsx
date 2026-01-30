@@ -2,13 +2,16 @@
 
 import { useState } from "react";
 import { X, Star, Loader2 } from "lucide-react";
+import NextImage from "next/image";
 import { reviewsApi } from "@/app/lib/api/client";
-import { Product } from "@/app/types";
+import { Product } from "@/app/types/product";
+import { ReviewProduct } from "@/app/types/review";
+import { getImageUrl } from "@/app/lib/utils/image";
 
 interface ReviewModalProps {
     isOpen: boolean;
     onClose: () => void;
-    product: Product;
+    product: ReviewProduct | Product;
     orderId: number;
     onSuccess?: () => void;
 }
@@ -38,8 +41,9 @@ export default function ReviewModal({ isOpen, onClose, product, orderId, onSucce
             // Reset form
             setRating(5);
             setComment("");
-        } catch (err: any) {
-            setError(err.message || "Failed to submit review");
+        } catch (err) {
+            const message = err instanceof Error ? err.message : "Failed to submit review";
+            setError(message);
         } finally {
             setLoading(false);
         }
@@ -62,10 +66,12 @@ export default function ReviewModal({ isOpen, onClose, product, orderId, onSucce
                     <div className="flex items-center space-x-4 mb-4">
                         <div className="h-16 w-16 relative rounded-md overflow-hidden border border-gray-200 bg-gray-100 shrink-0">
                             {/* Use the product image if available */}
-                            <img
-                                src={product.image || product.image_url || "/placeholder-product.svg"}
+                            <NextImage
+                                src={getImageUrl((product.images && product.images[0]) || "/placeholder-product.svg")}
                                 alt={product.name}
-                                className="object-cover w-full h-full"
+                                fill
+                                className="object-cover"
+                                sizes="64px"
                             />
                         </div>
                         <div>
@@ -88,8 +94,8 @@ export default function ReviewModal({ isOpen, onClose, product, orderId, onSucce
                                 >
                                     <Star
                                         className={`w-8 h-8 ${star <= rating
-                                                ? "text-yellow-400 fill-current"
-                                                : "text-gray-300"
+                                            ? "text-yellow-400 fill-current"
+                                            : "text-gray-300"
                                             }`}
                                     />
                                 </button>

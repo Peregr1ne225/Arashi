@@ -15,7 +15,6 @@ export default function AccountAddress() {
         e.preventDefault();
         setIsLoading(true);
         try {
-            // Assuming address is updated via profile endpoint
             const response = await api.put("/auth/profile/update/", { address });
             if (response.ok) {
                 const updatedUser = await response.json();
@@ -30,65 +29,72 @@ export default function AccountAddress() {
     };
 
     return (
-        <div className="bg-neutral-900 border border-white/10 skew-box overflow-hidden">
-            <div className="px-6 py-5 border-b border-white/10 bg-black/20 flex justify-between items-center">
+        <div className="space-y-8 animate-fadeIn">
+            <div className="flex justify-between items-end border-b border-gray-100 pb-4">
                 <div>
-                    <h3 className="text-2xl font-black uppercase italic tracking-tighter text-white">Shipping Coordinates</h3>
-                    <p className="mt-1 text-xs font-bold uppercase tracking-widest text-gray-500">Manage your delivery zone.</p>
+                    <h3 className="font-koulen text-3xl text-[#0e4d80] leading-none">
+                        Address Book
+                    </h3>
+                    <p className="font-istok text-sm text-gray-400 uppercase tracking-widest mt-1">
+                        Manage your shipping address
+                    </p>
                 </div>
                 {!isEditing && (
                     <button
                         onClick={() => setIsEditing(true)}
-                        className="text-xs font-bold uppercase tracking-widest text-accent hover:text-white transition-colors skew-box border border-accent/20 px-4 py-2 hover:bg-accent hover:text-black"
+                        className="font-istok text-xs font-bold uppercase tracking-[0.2em] text-[#0e4d80] hover:text-[#0b3d66] transition-colors border-b-2 border-transparent hover:border-[#0e4d80] pb-0.5"
                     >
-                        Edit Zone //
+                        Edit
                     </button>
                 )}
             </div>
 
-            <div className="p-6">
+            <div className="py-2">
                 {isEditing ? (
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div>
-                            <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Default Shipping Address</label>
+                            <label className="block font-istok text-xs font-bold uppercase tracking-[0.15em] mb-2 text-gray-400 ml-2">
+                                Default Shipping Address
+                            </label>
                             <textarea
                                 rows={4}
                                 value={address}
                                 onChange={(e) => setAddress(e.target.value)}
-                                className="w-full px-4 py-3 bg-black border border-white/20 rounded-none text-white font-bold tracking-wide focus:outline-none focus:border-accent skew-box transition-colors resize-none placeholder-gray-600"
-                                placeholder="ENTER YOUR FULL ADDRESS HERE..."
+                                className="block w-full rounded-2xl bg-gray-50 text-gray-900 border border-transparent focus:border-[#0e4d80] focus:outline-none focus:ring-2 focus:ring-[#0e4d80]/10 font-istok text-base font-bold p-6 min-h-35 resize-none placeholder-gray-400 shadow-inner transition-all"
+                                placeholder="Enter your full shipping address..."
                             />
                         </div>
-                        <div className="flex justify-end gap-4 border-t border-white/10 pt-6">
+                        <div className="flex justify-end gap-4">
                             <button
                                 type="button"
                                 onClick={() => setIsEditing(false)}
-                                className="px-6 py-2 border border-white/20 text-white font-bold uppercase tracking-wider hover:bg-white/10 skew-box transition-colors"
+                                className="px-8 h-12 rounded-full border-2 border-gray-100 text-gray-500 font-istok text-sm font-bold uppercase tracking-[0.2em] hover:bg-gray-50 hover:text-gray-700 transition-colors"
                             >
                                 Cancel
                             </button>
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="px-6 py-2 bg-accent text-black font-black uppercase italic tracking-wider hover:bg-white hover:text-black skew-box transition-colors"
+                                className="px-8 h-12 rounded-full bg-[#0e4d80] text-white font-istok text-sm font-bold uppercase tracking-[0.2em] hover:bg-[#0b3d66] hover:shadow-lg hover:shadow-blue-900/20 hover:-translate-y-0.5 transition-all disabled:opacity-50 min-w-37"
                             >
-                                {isLoading ? "Saving..." : "Save Coordinates //"}
+                                Save Address
                             </button>
                         </div>
                     </form>
                 ) : (
-                    <div className="bg-black border border-white/10 p-6 flex items-start space-x-4 skew-box relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
-                            <MapPin className="w-24 h-24 text-white" />
-                        </div>
-                        <div className="p-3 bg-neutral-900 border border-white/10 skew-box-sm">
-                            <MapPin className="w-6 h-6 text-accent" />
-                        </div>
-                        <div className="relative z-10">
-                            <h4 className="text-sm font-black uppercase italic tracking-wide text-white mb-2">Default Zone</h4>
-                            <p className="text-sm font-bold text-gray-400 whitespace-pre-wrap uppercase tracking-wide leading-relaxed">
-                                {user?.address || "NO ADDRESS ASSIGNED TO THIS LOCKER."}
-                            </p>
+                    <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                        <div className="flex items-start gap-4">
+                            <div className="p-3 bg-blue-50 rounded-full text-[#0e4d80]">
+                                <MapPin className="w-6 h-6" />
+                            </div>
+                            <div>
+                                <h4 className="font-istok font-bold uppercase tracking-[0.15em] mb-2 text-gray-400 text-xs">
+                                    Default Address
+                                </h4>
+                                <p className="font-istok text-lg font-bold text-gray-900 whitespace-pre-wrap leading-relaxed">
+                                    {user?.address || "No address saved yet."}
+                                </p>
+                            </div>
                         </div>
                     </div>
                 )}
