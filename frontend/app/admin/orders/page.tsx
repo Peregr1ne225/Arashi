@@ -1,16 +1,81 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { useAuth } from "@/app/hooks/useAuth";
-import { ordersApi, Order } from "@/app/lib/api/orders";
+import { ordersApi } from "@/app/lib/api/orders";
+import { Order } from "@/app/types/order";
+import { getImageUrl } from "@/app/lib/utils/image";
+import {
+    Search,
+    Truck,
+    Package,
+    CheckCircle2,
+    Clock,
+    ExternalLink,
+    ClipboardList,
+    TrendingUp,
+    ChevronDown,
+    ChevronUp
+} from "lucide-react";
+import { SortIcon } from "@/app/components/admin/SortIcon";
 
 export default function AdminOrdersPage() {
     const { user, isAuthenticated, loading } = useAuth();
     const router = useRouter();
     const [orders, setOrders] = useState<Order[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [expandedOrderIds, setExpandedOrderIds] = useState<Set<number>>(new Set());
+    const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
+    const [pagination, setPagination] = useState<{ next: string | null; previous: string | null; count: number }>({
+        next: null,
+        previous: null,
+        count: 0
+    });
+    const [stats, setStats] = useState({
+        total_orders: 0,
+        total_revenue: 0,
+        status_counts: {
+            pending: 0,
+            processing: 0,
+            shipped: 0,
+            delivered: 0,
+            cancelled: 0
+        }
+    });
+
+    const handleSort = (key: string) => {
+        let direction: 'asc' | 'desc' = 'asc';
+        if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
+            direction = 'desc';
+        }
+        setSortConfig({ key, direction });
+
+        // Map frontend keys to backend keys if necessary
+        const ordering = direction === 'desc' ? `-${key}` : key;
+        fetchOrders(ordering, searchQuery);
+    };
+
+    // Trigger search when query changes
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (sortConfig) {
+                const ordering = sortConfig.direction === 'desc' ? `-${sortConfig.key}` : sortConfig.key;
+                fetchOrders(ordering, searchQuery);
+            } else {
+                fetchOrders(undefined, searchQuery);
+            }
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [searchQuery, sortConfig]);
+
+    const filteredOrders = orders; // API does filtering
+    const sortedOrders = orders;   // API does sorting
+
+    // Modal States
     const [editingOrder, setEditingOrder] = useState<Order | null>(null);
     const [newTrackingNumber, setNewTrackingNumber] = useState("");
     const [editingStatusOrder, setEditingStatusOrder] = useState<Order | null>(null);
@@ -27,16 +92,61 @@ export default function AdminOrdersPage() {
         }
     }, [isAuthenticated, loading, user, router]);
 
-    const fetchOrders = async () => {
+    const fetchOrders = async (ordering?: string, search?: string, page: number = 1) => {
+        setIsLoading(true);
         try {
-            const response = await ordersApi.getOrders({ mode: "admin" });
+            const params: { mode: string; ordering?: string; search?: string; page?: number } = { mode: "admin" };
+            if (ordering) params.ordering = ordering;
+            if (search) params.search = search;
+            if (page > 1) params.page = page;
+
+            const response = await ordersApi.getOrders(params);
             setOrders(response.results);
+            setPagination({
+                next: response.next,
+                previous: response.previous,
+                count: response.count
+            });
         } catch (error) {
             console.error("Failed to fetch orders", error);
-            alert("Failed to load orders");
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const fetchStats = async () => {
+        try {
+            const data = await ordersApi.getStats();
+            setStats(data);
+        } catch (error) {
+            console.error("Failed to fetch order stats", error);
+        }
+    };
+
+    // Initial load
+    useEffect(() => {
+        if (!loading && isAuthenticated) {
+            fetchStats();
+            // fetchOrders is called by the other useEffect when user changes
+        }
+    }, [loading, isAuthenticated]);
+
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const handlePageChange = (newPage: number) => {
+        setCurrentPage(newPage);
+        const ordering = sortConfig ? (sortConfig.direction === 'desc' ? `-${sortConfig.key}` : sortConfig.key) : undefined;
+        fetchOrders(ordering, searchQuery, newPage);
+    };
+
+    const toggleOrderExpansion = (orderId: number) => {
+        const newExpanded = new Set(expandedOrderIds);
+        if (newExpanded.has(orderId)) {
+            newExpanded.delete(orderId);
+        } else {
+            newExpanded.add(orderId);
+        }
+        setExpandedOrderIds(newExpanded);
     };
 
     const handleEditClick = (order: Order) => {
@@ -64,12 +174,7 @@ export default function AdminOrdersPage() {
                 editingOrder.display_id || editingOrder.id,
                 newTrackingNumber
             );
-
-            // Update local state
-            setOrders(orders.map(o =>
-                (o.id === updatedOrder.id) ? updatedOrder : o
-            ));
-
+            setOrders(orders.map(o => (o.id === updatedOrder.id) ? updatedOrder : o));
             handleCloseModal();
         } catch (error) {
             console.error("Failed to update tracking", error);
@@ -83,16 +188,8 @@ export default function AdminOrdersPage() {
         if (!editingStatusOrder) return;
         setIsSaving(true);
         try {
-            const updatedOrder = await ordersApi.updateStatus(
-                editingStatusOrder.id, // updateStatus likely uses ID, let's verify if it supports display_id if we want consistency, but ID matches current usage in detail page
-                newStatus
-            );
-
-            // Update local state
-            setOrders(orders.map(o =>
-                (o.id === updatedOrder.id) ? updatedOrder : o
-            ));
-
+            const updatedOrder = await ordersApi.updateStatus(editingStatusOrder.id, newStatus);
+            setOrders(orders.map(o => (o.id === updatedOrder.id) ? updatedOrder : o));
             handleCloseModal();
         } catch (error) {
             console.error("Failed to update status", error);
@@ -102,231 +199,503 @@ export default function AdminOrdersPage() {
         }
     };
 
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case "pending":
-                return "bg-yellow-100 text-yellow-800";
-            case "processing":
-                return "bg-blue-100 text-blue-800";
-            case "shipped":
-                return "bg-purple-100 text-purple-800";
-            case "delivered":
-                return "bg-green-100 text-green-800";
-            case "cancelled":
-                return "bg-red-100 text-red-800";
-            default:
-                return "bg-gray-100 text-gray-800";
-        }
-    };
-
     if (loading || isLoading) {
         return (
-            <div className="flex justify-center items-center min-h-screen">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            <div className="flex justify-center items-center min-h-[60vh]">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#D2042D]"></div>
             </div>
         );
     }
 
     return (
-        <main className="container mx-auto px-4 py-8 flex-1">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4 border-b border-white/10 pb-6">
+        <div className="pt-8 flex flex-col space-y-8 animate-in fade-in duration-500">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-black uppercase italic tracking-tighter text-white">Order Operations</h1>
-                    <p className="text-gray-400 font-bold uppercase tracking-wider text-xs mt-1">Manage Logistics & Tracking</p>
+                    <h1 className="font-koulen text-4xl tracking-wide text-[#0e4d80]">
+                        Order <span className="text-[#D2042D]">Manager</span>
+                    </h1>
+                    <p className="font-istok text-xs text-gray-500 uppercase tracking-[0.2em] mt-1 font-bold">
+                        Oversee Logistics & Revenue
+                    </p>
+                </div>
+                <div className="flex items-center space-x-2 bg-white px-4 py-2 border border-gray-100 rounded-sm shadow-sm">
+                    <div className="flex items-center gap-2">
+                        <span className="font-istok text-[10px] text-gray-500 uppercase tracking-widest font-bold">Live Portal Status</span>
+                        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]" />
+                    </div>
                 </div>
             </div>
 
-            <div className="bg-neutral-900 border border-white/10 skew-box overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.3)]">
-                <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-white/10">
-                        <thead className="bg-black/40">
-                            <tr>
-                                <th scope="col" className="px-6 py-4 text-left text-[10px] font-black uppercase italic tracking-widest text-accent">Order ID</th>
-                                <th scope="col" className="px-6 py-4 text-left text-[10px] font-black uppercase italic tracking-widest text-accent">Customer</th>
-                                <th scope="col" className="px-6 py-4 text-left text-[10px] font-black uppercase italic tracking-widest text-accent">Date</th>
-                                <th scope="col" className="px-6 py-4 text-left text-[10px] font-black uppercase italic tracking-widest text-accent">Total</th>
-                                <th scope="col" className="px-6 py-4 text-left text-[10px] font-black uppercase italic tracking-widest text-accent">Status</th>
-                                <th scope="col" className="px-6 py-4 text-left text-[10px] font-black uppercase italic tracking-widest text-accent">Tracking</th>
-                                <th scope="col" className="px-6 py-4 text-right text-[10px] font-black uppercase italic tracking-widest text-accent">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-transparent divide-y divide-white/5">
-                            {orders.map((order) => (
-                                <tr key={order.id} className="hover:bg-white/5 transition-colors group">
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold uppercase tracking-wide text-white">
-                                        <span className="font-mono text-accent">#</span>{order.display_id || order.id}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                                        <div className="font-bold uppercase tracking-wide text-white group-hover:text-accent transition-colors">{order.full_name}</div>
-                                        <div className="text-[10px] font-mono text-gray-500">ID: {order.user}</div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-xs font-medium uppercase tracking-wider text-gray-400">
-                                        {new Date(order.created_at).toLocaleDateString()}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-black italic tracking-wide text-white">
-                                        ฿{order.total_amount.toLocaleString()}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <button
-                                            onClick={() => handleEditStatusClick(order)}
-                                            className={`px-3 py-1 text-[10px] font-black uppercase italic tracking-wider skew-box-sm hover:opacity-80 transition-opacity ${order.status === 'delivered' ? 'bg-accent/20 text-accent border border-accent/20' :
-                                                    order.status === 'shipped' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/20' :
-                                                        order.status === 'processing' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/20' :
-                                                            order.status === 'cancelled' ? 'bg-red-500/20 text-red-500 border border-red-500/20' :
-                                                                'bg-white/10 text-gray-400 border border-white/10'
-                                                }`}
-                                        >
-                                            {order.status}
-                                        </button>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        <button
-                                            onClick={() => handleEditClick(order)}
-                                            className="text-gray-400 hover:text-accent flex items-center gap-2 group/btn transition-colors"
-                                        >
-                                            {order.tracking_number ? (
-                                                <span className="font-mono text-xs text-white group-hover/btn:text-accent">{order.tracking_number}</span>
-                                            ) : (
-                                                <span className="text-[10px] font-bold uppercase tracking-wider opacity-50 group-hover/btn:opacity-100">Add Tracking //</span>
-                                            )}
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter" className="opacity-0 group-hover/btn:opacity-100 transition-opacity"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" /><path d="m15 5 4 4" /></svg>
-                                        </button>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <Link
-                                            href={`/admin/orders/${order.display_id || order.id}`}
-                                            className="text-gray-400 hover:text-accent text-xs font-bold uppercase tracking-wider transition-colors"
-                                        >
-                                            View Details
-                                        </Link>
-                                    </td>
-                                </tr>
-                            ))}
-                            {orders.length === 0 && (
-                                <tr>
-                                    <td colSpan={7} className="px-6 py-12 text-center text-gray-500 font-bold uppercase tracking-widest">
-                                        No active orders found.
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            {/* Edit Tracking Modal */}
-            {editingOrder && (
-                <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-                    <div className="bg-neutral-900 border border-white/10 w-full max-w-md skew-box shadow-2xl relative p-8">
-                        <div className="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
-                            <h3 className="text-xl font-black uppercase italic tracking-tighter text-white">
-                                Logistics Update
-                            </h3>
-                            <button
-                                onClick={handleCloseModal}
-                                className="text-gray-500 hover:text-white transition-colors"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter"><path d="M18 6 6 18" /><path d="m6 6 18 12" /></svg>
-                            </button>
+            {/* Dashboard Statistics */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div className="card-sport p-5 flex flex-col justify-between group">
+                    <div className="flex justify-between items-start mb-3">
+                        <div className="p-2 bg-blue-50 rounded-full group-hover:bg-blue-100 transition-colors">
+                            <ClipboardList className="w-5 h-5 text-blue-600" />
                         </div>
-                        <div className="mb-6 space-y-4">
-                            <p className="text-xs font-bold uppercase tracking-widest text-gray-500">
-                                Order ref: <span className="text-accent font-mono ml-1">#{editingOrder.display_id || editingOrder.id}</span>
-                            </p>
-                            <div>
-                                <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">
-                                    Tracking Number
-                                </label>
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Overall</span>
+                    </div>
+                    <div className="font-koulen text-2xl text-[#0e4d80]">{stats.total_orders}</div>
+                    <div className="font-istok text-[10px] text-gray-400 uppercase tracking-widest mt-1">Total Registry</div>
+                </div>
+
+                <div className="card-sport p-5 flex flex-col justify-between group">
+                    <div className="flex justify-between items-start mb-3">
+                        <div className="p-2 bg-yellow-50 rounded-full group-hover:bg-yellow-100 transition-colors">
+                            <Clock className="w-5 h-5 text-yellow-600" />
+                        </div>
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Awaiting</span>
+                    </div>
+                    <div className="font-koulen text-2xl text-yellow-600">{stats.status_counts.pending}</div>
+                    <div className="font-istok text-[10px] text-gray-400 uppercase tracking-widest mt-1">Pending Action</div>
+                </div>
+
+                <div className="card-sport p-5 flex flex-col justify-between group">
+                    <div className="flex justify-between items-start mb-3">
+                        <div className="p-2 bg-purple-50 rounded-full group-hover:bg-purple-100 transition-colors">
+                            <Package className="w-5 h-5 text-purple-600" />
+                        </div>
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">In Layout</span>
+                    </div>
+                    <div className="font-koulen text-2xl text-purple-600">{stats.status_counts.processing}</div>
+                    <div className="font-istok text-[10px] text-gray-400 uppercase tracking-widest mt-1">Processing</div>
+                </div>
+
+                <div className="card-sport p-5 flex flex-col justify-between group">
+                    <div className="flex justify-between items-start mb-3">
+                        <div className="p-2 bg-green-50 rounded-full group-hover:bg-green-100 transition-colors">
+                            <Truck className="w-5 h-5 text-green-600" />
+                        </div>
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Fulfilled</span>
+                    </div>
+                    <div className="font-koulen text-2xl text-green-600">{stats.status_counts.shipped + stats.status_counts.delivered}</div>
+                    <div className="font-istok text-[10px] text-gray-400 uppercase tracking-widest mt-1">Dispatched</div>
+                </div>
+
+                <div className="card-sport p-5 flex flex-col justify-between group">
+                    <div className="flex justify-between items-start mb-3">
+                        <div className="p-2 bg-red-50 rounded-full group-hover:bg-red-100 transition-colors">
+                            <TrendingUp className="w-5 h-5 text-[#D2042D]" />
+                        </div>
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Valuation</span>
+                    </div>
+                    <div className="font-koulen text-2xl text-[#D2042D]">฿{stats.total_revenue.toLocaleString()}</div>
+                    <div className="font-istok text-[10px] text-gray-400 uppercase tracking-widest mt-1">Total Revenue</div>
+                </div>
+            </div>
+
+            {/* Toolbar */}
+            <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="relative w-full md:max-w-md">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                        type="text"
+                        placeholder="Search by ID or Customer Name..."
+                        className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-md font-istok text-xs focus:ring-1 focus:ring-[#0e4d80] outline-none transition-all"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                </div>
+                <div className="flex items-center gap-3 w-full md:w-auto">
+                    <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                        Showing {filteredOrders.length} Results
+                    </div>
+                </div>
+            </div>
+
+            {/* Table Area */}
+            <div className="card-sport overflow-hidden">
+                <table className="min-w-full divide-y divide-gray-100">
+                    <thead className="bg-gray-100 sticky top-0 z-10">
+                        <tr>
+                            <th className="w-10 px-4 py-4"></th>
+                            <th className="px-6 py-4 text-left cursor-pointer group hover:bg-gray-200 transition-colors" onClick={() => handleSort('id')}>
+                                <div className="flex items-center gap-2 font-istok text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold">
+                                    Registry ID <SortIcon columnKey="id" sortConfig={sortConfig} />
+                                </div>
+                            </th>
+                            <th className="px-6 py-4 text-left cursor-pointer group hover:bg-gray-200 transition-colors" onClick={() => handleSort('full_name')}>
+                                <div className="flex items-center gap-2 font-istok text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold">
+                                    Customer Profile <SortIcon columnKey="full_name" sortConfig={sortConfig} />
+                                </div>
+                            </th>
+                            <th className="px-6 py-4 text-left cursor-pointer group hover:bg-gray-200 transition-colors" onClick={() => handleSort('created_at')}>
+                                <div className="flex items-center gap-2 font-istok text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold">
+                                    Timestamp <SortIcon columnKey="created_at" sortConfig={sortConfig} />
+                                </div>
+                            </th>
+                            <th className="px-6 py-4 text-left cursor-pointer group hover:bg-gray-200 transition-colors" onClick={() => handleSort('total_amount')}>
+                                <div className="flex items-center gap-2 font-istok text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold">
+                                    Valuation <SortIcon columnKey="total_amount" sortConfig={sortConfig} />
+                                </div>
+                            </th>
+                            <th className="px-6 py-4 text-left cursor-pointer group hover:bg-gray-200 transition-colors" onClick={() => handleSort('status')}>
+                                <div className="flex items-center gap-2 font-istok text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold">
+                                    System Status <SortIcon columnKey="status" sortConfig={sortConfig} />
+                                </div>
+                            </th>
+                            <th className="px-6 py-4 text-left font-istok text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold">Logistic ID</th>
+                            <th className="px-6 py-4 text-right font-istok text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold">Control</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 bg-white">
+                        {sortedOrders.length > 0 ? sortedOrders.map((order) => {
+                            const isExpanded = expandedOrderIds.has(order.id);
+                            return (
+                                <React.Fragment key={order.id}>
+                                    <tr className={`hover:bg-gray-50/80 transition-colors group ${isExpanded ? 'bg-gray-50/40' : ''}`}>
+                                        <td className="px-4 py-6">
+                                            <button
+                                                onClick={() => toggleOrderExpansion(order.id)}
+                                                className="p-1.5 hover:bg-white border border-transparent hover:border-gray-200 rounded-sm transition-all text-gray-400 hover:text-[#0e4d80]"
+                                            >
+                                                {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                                            </button>
+                                        </td>
+                                        <td className="px-6 py-6 border-l-2 border-transparent group-hover:border-l-[#0e4d80]">
+                                            <div className="font-koulen text-base text-black tracking-widest">#{order.display_id || order.id}</div>
+                                            <div className="text-[8px] text-gray-400 font-mono mt-0.5 uppercase">Internal Ref: {order.id}</div>
+                                        </td>
+                                        <td className="px-6 py-6">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-[#0e4d80] text-xs">
+                                                    {order.full_name?.charAt(0) || '?'}
+                                                </div>
+                                                <div>
+                                                    <div className="font-istok text-xs font-bold text-black uppercase tracking-wide">{order.full_name}</div>
+                                                    <div className="font-istok text-[9px] text-gray-400 uppercase tracking-widest mt-0.5">Contact: {order.phone_number || 'N/A'}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-6">
+                                            <div className="font-istok text-xs text-gray-500 uppercase tracking-widest">
+                                                {new Date(order.created_at).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
+                                            </div>
+                                            <div className="text-[8px] text-gray-400 mt-0.5 font-bold uppercase tracking-tighter">
+                                                {new Date(order.created_at).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-6">
+                                            <div className="font-koulen text-base text-[#D2042D]">฿{order.total_amount.toLocaleString()}</div>
+                                            <div className="text-[8px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">{order.items.length} Items</div>
+                                        </td>
+                                        <td className="px-6 py-6">
+                                            <button
+                                                onClick={() => handleEditStatusClick(order)}
+                                                className={`px-4 py-2 text-[11px] font-bold uppercase tracking-widest rounded-full border shadow-xs hover:shadow-sm active:scale-95 transition-all flex items-center gap-2 group/btn ${order.status === 'delivered' ? 'border-green-500/30 text-green-600 bg-green-50' :
+                                                    order.status === 'cancelled' ? 'border-red-500/30 text-red-500 bg-red-50' :
+                                                        order.status === 'shipped' ? 'border-blue-500/30 text-blue-600 bg-blue-50' :
+                                                            'border-orange-500/30 text-orange-600 bg-orange-50'
+                                                    }`}
+                                            >
+                                                <div className={`w-1 h-1 rounded-full ${order.status === 'delivered' ? 'bg-green-500' :
+                                                    order.status === 'cancelled' ? 'bg-red-500' :
+                                                        order.status === 'shipped' ? 'bg-blue-500' :
+                                                            'bg-orange-500 animate-pulse'
+                                                    }`} />
+                                                {order.status}
+                                            </button>
+                                        </td>
+                                        <td className="px-6 py-6">
+                                            <div
+                                                onClick={() => handleEditClick(order)}
+                                                className="cursor-pointer group/track"
+                                            >
+                                                {order.tracking_number ? (
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-black bg-gray-50 px-2 py-1 rounded-full border border-gray-100 font-mono text-[10px] font-bold group-hover/track:border-[#0e4d80] transition-colors">{order.tracking_number}</span>
+                                                        <Truck size={12} className="text-gray-400 group-hover/track:text-[#0e4d80] transition-colors" />
+                                                    </div>
+                                                ) : (
+                                                    <span className="font-istok text-[10px] font-bold text-gray-300 italic group-hover/track:text-[#0e4d80] transition-colors uppercase tracking-widest">+ Assign Logistics</span>
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-6 text-right">
+                                            <Link
+                                                href={`/admin/orders/${order.display_id || order.id}`}
+                                                className="inline-flex items-center gap-2 font-istok text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-[#D2042D] transition-colors group/inspect"
+                                            >
+                                                Inspect <ExternalLink size={12} className="group-hover/inspect:translate-x-0.5 group-hover/inspect:-translate-y-0.5 transition-transform" />
+                                            </Link>
+                                        </td>
+                                    </tr>
+
+                                    {/* Expandable Order Items */}
+                                    {isExpanded && (
+                                        <tr className="bg-gray-50/50 border-l-4 border-l-[#0e4d80]/20 animate-in fade-in slide-in-from-top-1 duration-200">
+                                            <td colSpan={8} className="px-6 py-4">
+                                                <div className="bg-white rounded border border-gray-100 shadow-inner overflow-hidden">
+                                                    <div className="bg-gray-50/50 px-4 py-2 border-b border-gray-100 flex items-center justify-between">
+                                                        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">MANIFEST CONTENT</span>
+                                                        <span className="text-[9px] font-bold text-[#0e4d80] uppercase tracking-widest">{order.items.length} LINE ITEMS</span>
+                                                    </div>
+                                                    <div className="divide-y divide-gray-50">
+                                                        {order.items.map((item, idx) => {
+                                                            const isDiscounted = item.product.price > item.price;
+                                                            return (
+                                                                <div key={idx} className="p-4 flex items-center justify-between hover:bg-gray-50/30 transition-colors">
+                                                                    <div className="flex items-center gap-4">
+                                                                        <div className="relative w-12 h-12 bg-white rounded border border-gray-100 overflow-hidden shrink-0">
+                                                                            {item.product.images && item.product.images.length > 0 ? (
+                                                                                <Image
+                                                                                    src={getImageUrl(item.product.images[0])}
+                                                                                    alt={item.product.name}
+                                                                                    fill
+                                                                                    className="object-contain p-1"
+                                                                                />
+                                                                            ) : (
+                                                                                <div className="w-full h-full flex items-center justify-center text-[10px] text-gray-300 font-bold">NO IMG</div>
+                                                                            )}
+                                                                        </div>
+                                                                        <div>
+                                                                            <div className="flex items-center gap-2">
+                                                                                <div className="font-koulen text-sm text-black tracking-wide uppercase">{item.product.name}</div>
+                                                                                {isDiscounted && (
+                                                                                    <span className="text-[8px] font-bold text-white bg-red-500 px-1.5 py-0.5 rounded-xs uppercase tracking-tighter animate-pulse">
+                                                                                        Save ฿{(item.product.price - item.price).toLocaleString()}
+                                                                                    </span>
+                                                                                )}
+                                                                            </div>
+                                                                            <div className="flex items-center gap-2 mt-1">
+                                                                                {item.color_name && (
+                                                                                    <span className="text-[8px] font-bold text-white bg-gray-400 px-1.5 py-0.5 rounded-xs uppercase tracking-tighter">COLOR: {item.color_name}</span>
+                                                                                )}
+                                                                                {item.size_name && (
+                                                                                    <span className="text-[8px] font-bold text-white bg-[#D2042D]/60 px-1.5 py-0.5 rounded-xs uppercase tracking-tighter">SIZE: {item.size_name}</span>
+                                                                                )}
+                                                                                <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest px-1.5 py-0.5 border border-gray-100 rounded-xs">QTY: {item.quantity}</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="text-right">
+                                                                        <div className="flex flex-col items-end">
+                                                                            {isDiscounted && (
+                                                                                <div className="text-[10px] text-gray-400 font-bold line-through decoration-red-500/50 decoration-1">
+                                                                                    ฿{(item.product.price * item.quantity).toLocaleString()}
+                                                                                </div>
+                                                                            )}
+                                                                            <div className={`font-koulen text-sm ${isDiscounted ? 'text-[#D2042D]' : 'text-black'}`}>
+                                                                                ฿{(item.price * item.quantity).toLocaleString()}
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="text-[8px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">
+                                                                            {isDiscounted ? (
+                                                                                <span>
+                                                                                    <span className="line-through decoration-gray-300">฿{item.product.price.toLocaleString()}</span>
+                                                                                    <span className="mx-1 text-gray-300">→</span>
+                                                                                    <span className="text-[#D2042D]">฿{item.price.toLocaleString()}</span>
+                                                                                </span>
+                                                                            ) : (
+                                                                                <span>฿{item.price.toLocaleString()}</span>
+                                                                            )} PER UNIT
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                    <div className="bg-gray-50/30 px-4 py-3 border-t border-gray-100">
+                                                        <div className="flex justify-end">
+                                                            <div className="flex flex-col items-end gap-1">
+                                                                <div className="flex items-center gap-4 text-[9px] text-gray-400 font-bold uppercase tracking-widest">
+                                                                    <span>Subtotal ({order.items.length} Items)</span>
+                                                                    <span>฿{order.items.reduce((acc, item) => acc + (item.price * item.quantity), 0).toLocaleString()}</span>
+                                                                </div>
+                                                                {(order.items.reduce((acc, item) => acc + ((item.product.price - item.price) * item.quantity), 0) > 0) && (
+                                                                    <div className="flex items-center gap-4 text-[9px] text-green-600 font-bold uppercase tracking-widest">
+                                                                        <span>Total Savings</span>
+                                                                        <span>-฿{order.items.reduce((acc, item) => acc + ((item.product.price - item.price) * item.quantity), 0).toLocaleString()}</span>
+                                                                    </div>
+                                                                )}
+                                                                {(Number(order.total_amount) - order.items.reduce((acc, item) => acc + (item.price * item.quantity), 0)) > 0 && (
+                                                                    <div className="flex items-center gap-4 text-[9px] text-gray-400 font-bold uppercase tracking-widest">
+                                                                        <span>Logistics & Handling</span>
+                                                                        <span>฿{(Number(order.total_amount) - order.items.reduce((acc, item) => acc + (item.price * item.quantity), 0)).toLocaleString()}</span>
+                                                                    </div>
+                                                                )}
+                                                                <div className="flex items-center gap-4 mt-1 border-t border-gray-200 pt-1">
+                                                                    <span className="text-[10px] font-bold text-[#0e4d80] uppercase tracking-widest">Total Valuation</span>
+                                                                    <span className="font-koulen text-xl text-[#D2042D]">฿{Number(order.total_amount).toLocaleString()}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        {order.shipping_address && (
+                                                            <div className="mt-4 pt-3 border-t border-gray-200/60">
+                                                                <div className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Shipping Destination</div>
+                                                                <div className="text-sm text-gray-600 font-istok">{order.shipping_address}</div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )}
+                                </React.Fragment>
+                            );
+                        }) : (
+                            <tr>
+                                <td colSpan={8} className="px-6 py-12 text-center">
+                                    <div className="flex flex-col items-center justify-center text-gray-400">
+                                        <Package size={48} className="mb-3 opacity-20" />
+                                        <p className="font-istok text-sm uppercase tracking-widest">No matching order entries found</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
+
+            {/* Pagination Controls */}
+            <div className="flex items-center justify-between border-t border-gray-100 bg-white px-4 py-3 sm:px-6 shadow-sm rounded-b-lg">
+                <div className="flex flex-1 justify-between sm:hidden">
+                    <button
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={!pagination.previous}
+                        className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        Previous
+                    </button>
+                    <button
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={!pagination.next}
+                        className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        Next
+                    </button>
+                </div>
+                <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                    <div>
+                        <p className="text-sm text-gray-700 font-istok">
+                            Showing <span className="font-bold">{((currentPage - 1) * 50) + 1}</span> to <span className="font-bold">{Math.min(currentPage * 50, pagination.count)}</span> of{' '}
+                            <span className="font-bold">{pagination.count}</span> results
+                        </p>
+                    </div>
+                    <div>
+                        <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                            <button
+                                onClick={() => handlePageChange(currentPage - 1)}
+                                disabled={!pagination.previous}
+                                className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <span className="sr-only">Previous</span>
+                                <ChevronDown className="h-5 w-5 rotate-90" aria-hidden="true" />
+                            </button>
+                            <span className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
+                                Page {currentPage}
+                            </span>
+                            <button
+                                onClick={() => handlePageChange(currentPage + 1)}
+                                disabled={!pagination.next}
+                                className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <span className="sr-only">Next</span>
+                                <ChevronDown className="h-5 w-5 -rotate-90" aria-hidden="true" />
+                            </button>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+            {/* Tracking Modal */}
+            {editingOrder && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-300">
+                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-300">
+                        <div className="bg-gray-50 px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+                            <h3 className="text-[#0e4d80] font-koulen text-xl tracking-wide uppercase">Assign Logistics ID</h3>
+                        </div>
+                        <div className="p-6">
+                            <div className="mb-6">
+                                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Order Identification</label>
+                                <div className="font-koulen text-lg text-black bg-gray-50 px-3 py-2 border border-gray-100 rounded">
+                                    #{editingOrder.display_id || editingOrder.id}
+                                </div>
+                            </div>
+                            <div className="mb-8">
+                                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Tracking Number</label>
                                 <input
                                     type="text"
                                     value={newTrackingNumber}
                                     onChange={(e) => setNewTrackingNumber(e.target.value)}
-                                    placeholder="ENTER TRACKING ID..."
-                                    className="w-full px-4 py-3 bg-black border border-white/20 text-white focus:border-accent focus:ring-1 focus:ring-accent skew-box font-mono uppercase tracking-wide outline-none transition-all placeholder-gray-700"
+                                    placeholder="e.g. TH-ORD-0982-11"
+                                    className="w-full bg-white border border-gray-200 rounded px-4 py-3 text-sm font-mono focus:ring-2 focus:ring-[#0e4d80]/20 focus:border-[#0e4d80] outline-none transition-all"
                                     autoFocus
                                 />
                             </div>
-                        </div>
-                        <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
-                            <button
-                                onClick={handleCloseModal}
-                                disabled={isSaving}
-                                className="px-6 py-2 bg-transparent border border-white/20 text-white hover:bg-white/5 transition-colors skew-box font-bold uppercase tracking-wider text-xs"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={handleSaveTracking}
-                                disabled={isSaving}
-                                className="px-8 py-2 bg-accent text-black font-black uppercase italic tracking-widest hover:bg-white hover:text-black transition-all skew-box shadow-[0_0_15px_rgba(204,255,0,0.4)] text-xs disabled:opacity-50"
-                            >
-                                {isSaving ? "SAVING..." : "CONFIRM"}
-                            </button>
+                            <div className="flex justify-end gap-3">
+                                <button
+                                    onClick={handleCloseModal}
+                                    className="px-6 py-2.5 text-[10px] font-bold text-gray-500 uppercase tracking-widest hover:bg-gray-100 rounded transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleSaveTracking}
+                                    disabled={isSaving}
+                                    className="px-8 py-2.5 bg-[#0e4d80] text-white text-[10px] font-bold uppercase tracking-widest rounded-full hover:bg-[#0b3d66] disabled:opacity-50 transition-colors shadow-lg shadow-[#0e4d80]/20"
+                                >
+                                    {isSaving ? "Synchronizing..." : "Update Logistics"}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* Edit Status Modal */}
+            {/* Status Modal */}
             {editingStatusOrder && (
-                <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-                    <div className="bg-neutral-900 border border-white/10 w-full max-w-md skew-box shadow-2xl relative p-8">
-                        <div className="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
-                            <h3 className="text-xl font-black uppercase italic tracking-tighter text-white">
-                                Update Status
-                            </h3>
-                            <button
-                                onClick={handleCloseModal}
-                                className="text-gray-500 hover:text-white transition-colors"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter"><path d="M18 6 6 18" /><path d="m6 6 18 12" /></svg>
-                            </button>
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-300">
+                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-300">
+                        <div className="bg-gray-50 px-6 py-4 border-b border-gray-100">
+                            <h3 className="text-[#0e4d80] font-koulen text-xl tracking-wide uppercase">Modify System Status</h3>
                         </div>
-                        <div className="mb-6 space-y-4">
-                            <p className="text-xs font-bold uppercase tracking-widest text-gray-500">
-                                Order ref: <span className="text-accent font-mono ml-1">#{editingStatusOrder.display_id || editingStatusOrder.id}</span>
-                            </p>
-                            <div>
-                                <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">
-                                    Current Status
-                                </label>
-                                <div className="relative">
-                                    <select
-                                        value={newStatus}
-                                        onChange={(e) => setNewStatus(e.target.value)}
-                                        className="w-full px-4 py-3 bg-black border border-white/20 text-white focus:border-accent focus:ring-1 focus:ring-accent skew-box font-bold uppercase tracking-wide outline-none appearance-none transition-all custom-select"
-                                    >
-                                        <option value="pending">Pending</option>
-                                        <option value="processing">Processing</option>
-                                        <option value="shipped">Shipped</option>
-                                        <option value="delivered">Delivered</option>
-                                        <option value="cancelled">Cancelled</option>
-                                    </select>
-                                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-accent">
-                                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 9l-7 7-7-7" /></svg>
-                                    </div>
+                        <div className="p-6">
+                            <div className="mb-6 text-center">
+                                <div className="inline-block p-4 bg-gray-50 rounded-full mb-3">
+                                    <ClipboardList size={32} className="text-[#0e4d80]" />
+                                </div>
+                                <div className="font-istok text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Target Registry</div>
+                                <div className="font-koulen text-2xl text-black">#{editingStatusOrder.display_id || editingStatusOrder.id}</div>
+                            </div>
+                            <div className="mb-8">
+                                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3">Target Status Level</label>
+                                <div className="grid grid-cols-1 gap-2">
+                                    {['pending', 'processing', 'shipped', 'delivered', 'cancelled'].map((s) => (
+                                        <button
+                                            key={s}
+                                            onClick={() => setNewStatus(s)}
+                                            className={`w-full px-4 py-3 rounded border text-left font-istok text-[11px] font-bold uppercase tracking-widest transition-all flex items-center justify-between ${newStatus === s
+                                                ? 'bg-[#0e4d80] text-white border-[#0e4d80] shadow-md shadow-[#0e4d80]/10 translate-x-1'
+                                                : 'bg-white text-gray-600 border-gray-100 hover:border-[#0e4d80]/50 hover:bg-gray-50'
+                                                }`}
+                                        >
+                                            {s}
+                                            {newStatus === s && <CheckCircle2 size={14} />}
+                                        </button>
+                                    ))}
                                 </div>
                             </div>
-                        </div>
-                        <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
-                            <button
-                                onClick={handleCloseModal}
-                                disabled={isSaving}
-                                className="px-6 py-2 bg-transparent border border-white/20 text-white hover:bg-white/5 transition-colors skew-box font-bold uppercase tracking-wider text-xs"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={handleSaveStatus}
-                                disabled={isSaving}
-                                className="px-8 py-2 bg-accent text-black font-black uppercase italic tracking-widest hover:bg-white hover:text-black transition-all skew-box shadow-[0_0_15px_rgba(204,255,0,0.4)] text-xs disabled:opacity-50"
-                            >
-                                {isSaving ? "UPDATING..." : "UPDATE"}
-                            </button>
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={handleCloseModal}
+                                    className="flex-1 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-widest hover:bg-gray-100 rounded-full transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleSaveStatus}
+                                    disabled={isSaving}
+                                    className="flex-1 py-3 bg-[#D2042D] text-white text-[10px] font-bold uppercase tracking-widest rounded-full hover:bg-[#b50327] disabled:opacity-50 transition-colors shadow-lg shadow-[#D2042D]/20"
+                                >
+                                    {isSaving ? "Updating Status..." : "Confirm Update"}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             )}
-        </main>
+        </div>
     );
 }

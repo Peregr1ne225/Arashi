@@ -4,8 +4,20 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useAuth } from "@/app/hooks/useAuth";
-import { ordersApi, Order } from "@/app/lib/api/orders";
+import { ordersApi } from "@/app/lib/api/orders";
+import { Order } from "@/app/types/order";
 import { getImageUrl } from "@/app/lib/utils/image";
+import {
+    ChevronLeft,
+    Truck,
+    User as UserIcon,
+    MapPin,
+    CreditCard,
+    Package as PackageIcon,
+    Calendar,
+    Clock,
+    Save
+} from "lucide-react";
 
 // Unwrap params for server/client components
 export default function AdminOrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -16,7 +28,7 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
     const [isUpdating, setIsUpdating] = useState(false);
     const [status, setStatus] = useState("");
     const [trackingNumber, setTrackingNumber] = useState("");
-    const [orderId, setOrderId] = useState<string | null>(null); // Use string for display_id
+    const [orderId, setOrderId] = useState<string | null>(null);
 
     useEffect(() => {
         // Unwrap params
@@ -51,9 +63,14 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
         if (!order) return;
         setIsUpdating(true);
         try {
-            const updatedOrder = await ordersApi.updateStatus(order.id, status);
-            setOrder(updatedOrder);
-            alert("Order status updated successfully");
+            await ordersApi.updateStatus(order.id, status);
+            // If dragging number changed, update it too
+            if (trackingNumber !== (order.tracking_number || "")) {
+                const identifier = order.display_id || order.id;
+                await ordersApi.updateTracking(identifier, trackingNumber);
+            }
+            fetchOrder(order.id.toString());
+            // alert("Order updated successfully"); // Removed for cleaner UX
         } catch (error) {
             console.error("Failed to update status", error);
             alert("Failed to update order status");
@@ -62,166 +79,287 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
         }
     };
 
-    const handleTrackingUpdate = async () => {
-        if (!order) return;
-        setIsUpdating(true);
-        try {
-            const updatedOrder = await ordersApi.updateTracking(order.id, trackingNumber); // Use internal ID for update? IDK, API uses lookup from viewset which supports both. Safest to use ID if we have it, but display_id works too. Let's use display_id if available to match viewset. Actually viewset lookup works for both.
-            // Wait, updateTracking uses `orders/{id}/tracking/`. If lookup_field is display_id, URL should use display_id. 
-            // The API function accepts id or string. Let's pass order.display_id || order.id
-            const identifier = order.display_id || order.id;
-            const res = await ordersApi.updateTracking(identifier, trackingNumber);
-            setOrder(res);
-            alert("Tracking number updated successfully");
-        } catch (error) {
-            console.error("Failed to update tracking", error);
-            alert("Failed to update tracking number");
-        } finally {
-            setIsUpdating(false);
-        }
-    };
-
     if (loading || isLoading) {
         return (
-            <div className="flex justify-center items-center min-h-screen">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            <div className="flex justify-center items-center h-[50vh]">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0e4d80]"></div>
             </div>
         );
     }
 
     if (!order) return null;
 
+    const getStatusColor = (s: string) => {
+        switch (s.toLowerCase()) {
+            case 'delivered': return 'bg-green-100 text-green-700 border-green-200';
+            case 'shipped': return 'bg-blue-100 text-blue-700 border-blue-200';
+            case 'processing': return 'bg-orange-100 text-orange-700 border-orange-200';
+            case 'cancelled': return 'bg-red-100 text-red-700 border-red-200';
+            default: return 'bg-gray-100 text-gray-700 border-gray-200';
+        }
+    };
+
+    const formatDate = (dateString?: string) => {
+        if (!dateString) return 'N/A';
+        return new Date(dateString).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
+
     return (
-        <main className="container mx-auto px-4 py-8 flex-1">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4 border-b border-white/10 pb-6">
-                <div>
-                    <h1 className="text-3xl font-black uppercase italic tracking-tighter text-white">Order <span className="text-accent">#{order.display_id || order.id}</span></h1>
-                    <p className="text-gray-400 font-bold uppercase tracking-wider text-xs mt-1">Manage Order Fulfillment & Details</p>
+        <div className="flex flex-col space-y-8 pb-12 pt-10">
+            {/* Header Area */}
+            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                <div className="flex-1">
+                    <button
+                        onClick={() => router.back()}
+                        className="group flex items-center text-gray-400 hover:text-[#0e4d80] transition-colors mb-4"
+                    >
+                        <ChevronLeft className="w-4 h-4 mr-1 group-hover:-translate-x-1 transition-transform" />
+                        <span className="font-istok text-xs font-bold uppercase tracking-[0.2em]">Back to Orders</span>
+                    </button>
+
+                    <div className="flex items-baseline gap-4 flex-wrap">
+                        <h1 className="font-koulen text-5xl text-black uppercase tracking-tight">
+                            Order #{order.display_id || order.id}
+                        </h1>
+                        <span className={`px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-[0.15em] border ${getStatusColor(order.status)}`}>
+                            {order.status}
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-6 mt-2 text-gray-500 font-istok text-xs uppercase tracking-wider">
+                        <span className="flex items-center gap-1">
+                            <Calendar className="w-3.5 h-3.5" />
+                            {formatDate(order.created_at)}
+                        </span>
+                        <span className="flex items-center gap-1">
+                            <CreditCard className="w-3.5 h-3.5" />
+                            Total: ฿{order.total_amount.toLocaleString()}
+                        </span>
+                    </div>
                 </div>
-                <button
-                    onClick={() => router.back()}
-                    className="px-6 py-2 bg-transparent border border-white/20 text-white hover:bg-white/5 transition-colors skew-box font-bold uppercase tracking-wider text-xs flex items-center gap-2"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter"><path d="m15 18-6-6 6-6" /></svg>
-                    Back to Orders
-                </button>
+
+                {/* Primary Action Button (Update) is in the sidebar for context, but we could put global actions here */}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Main Content */}
+                {/* Left Column: Order Items & Details */}
                 <div className="lg:col-span-2 space-y-8">
+
                     {/* Order Items */}
-                    <div className="bg-neutral-900 border border-white/10 skew-box shadow-[0_0_30px_rgba(0,0,0,0.3)] overflow-hidden">
-                        <div className="px-8 py-6 border-b border-white/10 bg-black/20">
-                            <h2 className="text-lg font-black uppercase italic tracking-tighter text-white">Order Manifest</h2>
+                    <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+                        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
+                            <h2 className="font-koulen text-xl text-[#0e4d80] uppercase tracking-wide flex items-center gap-2">
+                                <PackageIcon className="w-5 h-5 text-[#D2042D]" />
+                                Order Items
+                            </h2>
+                            <span className="font-istok text-xs font-bold text-gray-400 uppercase tracking-widest">
+                                {order.items.length} Item(s)
+                            </span>
                         </div>
-                        <ul className="divide-y divide-white/10">
+                        <ul className="divide-y divide-gray-100">
                             {order.items.map((item) => (
-                                <li key={item.id} className="p-8 flex items-center hover:bg-white/5 transition-colors group">
-                                    <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden border border-white/20 skew-box-sm">
+                                <li key={item.id} className="p-6 flex items-start sm:items-center gap-4 hover:bg-gray-50/80 transition-colors">
+                                    <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-md border border-gray-100 bg-white">
                                         <Image
-                                            src={getImageUrl(item.product.image_url)}
+                                            src={getImageUrl(item.product.images?.[0])}
                                             alt={item.product.name}
                                             fill
-                                            className="object-cover object-center group-hover:scale-110 transition-transform duration-500"
+                                            className="object-contain p-1"
                                         />
                                     </div>
-                                    <div className="ml-6 flex-1 flex flex-col">
-                                        <div>
-                                            <div className="flex justify-between text-base font-bold text-white uppercase tracking-wide">
-                                                <h3>{item.product.name}</h3>
-                                                <p className="ml-4 font-mono text-accent">฿{item.price.toLocaleString()}</p>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex justify-between items-start mb-1">
+                                            <h3 className="font-koulen text-lg text-black uppercase tracking-wide truncate pr-4">
+                                                {item.product.name}
+                                            </h3>
+                                            <div className="text-right">
+                                                {/* Use historical original_price if available, otherwise fallback to current product price for old orders */}
+                                                {(item.original_price || item.product.price) > item.price ? (
+                                                    <div className="flex flex-col items-end">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-[10px] bg-[#D2042D] text-white px-1.5 py-0.5 rounded-sm font-bold font-istok">
+                                                                -{Math.round((((item.original_price || item.product.price) - item.price) / (item.original_price || item.product.price)) * 100)}%
+                                                            </span>
+                                                            <span className="font-istok text-xs text-gray-400 line-through decoration-red-500/50">
+                                                                ฿{Number(item.original_price || item.product.price).toLocaleString()}
+                                                            </span>
+                                                        </div>
+                                                        <p className="font-bold font-istok text-sm text-[#D2042D]">
+                                                            ฿{Number(item.price).toLocaleString()}
+                                                        </p>
+                                                    </div>
+                                                ) : (
+                                                    <p className="font-bold font-istok text-sm text-black">
+                                                        ฿{Number(item.price).toLocaleString()}
+                                                    </p>
+                                                )}
                                             </div>
                                         </div>
-                                        <div className="flex-1 flex items-end justify-between text-sm mt-2">
-                                            <p className="text-gray-400 font-mono">QTY: <span className="text-white font-bold">{item.quantity}</span></p>
+                                        <div className="flex justify-between items-end">
+                                            <div className="space-y-1">
+                                                <p className="text-xs text-gray-400 font-istok uppercase tracking-wider">
+                                                    ID: {item.product.id}
+                                                </p>
+                                                {(item.color_name || item.size_name) && (
+                                                    <div className="flex gap-2 mt-1">
+                                                        {item.size_name && (
+                                                            <span className="inline-flex items-center px-2 py-0.5 rounded-sm bg-gray-100 text-[10px] font-bold font-istok text-gray-600 uppercase tracking-widest border border-gray-200">
+                                                                Size: {item.size_name}
+                                                            </span>
+                                                        )}
+                                                        {item.color_name && (
+                                                            <span className="inline-flex items-center px-2 py-0.5 rounded-sm bg-gray-100 text-[10px] font-bold font-istok text-gray-600 uppercase tracking-widest border border-gray-200">
+                                                                Color: {item.color_name}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="text-right">
+                                                <span className="inline-flex items-center px-2 py-1 rounded bg-gray-100 text-xs font-bold font-istok text-gray-600">
+                                                    x{item.quantity}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </li>
                             ))}
                         </ul>
-                        <div className="px-8 py-6 border-t border-white/10 bg-black/40">
-                            <div className="flex justify-between items-center">
-                                <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">Total Amount</p>
-                                <p className="text-2xl font-black italic tracking-tighter text-accent">฿{order.total_amount.toLocaleString()}</p>
+                        <div className="bg-gray-50 px-6 py-6 border-t border-gray-100">
+                            <div className="flex justify-between items-center text-sm font-istok uppercase tracking-wider text-gray-500 mb-2">
+                                <span>Subtotal</span>
+                                <span>฿{order.total_amount.toLocaleString()}</span>
+                            </div>
+                            <div className="flex justify-between items-center text-sm font-istok uppercase tracking-wider text-gray-500 mb-4">
+                                <span>Shipping</span>
+                                <span>฿0.00</span>
+                                {/* Assuming free shipping or handled elsewhere for now */}
+                            </div>
+                            <div className="flex justify-between items-center pt-4 border-t border-gray-200">
+                                <span className="font-koulen text-xl text-black">Total</span>
+                                <span className="font-koulen text-3xl text-[#D2042D]">฿{order.total_amount.toLocaleString()}</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Sidebar */}
-                <div className="space-y-8">
-                    {/* Status Management */}
-                    <div className="bg-neutral-900 border border-white/10 skew-box shadow-[0_0_20px_rgba(0,0,0,0.3)] p-6">
-                        <h2 className="text-sm font-black uppercase italic tracking-widest text-white mb-6 border-b border-white/10 pb-2">Status Control</h2>
-                        <div className="space-y-4">
-                            <div className="relative">
-                                <select
-                                    value={status}
-                                    onChange={(e) => setStatus(e.target.value)}
-                                    className="w-full px-4 py-3 bg-black border border-white/20 text-white focus:border-accent focus:ring-1 focus:ring-accent skew-box font-bold uppercase tracking-wide outline-none appearance-none transition-all custom-select text-sm"
-                                >
-                                    <option value="pending">Pending</option>
-                                    <option value="processing">Processing</option>
-                                    <option value="shipped">Shipped</option>
-                                    <option value="delivered">Delivered</option>
-                                    <option value="cancelled">Cancelled</option>
-                                </select>
-                                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-accent">
-                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 9l-7 7-7-7" /></svg>
+                {/* Right Column: Sidebar Management */}
+                <div className="space-y-6">
+
+                    {/* Management Card */}
+                    <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6 sticky top-8">
+                        <h2 className="font-koulen text-lg text-black uppercase tracking-wide mb-6 flex items-center gap-2 border-b border-gray-100 pb-3">
+                            <Save className="w-5 h-5 text-[#0e4d80]" />
+                            Order Management
+                        </h2>
+
+                        <div className="space-y-5">
+                            <div>
+                                <label className="block text-[10px] font-bold uppercase tracking-widest text-[#0e4d80] mb-2">
+                                    Order Status
+                                </label>
+                                <div className="relative">
+                                    <select
+                                        value={status}
+                                        onChange={(e) => setStatus(e.target.value)}
+                                        className="w-full bg-gray-50 text-gray-800 border border-gray-200 rounded-md py-2.5 pl-3 pr-10 text-xs font-istok font-bold uppercase tracking-wide outline-none focus:ring-2 focus:ring-[#0e4d80]/20 focus:border-[#0e4d80] transition-colors appearance-none cursor-pointer"
+                                    >
+                                        <option value="pending">Pending</option>
+                                        <option value="processing">Processing</option>
+                                        <option value="shipped">Shipped</option>
+                                        <option value="delivered">Delivered</option>
+                                        <option value="cancelled">Cancelled</option>
+                                    </select>
+                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                                        <Clock className="w-3.5 h-3.5 text-gray-400" />
+                                    </div>
                                 </div>
                             </div>
+
+                            <div>
+                                <label className="block text-[10px] font-bold uppercase tracking-widest text-[#0e4d80] mb-2">
+                                    Tracking Number
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        type="text"
+                                        value={trackingNumber}
+                                        onChange={(e) => setTrackingNumber(e.target.value)}
+                                        placeholder="Enter tracking ID..."
+                                        className="w-full bg-gray-50 text-gray-800 border border-gray-200 rounded-md py-2.5 pl-9 pr-3 text-xs font-istok font-medium outline-none focus:ring-2 focus:ring-[#0e4d80]/20 focus:border-[#0e4d80] transition-colors placeholder:text-gray-400"
+                                    />
+                                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                                        <Truck className="w-3.5 h-3.5" />
+                                    </div>
+                                </div>
+                            </div>
+
                             <button
                                 onClick={handleStatusUpdate}
-                                disabled={isUpdating || status === order.status}
-                                className="w-full px-4 py-3 bg-accent text-black font-black uppercase italic tracking-widest hover:bg-white hover:text-black transition-all skew-box shadow-[0_0_15px_rgba(204,255,0,0.4)] text-xs disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled={isUpdating || (status === order.status && trackingNumber === (order.tracking_number || ""))}
+                                className="w-full py-3 bg-[#0e4d80] text-white rounded-md text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-[#0b3d66] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm flex items-center justify-center gap-2 mt-2"
                             >
-                                {isUpdating ? "UPDATING..." : "UPDATE STATUS"}
+                                {isUpdating ? (
+                                    <>
+                                        <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                        Saving...
+                                    </>
+                                ) : (
+                                    "Update Order"
+                                )}
                             </button>
                         </div>
                     </div>
 
-                    {/* Tracking Number Management */}
-                    <div className="bg-neutral-900 border border-white/10 skew-box shadow-[0_0_20px_rgba(0,0,0,0.3)] p-6">
-                        <h2 className="text-sm font-black uppercase italic tracking-widest text-white mb-6 border-b border-white/10 pb-2">Tracking Info</h2>
+                    {/* Customer Info Card */}
+                    <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+                        <h2 className="font-koulen text-lg text-black uppercase tracking-wide mb-6 flex items-center gap-2 border-b border-gray-100 pb-3">
+                            <UserIcon className="w-5 h-5 text-[#D2042D]" />
+                            Customer Profile
+                        </h2>
+
                         <div className="space-y-4">
-                            <input
-                                type="text"
-                                value={trackingNumber}
-                                onChange={(e) => setTrackingNumber(e.target.value)}
-                                placeholder="ENTER TRACKING ID"
-                                className="w-full px-4 py-3 bg-black border border-white/20 text-white focus:border-accent focus:ring-1 focus:ring-accent skew-box font-bold uppercase tracking-wide outline-none transition-all placeholder-gray-700 text-sm"
-                            />
-                            <button
-                                onClick={handleTrackingUpdate}
-                                disabled={isUpdating || trackingNumber === (order.tracking_number || "")}
-                                className="w-full px-4 py-3 bg-transparent border border-white/20 text-white font-black uppercase italic tracking-widest hover:bg-white/5 hover:border-accent hover:text-accent transition-all skew-box text-xs disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                {isUpdating ? "UPDATING..." : "UPDATE TRACKING"}
-                            </button>
+                            <div className="flex items-start gap-4">
+                                <div className="p-2 bg-gray-50 rounded-full shrink-0">
+                                    <UserIcon className="w-5 h-5 text-gray-400" />
+                                </div>
+                                <div>
+                                    <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-0.5">Full Name</p>
+                                    <p className="font-koulen text-lg text-black leading-none tracking-wide">{order.full_name}</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-start gap-4">
+                                <div className="p-2 bg-gray-50 rounded-full shrink-0">
+                                    <MapPin className="w-5 h-5 text-gray-400" />
+                                </div>
+                                <div>
+                                    <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-0.5">Delivery Address</p>
+                                    <p className="font-istok text-sm text-gray-700 leading-relaxed font-medium">
+                                        {order.shipping_address}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-start gap-4">
+                                <div className="p-2 bg-gray-50 rounded-full shrink-0">
+                                    <CreditCard className="w-5 h-5 text-gray-400" />
+                                </div>
+                                <div>
+                                    <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-0.5">Contact</p>
+                                    <p className="font-istok text-sm text-gray-700 font-bold">{order.phone_number}</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    {/* Customer Details */}
-                    <div className="bg-neutral-900 border border-white/10 skew-box shadow-[0_0_20px_rgba(0,0,0,0.3)] p-6">
-                        <h2 className="text-sm font-black uppercase italic tracking-widest text-white mb-6 border-b border-white/10 pb-2">Customer Profile</h2>
-                        <dl className="space-y-4">
-                            <div>
-                                <dt className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">Full Name</dt>
-                                <dd className="text-sm text-white font-bold tracking-wide">{order.full_name}</dd>
-                            </div>
-                            <div>
-                                <dt className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">Phone</dt>
-                                <dd className="text-sm text-white font-mono">{order.phone_number}</dd>
-                            </div>
-                            <div>
-                                <dt className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">Shipping Address</dt>
-                                <dd className="text-sm text-white font-medium leading-relaxed opacity-80">{order.shipping_address}</dd>
-                            </div>
-                        </dl>
-                    </div>
                 </div>
             </div>
-        </main>
+        </div>
     );
 }

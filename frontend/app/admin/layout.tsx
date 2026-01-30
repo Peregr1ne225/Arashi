@@ -1,16 +1,14 @@
 
-import AuthGuard from "@/app/components/auth/AuthGuard";
+import AdminLayout from "@/app/components/admin/AdminLayout";
 
-export default function AdminLayout({
+export default function RootAdminLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
     return (
-        <AuthGuard requireAdmin={true}>
-            <div className="min-h-screen bg-background text-white flex flex-col">
-                {children}
-            </div>
-        </AuthGuard>
+        <AdminLayout>
+            {children}
+        </AdminLayout>
     );
 }

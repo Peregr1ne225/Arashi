@@ -1,13 +1,17 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useAuth } from "@/app/hooks/useAuth";
 import { categoriesApi } from "@/app/lib/api/client";
-import { Category } from "@/app/types";
+import { Category } from "@/app/types/category";
 import { getImageUrl } from "@/app/lib/utils/image";
 import { revalidateCategories } from "@/app/lib/actions";
+import CategoryForm from "@/app/components/admin/CategoryForm";
+import ConfirmationModal from "@/app/components/ui/ConfirmationModal";
+import { Search } from "lucide-react";
+import { SortIcon } from "@/app/components/admin/SortIcon";
 
 export default function AdminCategoriesPage() {
     const { user, isAuthenticated, loading } = useAuth();
@@ -16,19 +20,74 @@ export default function AdminCategoriesPage() {
     // Data State
     const [categories, setCategories] = useState<Category[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
+
+    // Memoized filtered and sorted categories for the table
+    const filteredAndSortedCategories = useMemo(() => {
+        let result = [...categories];
+
+        // Search filtering
+        if (searchQuery) {
+            const q = searchQuery.toLowerCase();
+            result = result.filter(c =>
+                c.name.toLowerCase().includes(q) ||
+                c.slug.toLowerCase().includes(q) ||
+                (c.parent_name && c.parent_name.toLowerCase().includes(q))
+            );
+        }
+
+        // Sorting
+        if (sortConfig) {
+            const key = sortConfig.key as keyof Category;
+            result.sort((a, b) => {
+                const valA = a[key];
+                const valB = b[key];
+
+                if (valA === undefined || valB === undefined || valA === null || valB === null) {
+                    if (valA === valB) return 0;
+                    return valA === null || valA === undefined ? 1 : -1;
+                }
+
+                if (typeof valA === 'string' && typeof valB === 'string') {
+                    const comparison = valA.localeCompare(valB);
+                    return sortConfig.direction === 'asc' ? comparison : -comparison;
+                }
+
+                if (typeof valA === 'number' && typeof valB === 'number') {
+                    return sortConfig.direction === 'asc' ? valA - valB : valB - valA;
+                }
+
+                return 0;
+            });
+        }
+
+        return result;
+    }, [categories, searchQuery, sortConfig]);
+
+    // Memoized Top 5 Categories
+    const topCategories = useMemo(() => {
+        return [...categories]
+            .sort((a, b) => (b.product_count || 0) - (a.product_count || 0))
+            .slice(0, 5);
+    }, [categories]);
 
     // Modal State
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isFormOpen, setIsFormOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-
-    // Form State
-    const [name, setName] = useState("");
-    const [description, setDescription] = useState("");
-    const [parentId, setParentId] = useState<string>("");
-    const [imageFile, setImageFile] = useState<File | null>(null);
-    const [imagePreview, setImagePreview] = useState<string | null>(null);
-    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
+    const fetchAllData = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            const data = await categoriesApi.getCategories();
+            setCategories(data);
+        } catch (error) {
+            console.error("Failed to fetch categories", error);
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
 
     useEffect(() => {
         if (!loading) {
@@ -36,75 +95,39 @@ export default function AdminCategoriesPage() {
                 router.push("/");
                 return;
             }
-            fetchCategories();
+            fetchAllData();
         }
-    }, [isAuthenticated, loading, user, router]);
+    }, [isAuthenticated, loading, user, router, fetchAllData]);
 
-    const fetchCategories = async () => {
-        try {
-            const data = await categoriesApi.getCategories({ revalidate: 0 });
-            setCategories(data);
-        } catch (error) {
-            console.error("Failed to fetch categories", error);
-        } finally {
-            setIsLoading(false);
+    const handleSort = (key: string) => {
+        let direction: 'asc' | 'desc' = 'asc';
+        if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
+            direction = 'desc';
         }
+        setSortConfig({ key, direction });
     };
 
-    const handleOpenModal = (category: Category | null = null) => {
-        if (category) {
-            setEditingCategory(category);
-            setName(category.name);
-            setDescription(category.description || "");
-            setParentId(category.parent ? category.parent.toString() : "");
-            setImagePreview(category.image ? getImageUrl(category.image) : null);
-        } else {
-            setEditingCategory(null);
-            setName("");
-            setDescription("");
-            setParentId("");
-            setImagePreview(null);
-        }
-        setImageFile(null);
-        setIsModalOpen(true);
+    const handleOpenForm = (category: Category | null = null) => {
+        setEditingCategory(category);
+        setIsFormOpen(true);
     };
 
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            setImageFile(file);
-            const url = URL.createObjectURL(file);
-            setImagePreview(url);
-        }
+    const handleCloseForm = () => {
+        setEditingCategory(null);
+        setIsFormOpen(false);
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSubmit = async (formData: FormData) => {
         setIsSubmitting(true);
-
         try {
-            const formData = new FormData();
-            formData.append("name", name);
-            formData.append("description", description);
-            if (parentId) {
-                formData.append("parent", parentId);
-            }
-            if (imageFile) {
-                formData.append("image", imageFile);
-            }
-
             if (editingCategory) {
-                const updated = await categoriesApi.updateCategory(editingCategory.id, formData);
-                setCategories(categories.map(c => c.id === updated.id ? updated : c));
+                await categoriesApi.updateCategory(editingCategory.id, formData);
             } else {
-                const created = await categoriesApi.createCategory(formData);
-                setCategories([...categories, created]);
+                await categoriesApi.createCategory(formData);
             }
-
             await revalidateCategories();
-            setIsModalOpen(false);
-            // Refresh to ensure full consistency (optional but recommended for hierachy)
-            fetchCategories();
+            fetchAllData();
+            handleCloseForm();
         } catch (error) {
             console.error("Failed to save category", error);
             alert("Failed to save category");
@@ -113,20 +136,44 @@ export default function AdminCategoriesPage() {
         }
     };
 
-    const handleDelete = async (id: number) => {
-        if (confirm("Are you sure? Deleting a category will delete its image and might affect products.")) {
-            try {
-                await categoriesApi.deleteCategory(id);
-                setCategories(categories.filter(c => c.id !== id));
-                await revalidateCategories();
-            } catch (error) {
-                console.error("Failed to delete category", error);
-                alert("Failed to delete category");
-            }
+    const handleDeleteClick = (category: Category) => {
+        setCategoryToDelete(category);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!categoryToDelete) return;
+
+        try {
+            await categoriesApi.deleteCategory(categoryToDelete.id);
+            await revalidateCategories();
+            fetchAllData();
+            setCategoryToDelete(null);
+        } catch (error) {
+            console.error("Failed to delete category", error);
+            alert("Failed to delete category");
         }
     };
 
-    if (loading || isLoading) {
+    // Helper to get full path (client-side approximation using allCategories)
+    const getCategoryPath = (cat: Category | null): string => {
+        if (!cat) return "";
+        let path = cat.name;
+        let current = cat;
+        let safety = 0;
+        while (current.parent && safety < 100) {
+            const parent = categories.find((c) => c.id === current.parent);
+            if (parent) {
+                path = `${parent.name} > ${path}`;
+                current = parent;
+            } else {
+                break;
+            }
+            safety++;
+        }
+        return path;
+    };
+
+    if (loading || (isLoading && categories.length === 0)) {
         return (
             <div className="flex justify-center items-center min-h-screen">
                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -135,192 +182,239 @@ export default function AdminCategoriesPage() {
     }
 
     return (
-        <main className="container mx-auto px-4 py-8 flex-1">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4 border-b border-white/10 pb-6">
+        <div className="pt-8 flex flex-col space-y-8 animate-in fade-in duration-500">
+            {/* Header & Stats */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-gray-200 pb-8">
                 <div>
-                    <h1 className="text-3xl font-black uppercase italic tracking-tighter text-white">Category Management</h1>
-                    <p className="text-gray-400 font-bold uppercase tracking-wider text-xs mt-1">Organize Team Divisions</p>
+                    <h2 className="font-koulen text-4xl tracking-wide text-[#0e4d80]">
+                        Taxonomy <span className="text-[#D2042D]">Manager</span>
+                    </h2>
+                    <p className="font-istok text-xs text-gray-500 uppercase tracking-[0.2em] mt-1 font-bold">
+                        Manage Categories
+                    </p>
                 </div>
                 <button
-                    onClick={() => handleOpenModal()}
-                    className="px-6 py-3 bg-accent text-black font-black uppercase italic tracking-widest hover:bg-white hover:text-black transition-all skew-box shadow-[0_0_15px_rgba(204,255,0,0.3)] text-xs"
+                    onClick={() => handleOpenForm()}
+                    className="font-istok text-[11px] uppercase tracking-widest font-bold px-8 py-3 bg-[#0047AB] text-white hover:opacity-90 transition-all rounded-full shadow-xl hover:shadow-2xl hover:-translate-y-1"
                 >
-                    + New Division
+                    + New Category
                 </button>
             </div>
 
-            <div className="bg-neutral-900 border border-white/10 skew-box overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.3)]">
-                <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-white/10">
-                        <thead className="bg-black/40">
-                            <tr>
-                                <th className="px-6 py-4 text-left text-[10px] font-black uppercase italic tracking-widest text-accent">Image</th>
-                                <th className="px-6 py-4 text-left text-[10px] font-black uppercase italic tracking-widest text-accent">Name</th>
-                                <th className="px-6 py-4 text-left text-[10px] font-black uppercase italic tracking-widest text-accent">Slug</th>
-                                <th className="px-6 py-4 text-left text-[10px] font-black uppercase italic tracking-widest text-accent">Parent</th>
-                                <th className="px-6 py-4 text-right text-[10px] font-black uppercase italic tracking-widest text-accent">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-transparent divide-y divide-white/5">
-                            {categories.map((category) => (
-                                <tr key={category.id} className="hover:bg-white/5 transition-colors group">
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="h-10 w-10 relative bg-black/50 skew-box-sm border border-white/10 overflow-hidden">
-                                            {category.image ? (
-                                                <Image
-                                                    src={getImageUrl(category.image)}
-                                                    alt={category.name}
-                                                    fill
-                                                    className="object-cover"
-                                                />
-                                            ) : (
-                                                <div className="flex items-center justify-center h-full text-gray-600 text-[10px]">N/A</div>
-                                            )}
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 text-sm font-bold uppercase tracking-wide text-white group-hover:text-accent transition-colors">{category.name}</td>
-                                    <td className="px-6 py-4 text-xs text-gray-500 font-mono">{category.slug}</td>
-                                    <td className="px-6 py-4 text-xs text-gray-500">
-                                        {category.parent ? <span className="bg-white/10 px-2 py-1 rounded-sm text-white">ID: {category.parent}</span> : "-"}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <div className="flex justify-end gap-3">
-                                            <button
-                                                onClick={() => handleOpenModal(category)}
-                                                className="text-gray-400 hover:text-accent transition-colors"
-                                            >
-                                                <span className="sr-only">Edit</span>
-                                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(category.id)}
-                                                className="text-gray-400 hover:text-red-500 transition-colors"
-                                            >
-                                                <span className="sr-only">Delete</span>
-                                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+            {/* Top 5 Categories */}
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                {topCategories.map((category, index) => (
+                    <div
+                        key={category.id}
+                        className="card-sport p-4 flex flex-col justify-between"
+                    >
+                        <div className="flex justify-between items-start mb-2">
+                            <span className="text-2xl font-koulen text-[#0e4d80]">
+                                #{index + 1}
+                            </span>
+                            {category.image && (
+                                <div className="h-6 w-6 rounded border border-gray-200 overflow-hidden bg-gray-50">
+                                    <Image
+                                        src={getImageUrl(category.image)}
+                                        alt={category.name}
+                                        width={24}
+                                        height={24}
+                                        className="object-contain"
+                                    />
+                                </div>
+                            )}
+                        </div>
+                        <div>
+                            <h3
+                                className="font-istok font-bold text-sm text-gray-900 truncate"
+                                title={category.name}
+                            >
+                                {category.name}
+                            </h3>
+                            <p className="font-istok text-xs text-gray-500 uppercase tracking-wider mt-1">
+                                {category.product_count || 0} Products
+                            </p>
+                        </div>
+                        <div className="w-full bg-gray-100 h-1 mt-3 rounded-full overflow-hidden">
+                            <div
+                                className="bg-linear-to-r from-[#0047AB] to-[#D2042D] h-full rounded-full"
+                                style={{
+                                    width: `${Math.min(100, ((category.product_count || 0) / (topCategories[0]?.product_count || 1)) * 100)}%`,
+                                }}
+                            />
+                        </div>
+                    </div>
+                ))}
+                {topCategories.length === 0 && (
+                    <div className="col-span-5 bg-gray-50 p-6 rounded-lg border border-gray-100 text-center text-gray-500 font-istok">
+                        No categories available yet.
+                    </div>
+                )}
+            </div>
+
+            {/* Toolbar */}
+            <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm flex items-center gap-4">
+                <div className="relative flex-1 max-w-md">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Search className="h-4 w-4 text-gray-400" />
+                    </div>
+                    <input
+                        type="text"
+                        className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-md leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors"
+                        placeholder="Search categories..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
                 </div>
             </div>
 
-            {/* Modal */}
-            {isModalOpen && (
-                <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-                    <div className="bg-neutral-900 border border-white/10 w-full max-w-lg skew-box shadow-2xl relative">
-                        <div className="p-8">
-                            <h2 className="text-2xl font-black uppercase italic tracking-tighter text-white mb-6 border-b border-white/10 pb-4">
-                                {editingCategory ? "Edit Division" : "New Division"}
-                            </h2>
-                            <form onSubmit={handleSubmit} className="space-y-6">
-                                {/* Image Upload */}
-                                <div>
-                                    <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Cover Image</label>
-                                    <div
-                                        className="border-2 border-dashed border-white/20 bg-black/20 hover:bg-white/5 hover:border-accent transition-all cursor-pointer h-40 flex flex-col items-center justify-center group skew-box-sm relative overflow-hidden"
-                                        onClick={() => fileInputRef.current?.click()}
+            {/* Table */}
+            {/* Table */}
+            <div className="card-sport overflow-hidden">
+                <table className="min-w-full divide-y divide-gray-100">
+                    <thead className="bg-gray-100 sticky top-0 z-10">
+                        <tr>
+                            <th className="px-6 py-4 text-left font-istok text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold">
+                                Visual
+                            </th>
+                            <th className="px-6 py-4 text-left cursor-pointer group hover:bg-gray-200 transition-colors" onClick={() => handleSort('name')}>
+                                <div className="flex items-center gap-2 font-istok text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold">
+                                    Designation <SortIcon columnKey="name" sortConfig={sortConfig} />
+                                </div>
+                            </th>
+                            <th className="px-6 py-4 text-left cursor-pointer group hover:bg-gray-200 transition-colors" onClick={() => handleSort('product_count')}>
+                                <div className="flex items-center gap-2 font-istok text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold">
+                                    Products <SortIcon columnKey="product_count" sortConfig={sortConfig} />
+                                </div>
+                            </th>
+                            <th className="px-6 py-4 text-left cursor-pointer group hover:bg-gray-200 transition-colors" onClick={() => handleSort('parent')}>
+                                <div className="flex items-center gap-2 font-istok text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold">
+                                    Hierarchy <SortIcon columnKey="parent" sortConfig={sortConfig} />
+                                </div>
+                            </th>
+                            <th className="px-6 py-4 text-right font-istok text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold">
+                                Control
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 bg-white">
+                        {filteredAndSortedCategories.length === 0 ? (
+                            <tr>
+                                <td
+                                    colSpan={5}
+                                    className="px-6 py-12 text-center text-gray-400 font-istok"
+                                >
+                                    No categories found matching your search.
+                                </td>
+                            </tr>
+                        ) : (
+                            filteredAndSortedCategories.map((category) => {
+                                return (
+                                    <tr
+                                        key={category.id}
+                                        className="hover:bg-gray-50/80 transition-colors group"
                                     >
-                                        {imagePreview ? (
-                                            <div className="relative h-full w-full">
-                                                <Image
-                                                    src={imagePreview}
-                                                    alt="Preview"
-                                                    fill
-                                                    className="object-cover opacity-50 group-hover:opacity-100 transition-opacity"
-                                                />
-                                                <div className="absolute inset-0 flex items-center justify-center">
-                                                    <span className="bg-black/50 text-white px-2 py-1 text-xs font-bold uppercase tracking-wider backdrop-blur-sm">Change Image</span>
-                                                </div>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <div className="h-12 w-12 relative bg-white border border-gray-200 rounded-lg overflow-hidden p-1 shadow-sm group-hover:border-[#D2042D]/30 transition-colors">
+                                                {category.image ? (
+                                                    <Image
+                                                        src={getImageUrl(category.image)}
+                                                        alt={category.name}
+                                                        fill
+                                                        className="object-contain"
+                                                    />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center text-[8px] text-gray-300 font-bold uppercase tracking-wider">
+                                                        No Img
+                                                    </div>
+                                                )}
                                             </div>
-                                        ) : (
-                                            <>
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-500 group-hover:text-accent transition-colors mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={2} d="M12 4v16m8-8H4" />
-                                                </svg>
-                                                <span className="text-xs font-bold uppercase tracking-wider text-gray-500 group-hover:text-white transition-colors">Select Visual //</span>
-                                            </>
-                                        )}
-                                        <input
-                                            type="file"
-                                            ref={fileInputRef}
-                                            className="hidden"
-                                            accept="image/*"
-                                            onChange={handleImageChange}
-                                        />
-                                    </div>
-                                </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex flex-col">
+                                                <span className="font-koulen text-lg text-black tracking-wide uppercase group-hover:text-[#D2042D] transition-colors">
+                                                    {category.name}
+                                                </span>
+                                                <span className="font-mono text-[10px] text-gray-400">
+                                                    /{category.slug}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 font-istok">
+                                            <span
+                                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${(category.product_count || 0) > 0
+                                                    ? "bg-blue-50 text-blue-700"
+                                                    : "bg-gray-100 text-gray-400"
+                                                    }`}
+                                            >
+                                                {category.product_count || 0} items
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            {category.parent_name ? (
+                                                <div className="flex flex-col">
+                                                    <span className="font-istok text-[9px] text-gray-400 uppercase tracking-wider mb-1">
+                                                        Child of
+                                                    </span>
+                                                    <span className="font-bold text-xs text-gray-700">
+                                                        {category.parent_name}
+                                                    </span>
+                                                </div>
+                                            ) : (
+                                                <span className="font-istok text-[9px] text-gray-400 uppercase tracking-widest border border-gray-200 px-2 py-1 rounded bg-gray-50">
+                                                    Top Level
+                                                </span>
+                                            )}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-right">
+                                            <div className="flex justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
+                                                <button
+                                                    onClick={() => handleOpenForm(category)}
+                                                    className="text-[#0047AB] hover:text-[#003380] font-bold uppercase text-xs tracking-wider"
+                                                >
+                                                    Edit
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDeleteClick(category)}
+                                                    className="text-[#D2042D] hover:text-[#9e0322] font-bold uppercase text-xs tracking-wider ml-2"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                );
+                            })
+                        )}
+                    </tbody>
+                </table>
+            </div>
 
-                                <div>
-                                    <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Name</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        value={name}
-                                        onChange={(e) => setName(e.target.value)}
-                                        className="w-full px-4 py-3 bg-black border border-white/20 text-white focus:border-accent focus:ring-1 focus:ring-accent skew-box font-bold uppercase tracking-wide outline-none transition-all"
-                                        placeholder="DIVISION NAME..."
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Description</label>
-                                    <textarea
-                                        value={description}
-                                        onChange={(e) => setDescription(e.target.value)}
-                                        className="w-full px-4 py-3 bg-black border border-white/20 text-white placeholder-gray-600 focus:border-accent focus:ring-1 focus:ring-accent skew-box font-medium text-sm leading-relaxed outline-none transition-all resize-none"
-                                        rows={3}
-                                        placeholder="Brief description..."
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Parent Division</label>
-                                    <div className="relative">
-                                        <select
-                                            value={parentId}
-                                            onChange={(e) => setParentId(e.target.value)}
-                                            className="w-full px-4 py-3 bg-black border border-white/20 text-white focus:border-accent focus:ring-1 focus:ring-accent skew-box font-bold uppercase tracking-wide outline-none appearance-none transition-all custom-select"
-                                        >
-                                            <option value="">None (Top Level)</option>
-                                            {categories
-                                                .filter(c => c.id !== editingCategory?.id)
-                                                .map((cat) => (
-                                                    <option key={cat.id} value={cat.id}>
-                                                        {cat.name}
-                                                    </option>
-                                                ))}
-                                        </select>
-                                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-accent">
-                                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 9l-7 7-7-7" /></svg>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="flex justify-end gap-3 pt-6 border-t border-white/10">
-                                    <button
-                                        type="button"
-                                        onClick={() => setIsModalOpen(false)}
-                                        className="px-6 py-2 bg-transparent border border-white/20 text-white hover:bg-white/5 transition-colors skew-box font-bold uppercase tracking-wider text-xs"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        disabled={isSubmitting}
-                                        className="px-8 py-2 bg-accent text-black font-black uppercase italic tracking-widest hover:bg-white hover:text-black transition-all skew-box shadow-[0_0_15px_rgba(204,255,0,0.4)] text-xs disabled:opacity-50"
-                                    >
-                                        {isSubmitting ? "SAVING..." : "SAVE"}
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
+            {/* Category Form Modal */}
+            {
+                isFormOpen && (
+                    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+                        <CategoryForm
+                            key={editingCategory ? editingCategory.id : "create"}
+                            initialData={editingCategory}
+                            categories={categories} // Use all categories source
+                            onSubmit={handleSubmit}
+                            onCancel={handleCloseForm}
+                            isLoading={isSubmitting}
+                        />
                     </div>
-                </div>
-            )}
-        </main>
+                )
+            }
+
+            {/* Delete Confirmation Modal */}
+            <ConfirmationModal
+                isOpen={!!categoryToDelete}
+                onCancel={() => setCategoryToDelete(null)}
+                onConfirm={handleConfirmDelete}
+                title="Delete Category"
+                message={`Are you sure you want to delete "${getCategoryPath(categoryToDelete)}"? all related products will be affected.`}
+                confirmText="Delete Category"
+            />
+        </div >
     );
 }
