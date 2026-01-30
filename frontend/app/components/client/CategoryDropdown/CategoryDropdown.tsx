@@ -191,7 +191,7 @@ export default function CategoryDropdown({
       {isDropdownOpen && (
         <div
           ref={dropdownRef}
-          className="fixed z-50 bg-white shadow-2xl border-t border-gray-200 flex flex-col md:flex-row overflow-hidden animate-in fade-in slide-in-from-top-1 duration-200"
+          className="fixed z-50 bg-white shadow-2xl shadow-black/5 border-t border-gray-100 flex flex-col md:flex-row overflow-hidden animate-in fade-in slide-in-from-top-1 duration-200 rounded-b-3xl"
           style={{
             left: 0,
             top: `var(--header-height)`,
@@ -207,12 +207,12 @@ export default function CategoryDropdown({
           {/* Desktop Mega Menu */}
           <div className="hidden md:flex flex-row h-[500px] max-h-full w-full">
             {/* Navigation Columns area */}
-            <div className="flex flex-row shrink-0 bg-white overflow-x-auto custom-scrollbar">
+            <div className="flex flex-row shrink-0 bg-white overflow-x-auto custom-scrollbar pl-8 py-8">
               {columns.length > 0 ? (
                 columns.map((col, level) => (
                   <div
                     key={level}
-                    className="flex flex-col w-72 overflow-y-auto border-r border-gray-100 last:border-0"
+                    className="flex flex-col w-72 overflow-y-auto border-r border-gray-50 last:border-0 px-2"
                   >
                     {col.items.map((cat) => {
                       const isActive = activePath[level] === cat.id;
@@ -225,14 +225,12 @@ export default function CategoryDropdown({
                         <Link
                           key={cat.id}
                           href={`/category/${itemPath}`}
-                          className={`group px-6 py-4 flex items-center justify-between transition-all cursor-pointer border-b border-gray-50 last:border-0
-                              ${isActive ? "bg-black text-white" : "hover:bg-gray-50 text-gray-900"}
-                          `}
+                          className="group flex items-center justify-between px-4 py-3 rounded-xl transition-all cursor-pointer hover:bg-gray-50 mb-1"
                           onMouseEnter={() => handleItemHover(cat, level)}
                         >
                           <div className="flex items-center gap-4">
-                            <div className={`w-12 h-12 relative overflow-hidden bg-gray-100 shrink-0 border border-gray-200 transition-transform duration-300 group-hover:scale-110
-                                ${isActive ? "border-white/20" : ""}
+                            <div className={`w-10 h-10 relative overflow-hidden bg-gray-100 shrink-0 rounded-xl transition-all duration-300
+                                ${isActive ? "ring-2 ring-black" : "group-hover:ring-1 group-hover:ring-gray-200"}
                             `}>
                               {cat.image ? (
                                 <Image
@@ -242,23 +240,21 @@ export default function CategoryDropdown({
                                   className="object-cover"
                                 />
                               ) : (
-                                <div className="w-full h-full flex items-center justify-center text-[10px] font-black uppercase text-gray-400">
+                                <div className="w-full h-full flex items-center justify-center text-[10px] font-bold uppercase text-gray-300 font-istok">
                                   {cat.name.substring(0, 2)}
                                 </div>
                               )}
                             </div>
-                            <span className={`text-sm font-black font-istok uppercase tracking-tight
-                                ${isActive ? "text-white" : "text-gray-900"}
+                            <span className={`text-[12px] font-istok uppercase tracking-[0.2em] transition-colors
+                                ${isActive ? "font-normal text-black" : "font-light text-gray-500 group-hover:text-black"}
                             `}>
                               {cat.name}
                             </span>
                           </div>
                           {hasChildren && (
-                            <span className={`text-xs transition-transform duration-300 group-hover:translate-x-1 ${isActive ? "text-white/50" : "text-gray-300"}`}>
-                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="square">
-                                <path d="M9 18l6-6-6-6" />
-                              </svg>
-                            </span>
+                            <div className={`w-1.5 h-1.5 rounded-full transition-all duration-300 
+                                ${isActive ? "bg-black opacity-100" : "bg-gray-300 opacity-0 group-hover:opacity-100"}
+                            `} />
                           )}
                         </Link>
                       );
@@ -266,43 +262,42 @@ export default function CategoryDropdown({
                   </div>
                 ))
               ) : (
-                <div className="p-12 text-gray-400 w-48 text-center font-istok font-bold uppercase tracking-wider">
+                <div className="p-12 text-gray-300 w-48 text-center font-istok font-light uppercase tracking-wider text-xs">
                   No items
                 </div>
               )}
             </div>
 
             {/* Featured Image Area */}
-            <div className="flex-1 min-w-[300px] relative bg-gray-100 overflow-hidden group">
+            <div className="flex-1 min-w-[300px] relative bg-gray-50 overflow-hidden group m-4 rounded-2xl">
               {featuredCategory && (
                 <>
                   <Image
                     src={getImageUrl(featuredCategory.image)}
                     alt={featuredCategory.name}
                     fill
-                    className="object-cover transition-transform duration-1000 group-hover:scale-110"
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
                   />
-                  {/* Overlay Gradient */}
-                  <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
+                  {/* Overlay */}
+                  <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors duration-500" />
 
                   {/* Content Overlay */}
-                  <div className="absolute inset-0 flex flex-col justify-end p-16">
+                  <div className="absolute inset-0 flex flex-col justify-end p-12">
                     <div className="overflow-hidden mb-4">
-                      <span className="inline-block px-4 py-1.5 bg-white text-black text-[11px] font-black uppercase tracking-[0.3em] translate-y-full group-hover:translate-y-0 transition-transform duration-500">
-                        Exercise // Ready
+                      <span className="inline-block px-4 py-1.5 bg-white/90 backdrop-blur-md text-black text-[10px] font-istok font-bold uppercase tracking-[0.3em] rounded-full translate-y-8 group-hover:translate-y-0 transition-transform duration-500">
+                        Collection
                       </span>
                     </div>
-                    <h2 className="text-7xl font-black text-white font-koulen uppercase tracking-tighter leading-[0.85] mb-6 max-w-lg">
+                    <h2 className="text-5xl font-normal text-white font-istok uppercase tracking-tighter mb-6 max-w-lg drop-shadow-lg">
                       {featuredCategory.name}
                     </h2>
                     <Link
                       href={`/category/${featuredCategory.slug}`}
-                      className="group/btn flex items-center gap-3 w-fit"
+                      className="group/btn px-8 py-3 bg-white text-black rounded-full w-fit hover:bg-black hover:text-white transition-all duration-300"
                     >
-                      <span className="text-white font-istok font-black uppercase tracking-[0.2em] text-xs">
-                        Explore Collection
+                      <span className="font-istok font-normal uppercase tracking-[0.2em] text-[11px]">
+                        Explore
                       </span>
-                      <div className="w-12 h-[2px] bg-white transform origin-left transition-transform duration-500 group-hover/btn:scale-x-150" />
                     </Link>
                   </div>
                 </>

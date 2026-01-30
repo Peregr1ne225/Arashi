@@ -56,64 +56,70 @@ export default function UserDropdown() {
                 </button>
 
                 {isOpen && (
-                    <div className="absolute right-0 top-full mt-3 w-56 bg-white border border-gray-100 rounded-xl shadow-xl py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200 overflow-hidden">
+                    <div className="absolute right-0 top-full mt-3 w-64 bg-white border border-gray-100 rounded-3xl shadow-2xl shadow-black/5 py-4 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                         {isAuthenticated ? (
                             <>
-                                <div className="px-5 py-4 border-b border-gray-100 mb-2">
-                                    <p className="text-lg font-bold text-black font-koulen uppercase tracking-wide truncate">
+                                <div className="px-6 py-4 border-b border-gray-50 mb-2">
+                                    <p className="text-sm font-normal text-black font-istok uppercase tracking-[0.2em] truncate">
                                         {user?.username || "Account"}
                                     </p>
-                                    <p className="text-xs font-bold text-gray-400 font-istok uppercase tracking-wider truncate">
+                                    <p className="text-[10px] font-light text-gray-400 font-istok uppercase tracking-wider truncate mt-1">
                                         {user?.email}
                                     </p>
                                 </div>
 
-                                <div className="space-y-1">
+                                <div className="space-y-1 px-2">
                                     {menuItems.map(
                                         (item) =>
                                             item.show && (
                                                 <Link
                                                     key={item.href}
                                                     href={item.href}
-                                                    className="block px-5 py-2.5 text-sm font-bold text-black font-istok uppercase tracking-wider hover:bg-[#1e1c15] hover:text-white transition-colors"
+                                                    className="group flex items-center px-4 py-2.5 text-[12px] font-light text-gray-500 font-istok uppercase tracking-[0.2em] hover:text-black transition-all"
                                                     onClick={() => setIsOpen(false)}
                                                 >
+                                                    <div className="w-1.5 h-1.5 bg-accent rounded-full opacity-0 -ml-3 group-hover:opacity-100 group-hover:ml-0 transition-all mr-2" />
                                                     {item.label}
                                                 </Link>
                                             ),
                                     )}
                                 </div>
 
-                                <div className="pt-2 mt-2 border-t border-gray-100">
+                                <div className="pt-2 mt-2 px-6">
                                     <button
                                         onClick={handleLogout}
-                                        className="block w-full text-left px-5 py-3 text-sm font-bold text-red-600 font-istok uppercase tracking-wider hover:bg-red-50 transition-colors"
+                                        className="text-[11px] font-normal text-red-400 font-istok uppercase tracking-[0.25em] hover:text-red-600 transition-colors"
                                     >
                                         Sign out
                                     </button>
                                 </div>
                             </>
                         ) : (
-                            <div className="p-2 space-y-2">
-                                <div className="px-3 py-2">
-                                    <p className="text-sm text-gray-400 font-istok font-bold uppercase tracking-wider mb-2">Welcome</p>
+                            <div className="px-6 py-4 space-y-6">
+                                <div className="space-y-1">
+                                    <p className="text-[10px] text-gray-400 font-istok font-light uppercase tracking-widest">Performance Portal</p>
+                                    <h4 className="text-lg font-normal text-black font-istok uppercase tracking-tighter italic">Welcome back</h4>
                                 </div>
+
                                 <button
                                     onClick={() => {
                                         setIsOpen(false);
                                         setIsLoginModalOpen(true);
                                     }}
-                                    className="flex w-full items-center justify-center px-4 py-3 bg-black text-white rounded-lg text-sm font-koulen uppercase tracking-widest hover:bg-gray-900 transition-colors"
+                                    className="w-full py-3.5 bg-black text-white rounded-full text-[12px] font-normal font-istok uppercase tracking-widest hover:bg-gray-800 transition-all transform hover:scale-[1.02]"
                                 >
-                                    Sign in
+                                    Login
                                 </button>
-                                <Link
-                                    href="/register"
-                                    className="block w-full px-4 py-3 text-sm text-black border border-gray-200 rounded-lg font-koulen uppercase tracking-widest hover:bg-gray-50 transition-colors text-center"
-                                    onClick={() => setIsOpen(false)}
-                                >
-                                    Create account
-                                </Link>
+
+                                <div className="text-center pt-2">
+                                    <Link
+                                        href="/register"
+                                        className="text-[11px] text-gray-500 font-istok font-light uppercase tracking-[0.2em] border-b border-transparent hover:border-gray-200 transition-all"
+                                        onClick={() => setIsOpen(false)}
+                                    >
+                                        Create an account
+                                    </Link>
+                                </div>
                             </div>
                         )}
                     </div>
