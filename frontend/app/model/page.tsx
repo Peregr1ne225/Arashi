@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AvatarScene from "@/app/components/avatar/AvatarScene";
 import ConfiguratorPanel from "@/app/components/avatar/ConfiguratorPanel";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
+import { visualizationApi } from "@/app/lib/api/client";
+import { Avatar } from "@/app/types/visualization";
 
 
 
@@ -23,15 +25,49 @@ const ENVIRONMENTS: { id: 'apartment' | 'city' | 'dawn' | 'forest' | 'lobby' | '
 ];
 
 export default function ModelPage() {
+    const [avatars, setAvatars] = useState<Avatar[]>([]);
+    const [currentAvatar, setCurrentAvatar] = useState<Avatar | null>(null);
+    const [loading, setLoading] = useState(true);
+
     const [selectedCategory, setSelectedCategory] = useState<"shirts" | "pants">("shirts");
     const [selectedShirt, setSelectedShirt] = useState<string | null>(null);
     const [selectedPant, setSelectedPant] = useState<string | null>(null);
     const [actionName, setActionName] = useState<string>("Idle");
     const [environment, setEnvironment] = useState<'apartment' | 'city' | 'dawn' | 'forest' | 'lobby' | 'night' | 'park' | 'studio' | 'sunset' | 'warehouse'>("city");
 
-    // Hardcoded for MVP
-    const BASE_URL = "http://localhost:8000";
-    const AVATAR_ID = "avatar2";
+    useEffect(() => {
+        const fetchAvatars = async () => {
+            try {
+                const data = await visualizationApi.getAvatars();
+                setAvatars(data);
+                if (data.length > 0) {
+                    setCurrentAvatar(data[0]);
+                }
+            } catch (error) {
+                console.error("Failed to fetch avatars:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchAvatars();
+    }, []);
+
+    // Reset selection when avatar changes
+    useEffect(() => {
+        setSelectedShirt(null);
+        setSelectedPant(null);
+    }, [currentAvatar]);
+
+    if (loading) return <div className="min-h-screen flex items-center justify-center">Loading 3D Configurator...</div>;
+    if (!currentAvatar) return <div className="min-h-screen flex items-center justify-center">No avatars found.</div>;
+
+    // Filter assets for the current avatar
+    const availableShirts = currentAvatar.assets.filter(a => a.type === 'shirt');
+    const availablePants = currentAvatar.assets.filter(a => a.type === 'pant');
+
+    // Find full URLs for selected assets
+    const shirtUrl = availableShirts.find(s => s.slug === selectedShirt)?.file || null;
+    const pantUrl = availablePants.find(p => p.slug === selectedPant)?.file || null;
 
     return (
         <div className="flex h-screen w-full bg-neutral-50 overflow-hidden">
@@ -45,9 +81,6 @@ export default function ModelPage() {
                         <ChevronLeft size={16} />
                         Back to Shop
                     </Link>
-                    <div className="px-4 py-2 bg-white/80 backdrop-blur-md rounded-full shadow-sm text-sm font-medium">
-                        3D Configurator Alpha
-                    </div>
                 </header>
 
                 {/* Environment Controls (Top Left) */}
@@ -91,10 +124,9 @@ export default function ModelPage() {
                 </div>
 
                 <AvatarScene
-                    baseUrl={BASE_URL}
-                    avatarId={AVATAR_ID}
-                    selectedShirt={selectedShirt}
-                    selectedPant={selectedPant}
+                    baseModelUrl={currentAvatar.base_file}
+                    shirtUrl={shirtUrl}
+                    pantUrl={pantUrl}
                     actionName={actionName}
                     environmentPreset={environment}
                 />
@@ -109,6 +141,11 @@ export default function ModelPage() {
                     setSelectedShirt={setSelectedShirt}
                     selectedPant={selectedPant}
                     setSelectedPant={setSelectedPant}
+                    availableShirts={availableShirts}
+                    availablePants={availablePants}
+                    avatars={avatars}
+                    currentAvatar={currentAvatar}
+                    setCurrentAvatar={setCurrentAvatar}
                 />
             </div>
         </div>

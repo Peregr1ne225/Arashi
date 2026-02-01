@@ -2,7 +2,9 @@ import { Product, ProductListResponse, SearchParams, RawProduct } from "@/app/ty
 import { Category } from "@/app/types/category";
 import { Color, Size, Tag } from "@/app/types/attributes";
 import { User } from "@/app/types/user";
+import { Avatar, AvatarAsset } from "@/app/types/visualization";
 import { api } from "../api";
+
 
 /**
  * API client with Next.js caching options
@@ -957,3 +959,73 @@ export async function revalidateCache(tags: string[]): Promise<void> {
     console.error("Failed to revalidate cache:", error);
   }
 }
+
+/**
+ * Visualization API client (Avatars)
+ */
+export const visualizationApi = {
+  async getAvatars(): Promise<Avatar[]> {
+    const response = await api.get("/avatars/");
+    if (!response.ok) return [];
+
+    const data = await response.json();
+    // Map URL fix
+    const avatars = (Array.isArray(data) ? data : data.results || []).map((avatar: Avatar) => ({
+      ...avatar,
+      base_file: fixImageUrl(avatar.base_file),
+      thumbnail: avatar.thumbnail ? fixImageUrl(avatar.thumbnail) : null,
+      assets: avatar.assets.map((asset) => ({
+        ...asset,
+        file: fixImageUrl(asset.file),
+        thumbnail: asset.thumbnail ? fixImageUrl(asset.thumbnail) : null,
+      })),
+    }));
+
+    return avatars;
+  },
+
+  async getAvatar(slug: string): Promise<Avatar> {
+    const response = await api.get(`/avatars/${slug}/`);
+    if (!response.ok) throw new Error("Avatar not found");
+    const avatar = await response.json();
+
+    return {
+      ...avatar,
+      base_file: fixImageUrl(avatar.base_file),
+      thumbnail: avatar.thumbnail ? fixImageUrl(avatar.thumbnail) : null,
+      assets: avatar.assets.map((asset: AvatarAsset) => ({
+        ...asset,
+        file: fixImageUrl(asset.file),
+        thumbnail: asset.thumbnail ? fixImageUrl(asset.thumbnail) : null,
+      })),
+    };
+  },
+
+  async createAvatar(data: FormData): Promise<Avatar> {
+    const response = await api.post("/avatars/", data);
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.detail || "Failed to create avatar");
+    }
+    return response.json();
+  },
+
+  async deleteAvatar(slug: string): Promise<void> {
+    const response = await api.delete(`/avatars/${slug}/`);
+    if (!response.ok) throw new Error("Failed to delete avatar");
+  },
+
+  async createAvatarAsset(data: FormData): Promise<AvatarAsset> {
+    const response = await api.post("/avatar-assets/", data);
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.detail || "Failed to create asset");
+    }
+    return response.json();
+  },
+
+  async deleteAvatarAsset(id: number): Promise<void> {
+    const response = await api.delete(`/avatar-assets/${id}/`);
+    if (!response.ok) throw new Error("Failed to delete asset");
+  }
+};

@@ -1,7 +1,7 @@
 "use client";
 
 import { Dispatch, SetStateAction } from "react";
-
+import { Avatar, AvatarAsset } from "@/app/types/visualization";
 
 interface ConfiguratorPanelProps {
     selectedCategory: "shirts" | "pants";
@@ -10,21 +10,14 @@ interface ConfiguratorPanelProps {
     setSelectedShirt: Dispatch<SetStateAction<string | null>>;
     selectedPant: string | null;
     setSelectedPant: Dispatch<SetStateAction<string | null>>;
+    availableShirts: AvatarAsset[];
+    availablePants: AvatarAsset[];
 
+    // New props for avatar selection
+    avatars: Avatar[];
+    currentAvatar: Avatar | null;
+    setCurrentAvatar: Dispatch<SetStateAction<Avatar | null>>;
 }
-
-
-
-const ITEMS = {
-    shirts: [
-        { id: "shirt1", name: "Yellow Duck Shirt", description: "A classic yellow duck mesh." },
-        // { id: "shirt2", name: "Blue Shirt", description: "Coming soon..." },
-    ],
-    pants: [
-        { id: "pant1", name: "Boxy Pants", description: "Simple box geometry pant." },
-        // { id: "pant2", name: "Jeans", description: "Coming soon..." },
-    ]
-};
 
 export default function ConfiguratorPanel({
     selectedCategory,
@@ -32,13 +25,39 @@ export default function ConfiguratorPanel({
     selectedShirt,
     setSelectedShirt,
     selectedPant,
-    setSelectedPant
+    setSelectedPant,
+    availableShirts,
+    availablePants,
+    avatars,
+    currentAvatar,
+    setCurrentAvatar
 }: ConfiguratorPanelProps) {
 
-    const items = ITEMS[selectedCategory];
+    const items = selectedCategory === "shirts" ? availableShirts : availablePants;
 
     return (
         <div className="flex flex-col h-full bg-white border-l border-neutral-200">
+            {/* Avatar Selector Section */}
+            <div className="p-6 border-b border-neutral-200">
+                <h3 className="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-3">Model</h3>
+                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                    {avatars.map(avatar => (
+                        <button
+                            key={avatar.id}
+                            onClick={() => setCurrentAvatar(avatar)}
+                            className={cn(
+                                "shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all border",
+                                currentAvatar?.id === avatar.id
+                                    ? "bg-neutral-900 text-white border-neutral-900 shadow-sm"
+                                    : "bg-white text-neutral-600 border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50"
+                            )}
+                        >
+                            {avatar.name}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
             {/* Category Tabs */}
             <div className="flex border-b border-neutral-200">
                 <button
@@ -65,24 +84,22 @@ export default function ConfiguratorPanel({
                 </button>
             </div>
 
-
-
             {/* Items Grid */}
             <div className="flex-1 overflow-y-auto p-6">
                 <div className="grid grid-cols-2 gap-4">
                     {items.map((item) => {
                         const isSelected =
-                            (selectedCategory === "shirts" && selectedShirt === item.id) ||
-                            (selectedCategory === "pants" && selectedPant === item.id);
+                            (selectedCategory === "shirts" && selectedShirt === item.slug) ||
+                            (selectedCategory === "pants" && selectedPant === item.slug);
 
                         return (
                             <button
                                 key={item.id}
                                 onClick={() => {
                                     if (selectedCategory === "shirts") {
-                                        setSelectedShirt(isSelected ? null : item.id);
+                                        setSelectedShirt(isSelected ? null : item.slug);
                                     } else {
-                                        setSelectedPant(isSelected ? null : item.id);
+                                        setSelectedPant(isSelected ? null : item.slug);
                                     }
                                 }}
                                 className={cn(
@@ -115,15 +132,11 @@ export default function ConfiguratorPanel({
                 >
                     Reset Avatar
                 </button>
-                <div className="mt-4 text-xs text-neutral-400 text-center">
-                    Backend: localhost:8000/static/models/avatar1
-                </div>
             </div>
         </div>
     );
 }
 
-// Simple className merger helper if not imported
 function cn(...classes: (string | undefined | null | boolean)[]) {
     return classes.filter(Boolean).join(" ");
 }

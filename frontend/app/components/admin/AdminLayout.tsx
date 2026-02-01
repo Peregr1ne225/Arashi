@@ -11,6 +11,7 @@ import {
     Image as ImageIcon,
     SlidersHorizontal,
     User as UserIcon,
+    Box,
 } from "lucide-react";
 
 interface AdminLayoutProps {
@@ -50,6 +51,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             label: "Attributes",
             href: "/admin/attributes",
             icon: SlidersHorizontal,
+        },
+        {
+            id: "avatars",
+            label: "3D Avatars",
+            href: "/admin/avatars",
+            icon: Box,
         },
         { id: "hero", label: "Hero", href: "/admin/hero", icon: ImageIcon },
         { id: "users", label: "Users", href: "/admin/users", icon: UserIcon },

@@ -46,6 +46,9 @@ export type {
 // Common types
 export type { ApiResponse } from "./common";
 
+// Visualization types
+export type { Avatar, AvatarAsset } from "./visualization";
+
 // Header/Footer types
 export type {
   NavigationItem,

@@ -6,30 +6,20 @@ import { AvatarBase, AvatarComponent } from "./AvatarComponents";
 import { Suspense } from "react";
 
 interface AvatarSceneProps {
-    baseUrl: string;
-    avatarId: string;
-    selectedShirt: string | null;
-    selectedPant: string | null;
+    baseModelUrl: string;
+    shirtUrl: string | null;
+    pantUrl: string | null;
     actionName: string;
     environmentPreset: 'apartment' | 'city' | 'dawn' | 'forest' | 'lobby' | 'night' | 'park' | 'studio' | 'sunset' | 'warehouse';
 }
 
 export default function AvatarScene({
-    baseUrl,
-    avatarId,
-    selectedShirt,
-    selectedPant,
+    baseModelUrl,
+    shirtUrl,
+    pantUrl,
     actionName,
     environmentPreset
 }: AvatarSceneProps) {
-
-    const baseModelUrl = `${baseUrl}/media/models/${avatarId}/base.glb`;
-    const shirtUrl = selectedShirt
-        ? `${baseUrl}/media/models/${avatarId}/shirts/${selectedShirt}.glb`
-        : null;
-    const pantUrl = selectedPant
-        ? `${baseUrl}/media/models/${avatarId}/pants/${selectedPant}.glb`
-        : null;
 
     return (
         <div className="w-full h-full min-h-[500px] bg-neutral-100 rounded-xl overflow-hidden relative">
