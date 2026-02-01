@@ -2,49 +2,68 @@ import { ReactNode } from "react";
 
 interface CatalogLayoutProps {
     title?: string;
-    description?: string;
     children: ReactNode;
     breadcrumb?: ReactNode;
     headerContent?: ReactNode;
+    sidebar?: ReactNode;
 }
 
 export default function CatalogLayout({
     title,
-    description,
     children,
     breadcrumb,
     headerContent,
+    sidebar,
 }: CatalogLayoutProps) {
     return (
-        <div className="min-h-screen bg-background text-white">
-            <main className="container mx-auto px-4 py-12">
-                {/* Breadcrumb - Optional but typically present */}
-                {breadcrumb && (
-                    <div className="flex items-center text-sm font-bold uppercase tracking-widest text-gray-500 pt-5 mb-8">
-                        {breadcrumb}
-                    </div>
+        <div className="min-h-screen bg-white">
+            <div className="flex w-full">
+                {/* Sidebar Column - Only renders if sidebar prop is provided */}
+                {sidebar && (
+                    <aside className="hidden lg:block w-80 shrink-0 border-r border-gray-100">
+                        <div className="sticky top-0 h-screen overflow-y-auto no-scrollbar p-6 flex flex-col justify-center">
+                            {sidebar}
+                        </div>
+                    </aside>
                 )}
 
-                {/* Page Header */}
-                {(title || description || headerContent) && (
-                    <div className="mb-12 border-b border-white/10 pb-8">
-                        {title && (
-                            <h1 className="text-6xl md:text-8xl font-black uppercase italic tracking-tighter text-white mb-4 drop-shadow-lg">
-                                {title}
-                            </h1>
-                        )}
-                        {description && (
-                            <p className="text-xl text-accent font-bold uppercase tracking-wider max-w-2xl border-l-4 border-accent pl-4">
-                                {description}
-                            </p>
-                        )}
-                        {headerContent}
-                    </div>
-                )}
+                {/* Main Content Column */}
+                <main className="flex-1 w-full px-6 py-8 min-w-0">
+                    {/* Breadcrumb - Optional but typically present */}
+                    {breadcrumb && (
+                        <div className="flex items-center text-sm text-gray-600 pt-1 mb-6">
+                            {breadcrumb}
+                        </div>
+                    )}
 
-                {/* Main Content Area (Sidebar + Grid) */}
-                {children}
-            </main>
+                    {/* Page Header - Left Aligned */}
+                    {(title || headerContent) && (
+                        <div className="mb-8">
+                            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4">
+                                <div>
+                                    {title && (
+                                        <h1 className="font-istok text-[32px] md:text-[42px] font-bold leading-tight text-black uppercase tracking-wide">
+                                            {title}
+                                        </h1>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Search Bar / Header Content Row */}
+                            {headerContent && (
+                                <div className="flex flex-col md:flex-row md:items-center justify-start gap-4 mt-4">
+                                    <div className="w-full md:w-auto">
+                                        {headerContent}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Main Content Area (Sidebar + Grid) */}
+                    {children}
+                </main>
+            </div>
         </div>
     );
 }

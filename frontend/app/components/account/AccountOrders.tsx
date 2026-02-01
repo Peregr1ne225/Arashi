@@ -12,7 +12,7 @@ import dynamic from "next/dynamic";
 import { ReviewProduct } from "@/app/types/review";
 import { getImageUrl } from "@/app/lib/utils/image";
 
-const ReviewModal = dynamic(() => import("../product/ReviewModal"), {
+const ReviewModal = dynamic(() => import("@/app/components/product/ReviewModal"), {
     ssr: false,
 });
 import ConfirmationModal from "@/app/components/ui/ConfirmationModal";
