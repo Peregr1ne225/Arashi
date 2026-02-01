@@ -1,12 +1,10 @@
 import { Suspense } from "react";
 import ProductGrid from "@/app/components/product/ProductGrid";
-import CategorySection from "@/app/components/ui/CategorySection";
 import ProductSkeleton from "@/app/components/product/ProductSkeleton";
 import HeroSection from "@/app/components/home/HeroSection";
-import { productsApi, categoriesApi } from "@/app/lib/api/client";
+import { productsApi } from "@/app/lib/api/client";
 import { Product } from "@/app/types/product";
 import { cmsApi } from "@/app/lib/api/client";
-import { Category } from "@/app/types/category";
 
 // --- Async Components for Streaming ---
 async function HeroSectionFetcher() {
@@ -31,19 +29,6 @@ async function HeroSectionFetcher() {
   }
 
   return <HeroSection heroImages={heroImages} />;
-}
-
-async function CategoriesFetcher() {
-  let categories: Category[] = [];
-  try {
-    categories = await categoriesApi.getCategories();
-  } catch (error) {
-    console.warn("Failed to fetch categories:", error);
-  }
-
-  // Take first 8 categories for stability
-  const selectedCategories = (categories || []).slice(0, 8);
-  return <CategorySection categories={selectedCategories} />;
 }
 
 async function FeaturedSection() {
@@ -125,11 +110,6 @@ export default function Home() {
       </Suspense>
 
       <main className="container mx-auto px-4 md:px-8 py-8 space-y-16">
-        {/* Categories - Streamed */}
-        <Suspense fallback={<div className="h-40 bg-secondary animate-pulse m-4 rounded-none"></div>}>
-          <CategoriesFetcher />
-        </Suspense>
-
         {/* Featured Products - Streamed */}
         <Suspense fallback={<ProductSkeleton title="Featured Products" />}>
           <FeaturedSection />
