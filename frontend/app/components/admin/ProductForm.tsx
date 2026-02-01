@@ -379,9 +379,9 @@ export default function ProductForm({
     return (
         <form onSubmit={handleSubmit} className="space-y-8 px-1">
             {/* Basic Information Section */}
-            <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-                <div className="bg-linear-to-r from-[#0047AB] to-[#D2042D] px-6 py-4">
-                    <h3 className="text-base font-bold text-white flex items-center gap-2 uppercase tracking-wide">
+            <div className="bg-white rounded-4xl border border-gray-100 shadow-sm overflow-hidden">
+                <div className="bg-linear-to-r from-[#0e4d80] to-[#0a3a60] px-8 py-5">
+                    <h3 className="text-lg font-bold text-white flex items-center gap-2 uppercase tracking-wide font-koulen">
                         Basic Information
                     </h3>
                 </div>
@@ -396,7 +396,7 @@ export default function ProductForm({
                             required
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            className="block w-full rounded-lg border-gray-400 bg-gray-50 shadow-sm focus:border-[#0e4d80] focus:ring-[#0e4d80] sm:text-sm py-2.5 px-4 font-medium text-gray-900 placeholder-gray-400"
+                            className="block w-full rounded-2xl border-gray-200 bg-gray-50 shadow-sm focus:border-[#0e4d80] focus:ring-[#0e4d80] sm:text-sm py-3 px-5 font-medium text-gray-900 placeholder-gray-400 experiment-input"
                             placeholder="e.g. Minimalist Cotton T-Shirt"
                         />
                     </div>
@@ -436,9 +436,9 @@ export default function ProductForm({
             </div>
 
             {/* Pricing & Inventory */}
-            <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-                <div className="bg-linear-to-r from-[#0047AB] to-[#D2042D] px-6 py-4">
-                    <h3 className="text-base font-bold text-white flex items-center gap-2 uppercase tracking-wide">
+            <div className="bg-white rounded-4xl border border-gray-100 shadow-sm overflow-hidden">
+                <div className="bg-linear-to-r from-[#0e4d80] to-[#0a3a60] px-8 py-5">
+                    <h3 className="text-lg font-bold text-white flex items-center gap-2 uppercase tracking-wide font-koulen">
                         Pricing & Inventory
                     </h3>
                 </div>
@@ -480,9 +480,9 @@ export default function ProductForm({
             </div>
 
             {/* Media Section */}
-            <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-                <div className="bg-linear-to-r from-[#0047AB] to-[#D2042D] px-6 py-4">
-                    <h3 className="text-base font-bold text-white flex items-center gap-2 uppercase tracking-wide">
+            <div className="bg-white rounded-4xl border border-gray-100 shadow-sm overflow-hidden">
+                <div className="bg-linear-to-r from-[#0e4d80] to-[#0a3a60] px-8 py-5">
+                    <h3 className="text-lg font-bold text-white flex items-center gap-2 uppercase tracking-wide font-koulen">
                         Media Gallery
                     </h3>
                 </div>
@@ -577,7 +577,7 @@ export default function ProductForm({
                             <button
                                 type="button"
                                 onClick={addTagManually}
-                                className="bg-linear-to-b from-[#0e4d80] to-[#D2042D] text-white px-6 py-2 rounded-lg text-sm font-bold shadow-md hover:opacity-90 transition-opacity uppercase tracking-wide"
+                                className="bg-[#0e4d80] text-white px-6 py-2 rounded-full text-sm font-bold shadow-md hover:opacity-90 transition-opacity uppercase tracking-wide font-koulen"
                             >
                                 Add
                             </button>
@@ -716,8 +716,8 @@ export default function ProductForm({
                                                         handleVariantChange(idx, "is_active", !v.is_active)
                                                     }
                                                     className={`px-3 py-1 text-xs font-bold rounded-full border flex items-center gap-1 w-fit transition-colors uppercase tracking-wide ${v.is_active
-                                                            ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
-                                                            : "bg-red-50 text-red-700 border-red-200 hover:bg-red-100"
+                                                        ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+                                                        : "bg-red-50 text-red-700 border-red-200 hover:bg-red-100"
                                                         }`}
                                                 >
                                                     <span

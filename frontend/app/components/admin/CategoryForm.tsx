@@ -71,11 +71,11 @@ export default function CategoryForm({
     });
 
     return (
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        <form onSubmit={handleSubmit} className="bg-white rounded-4xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] border border-gray-100">
             {/* Header */}
-            <div className="bg-linear-to-r from-gray-900 to-gray-800 px-6 py-4 flex items-center justify-between shrink-0">
-                <h2 className="font-koulen text-xl text-white tracking-widest uppercase">
-                    {isEditMode ? "Edit Category" : "Create Category"}
+            <div className="bg-linear-to-r from-[#0e4d80] to-[#0a3a60] px-8 py-5 flex items-center justify-between shrink-0">
+                <h2 className="font-koulen text-2xl text-white tracking-widest uppercase">
+                    {isEditMode ? "Edit Category" : "Build Category"}
                 </h2>
                 <button
                     type="button"
@@ -91,11 +91,11 @@ export default function CategoryForm({
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Left Column: Image */}
                     <div className="md:col-span-1">
-                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">
-                            Visual
+                        <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3">
+                            Visual Avatar
                         </label>
                         <div
-                            className="aspect-square border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center p-4 text-center cursor-pointer hover:bg-gray-50 hover:border-[#D2042D] transition-all group relative overflow-hidden"
+                            className="aspect-square border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center p-4 text-center cursor-pointer hover:bg-gray-50 hover:border-[#0e4d80] transition-all group relative overflow-hidden bg-gray-50/50"
                             onClick={() => fileInputRef.current?.click()}
                         >
                             {imagePreview ? (
@@ -111,9 +111,9 @@ export default function CategoryForm({
                                     </div>
                                 </>
                             ) : (
-                                <div className="text-gray-400 group-hover:text-[#D2042D] transition-colors">
-                                    <Upload className="w-8 h-8 mx-auto mb-2" />
-                                    <p className="text-[10px] font-bold uppercase tracking-widest">Upload Image</p>
+                                <div className="text-gray-400 group-hover:text-[#0e4d80] transition-colors">
+                                    <Upload className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                                    <p className="text-[10px] font-bold uppercase tracking-widest">Add Brand Icon</p>
                                 </div>
                             )}
                             <input
@@ -142,7 +142,7 @@ export default function CategoryForm({
                     <div className="md:col-span-2 space-y-5">
                         {/* Name */}
                         <div>
-                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">
+                            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">
                                 Designation *
                             </label>
                             <input
@@ -150,42 +150,42 @@ export default function CategoryForm({
                                 required
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
-                                placeholder="E.g. Electronics"
-                                className="block w-full rounded-sm border-gray-300 shadow-sm focus:border-black focus:ring-black sm:text-sm py-2.5 px-3 font-medium bg-gray-50 border"
+                                placeholder="E.g. Performance Wear"
+                                className="block w-full rounded-2xl border-gray-100 shadow-sm focus:border-[#0e4d80] focus:ring-4 focus:ring-[#0e4d80]/5 sm:text-sm py-3 px-4 font-medium bg-gray-50 border outline-none transition-all placeholder:text-gray-400"
                             />
                         </div>
 
                         {/* Slug (Read-only for now, or could be editable) */}
                         {isEditMode && initialData?.slug && (
                             <div>
-                                <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5">
-                                    URL Slug (Auto)
+                                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">
+                                    Path Identifier (URL)
                                 </label>
-                                <div className="py-2.5 px-3 bg-gray-100 rounded-sm border border-gray-200 text-gray-500 text-sm font-mono">
-                                    {initialData.slug}
+                                <div className="py-3 px-4 bg-gray-100/50 rounded-2xl border border-gray-100 text-gray-400 text-[11px] font-mono tracking-wider">
+                                    /{initialData.slug}
                                 </div>
                             </div>
                         )}
 
                         {/* Parent Category */}
                         <div>
-                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">
-                                Parent Category
+                            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">
+                                Hierarchy Layer
                             </label>
                             <div className="relative">
                                 <select
                                     value={parentId}
                                     onChange={(e) => setParentId(e.target.value)}
-                                    className="block w-full rounded-sm border-gray-300 shadow-sm focus:border-black focus:ring-black text-base py-3 px-3 font-medium bg-white border appearance-none"
+                                    className="block w-full rounded-2xl border-gray-100 shadow-sm focus:border-[#0e4d80] focus:ring-4 focus:ring-[#0e4d80]/5 text-sm py-3 px-4 font-medium bg-white border appearance-none outline-none transition-all"
                                 >
-                                    <option value="">Top Level (No Parent)</option>
+                                    <option value="">Master Category (Top Level)</option>
                                     {availableParents.map((cat) => (
                                         <option key={cat.id} value={cat.id}>
                                             {cat.name}
                                         </option>
                                     ))}
                                 </select>
-                                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+                                <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center px-2 text-gray-400">
                                     <svg className="h-4 w-4 fill-current" viewBox="0 0 20 20">
                                         <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
                                     </svg>
@@ -195,15 +195,15 @@ export default function CategoryForm({
 
                         {/* Description */}
                         <div>
-                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">
-                                Description
+                            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">
+                                Narrative Info
                             </label>
                             <textarea
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
                                 rows={3}
-                                className="block w-full rounded-sm border-gray-300 shadow-sm focus:border-black focus:ring-black sm:text-sm py-2 px-3 font-medium bg-gray-50 border"
-                                placeholder="Optional description..."
+                                className="block w-full rounded-2xl border-gray-100 shadow-sm focus:border-[#0e4d80] focus:ring-4 focus:ring-[#0e4d80]/5 sm:text-sm py-3 px-4 font-medium bg-gray-50 border outline-none transition-all placeholder:text-gray-400"
+                                placeholder="Details about this segment..."
                             />
                         </div>
                     </div>
@@ -211,20 +211,20 @@ export default function CategoryForm({
             </div>
 
             {/* Footer */}
-            <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3 shrink-0">
+            <div className="px-8 py-5 bg-gray-50/50 border-t border-gray-100 flex justify-end gap-3 shrink-0">
                 <button
                     type="button"
                     onClick={onCancel}
-                    className="px-6 py-2.5 border border-gray-300 text-gray-700 font-bold uppercase tracking-widest text-[11px] rounded-sm hover:bg-white hover:border-gray-400 transition-all shadow-sm"
+                    className="px-8 py-3 border border-gray-200 text-gray-600 font-bold uppercase tracking-[0.2em] text-[10px] rounded-full hover:bg-white hover:border-gray-300 transition-all shadow-sm"
                 >
-                    Cancel
+                    Discard
                 </button>
                 <button
                     type="submit"
                     disabled={isLoading}
-                    className="px-8 py-2.5 bg-linear-to-b from-[#0047AB] to-[#D2042D] text-white font-bold uppercase tracking-widest text-[11px] rounded-sm hover:opacity-90 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-10 py-3 bg-[#0e4d80] text-white font-bold uppercase tracking-[0.2em] text-[10px] rounded-full hover:bg-[#0b3d66] transition-all shadow-lg hover:shadow-blue-900/10 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    {isLoading ? "Saving..." : (isEditMode ? "Save Changes" : "Create Category")}
+                    {isLoading ? "SAVING..." : (isEditMode ? "UPDATE CATEGORY" : "SAVE CATEGORY")}
                 </button>
             </div>
         </form>

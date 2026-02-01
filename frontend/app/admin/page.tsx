@@ -123,7 +123,7 @@ export default function AdminDashboard() {
             <div className="flex justify-between items-end">
                 <div>
                     <h1 className="font-koulen text-4xl tracking-wide text-[#0e4d80]">
-                        Management <span className="text-[#D2042D]">Dashboard</span>
+                        Management <span className="text-[#0e4d80]/60">Dashboard</span>
                     </h1>
                     <p className="font-istok text-xs text-gray-500 uppercase tracking-[0.2em] mt-1 font-bold">
                         Real-time system metrics
@@ -131,7 +131,7 @@ export default function AdminDashboard() {
                 </div>
                 <button
                     onClick={fetchDashboardData}
-                    className="px-4 py-2 bg-white border border-gray-200 rounded-full text-xs font-istok uppercase tracking-widest hover:border-[#D2042D] transition-colors"
+                    className="px-6 py-2 bg-white border border-gray-200 rounded-full text-xs font-istok uppercase tracking-widest hover:border-[#0e4d80] hover:text-[#0e4d80] transition-colors"
                 >
                     Refresh Data
                 </button>

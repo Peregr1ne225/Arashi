@@ -124,8 +124,8 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
                     </button>
 
                     <div className="flex items-baseline gap-4 flex-wrap">
-                        <h1 className="font-koulen text-5xl text-black uppercase tracking-tight">
-                            Order #{order.display_id || order.id}
+                        <h1 className="font-koulen text-5xl text-[#0e4d80] uppercase tracking-tight">
+                            Order <span className="text-[#0e4d80]/60">#{order.display_id || order.id}</span>
                         </h1>
                         <span className={`px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-[0.15em] border ${getStatusColor(order.status)}`}>
                             {order.status}
@@ -151,13 +151,13 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
                 <div className="lg:col-span-2 space-y-8">
 
                     {/* Order Items */}
-                    <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-                        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
-                            <h2 className="font-koulen text-xl text-[#0e4d80] uppercase tracking-wide flex items-center gap-2">
-                                <PackageIcon className="w-5 h-5 text-[#D2042D]" />
+                    <div className="bg-white border border-gray-100 rounded-4xl shadow-sm overflow-hidden">
+                        <div className="px-8 py-5 border-b border-gray-50 bg-[#0e4d80] flex items-center justify-between">
+                            <h2 className="font-koulen text-xl text-white uppercase tracking-wide flex items-center gap-2">
+                                <PackageIcon className="w-5 h-5 text-white/70" />
                                 Order Items
                             </h2>
-                            <span className="font-istok text-xs font-bold text-gray-400 uppercase tracking-widest">
+                            <span className="font-istok text-[10px] font-bold text-white/60 uppercase tracking-widest">
                                 {order.items.length} Item(s)
                             </span>
                         </div>
@@ -230,19 +230,18 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
                                 </li>
                             ))}
                         </ul>
-                        <div className="bg-gray-50 px-6 py-6 border-t border-gray-100">
-                            <div className="flex justify-between items-center text-sm font-istok uppercase tracking-wider text-gray-500 mb-2">
+                        <div className="bg-gray-50/30 px-8 py-8 border-t border-gray-100">
+                            <div className="flex justify-between items-center text-xs font-istok uppercase tracking-[0.15em] text-gray-400 mb-3">
                                 <span>Subtotal</span>
-                                <span>฿{order.total_amount.toLocaleString()}</span>
+                                <span className="font-bold text-gray-600">฿{order.total_amount.toLocaleString()}</span>
                             </div>
-                            <div className="flex justify-between items-center text-sm font-istok uppercase tracking-wider text-gray-500 mb-4">
+                            <div className="flex justify-between items-center text-xs font-istok uppercase tracking-[0.15em] text-gray-400 mb-6">
                                 <span>Shipping</span>
-                                <span>฿0.00</span>
-                                {/* Assuming free shipping or handled elsewhere for now */}
+                                <span className="font-bold text-gray-600">฿0.00</span>
                             </div>
-                            <div className="flex justify-between items-center pt-4 border-t border-gray-200">
-                                <span className="font-koulen text-xl text-black">Total</span>
-                                <span className="font-koulen text-3xl text-[#D2042D]">฿{order.total_amount.toLocaleString()}</span>
+                            <div className="flex justify-between items-center pt-6 border-t border-gray-200/60">
+                                <span className="font-koulen text-2xl text-black">Total Amount</span>
+                                <span className="font-koulen text-4xl text-[#0e4d80]">฿{order.total_amount.toLocaleString()}</span>
                             </div>
                         </div>
                     </div>
@@ -252,10 +251,10 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
                 <div className="space-y-6">
 
                     {/* Management Card */}
-                    <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6 sticky top-8">
-                        <h2 className="font-koulen text-lg text-black uppercase tracking-wide mb-6 flex items-center gap-2 border-b border-gray-100 pb-3">
-                            <Save className="w-5 h-5 text-[#0e4d80]" />
-                            Order Management
+                    <div className="bg-white border border-gray-100 rounded-4xl shadow-sm p-8 sticky top-8">
+                        <h2 className="font-koulen text-2xl text-[#0e4d80] uppercase tracking-wide mb-8 flex items-center gap-2 border-b border-gray-50 pb-4">
+                            <Save className="w-5 h-5 text-[#0e4d80]/40" />
+                            Management
                         </h2>
 
                         <div className="space-y-5">
@@ -291,10 +290,10 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
                                         value={trackingNumber}
                                         onChange={(e) => setTrackingNumber(e.target.value)}
                                         placeholder="Enter tracking ID..."
-                                        className="w-full bg-gray-50 text-gray-800 border border-gray-200 rounded-md py-2.5 pl-9 pr-3 text-xs font-istok font-medium outline-none focus:ring-2 focus:ring-[#0e4d80]/20 focus:border-[#0e4d80] transition-colors placeholder:text-gray-400"
+                                        className="w-full bg-gray-50 text-gray-800 border border-gray-200 rounded-2xl py-3 pl-10 pr-4 text-xs font-istok font-medium outline-none focus:ring-2 focus:ring-[#0e4d80]/10 focus:border-[#0e4d80] transition-all placeholder:text-gray-400"
                                     />
                                     <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                                        <Truck className="w-3.5 h-3.5" />
+                                        <Truck className="w-4 h-4" />
                                     </div>
                                 </div>
                             </div>
@@ -302,25 +301,25 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
                             <button
                                 onClick={handleStatusUpdate}
                                 disabled={isUpdating || (status === order.status && trackingNumber === (order.tracking_number || ""))}
-                                className="w-full py-3 bg-[#0e4d80] text-white rounded-md text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-[#0b3d66] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm flex items-center justify-center gap-2 mt-2"
+                                className="w-full py-4 bg-[#0e4d80] text-white rounded-full text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-[#0b3d66] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-900/10 flex items-center justify-center gap-2 mt-2"
                             >
                                 {isUpdating ? (
                                     <>
                                         <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                        Saving...
+                                        SAVING...
                                     </>
                                 ) : (
-                                    "Update Order"
+                                    "UPDATE ORDER"
                                 )}
                             </button>
                         </div>
                     </div>
 
                     {/* Customer Info Card */}
-                    <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
-                        <h2 className="font-koulen text-lg text-black uppercase tracking-wide mb-6 flex items-center gap-2 border-b border-gray-100 pb-3">
-                            <UserIcon className="w-5 h-5 text-[#D2042D]" />
-                            Customer Profile
+                    <div className="bg-white border border-gray-100 rounded-4xl shadow-sm p-8">
+                        <h2 className="font-koulen text-2xl text-[#0e4d80] uppercase tracking-wide mb-8 flex items-center gap-2 border-b border-gray-50 pb-4">
+                            <UserIcon className="w-5 h-5 text-[#0e4d80]/40" />
+                            Customer
                         </h2>
 
                         <div className="space-y-4">

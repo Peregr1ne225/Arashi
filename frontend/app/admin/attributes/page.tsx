@@ -219,7 +219,7 @@ export default function AdminAttributesPage() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h1 className="font-koulen text-4xl tracking-wide text-[#0e4d80]">
-                        Attributes <span className="text-[#D2042D]">Manager</span>
+                        Attributes <span className="text-[#0e4d80]/60">Manager</span>
                     </h1>
                     <p className="font-istok text-xs text-gray-500 uppercase tracking-[0.2em] mt-1 font-bold">
                         Manage Product Colors, Sizes & Tags
@@ -239,7 +239,7 @@ export default function AdminAttributesPage() {
                                 setIsTagModalOpen(true);
                             }
                         }}
-                        className="font-istok text-[11px] uppercase tracking-widest font-bold px-8 py-3 bg-[#0047AB] text-white hover:opacity-90 transition-all rounded-full shadow-xl hover:shadow-2xl hover:-translate-y-1"
+                        className="font-istok text-[11px] uppercase tracking-widest font-bold px-8 py-3 bg-[#0e4d80] text-white hover:opacity-90 transition-all rounded-full shadow-xl hover:shadow-2xl hover:-translate-y-1"
                     >
                         + New {activeTab === "colors" ? "Color" : activeTab === "sizes" ? "Size" : "Tag"}
                     </button>
@@ -262,7 +262,7 @@ export default function AdminAttributesPage() {
                         </div>
                         <div className="w-full bg-gray-100 h-1 mt-3 rounded-full overflow-hidden">
                             <div
-                                className="bg-linear-to-r from-[#0047AB] to-[#D2042D] h-full rounded-full"
+                                className="bg-linear-to-r from-[#0e4d80] to-[#0a3a60] h-full rounded-full"
                                 style={{ width: `${Math.min(100, (item.count / (topItems[0]?.count || 1)) * 100)}%` }}
                             />
                         </div>
@@ -276,15 +276,15 @@ export default function AdminAttributesPage() {
             </div>
 
             {/* Tabs */}
-            <div className="border-b border-gray-200">
-                <nav className="-mb-px flex space-x-2" aria-label="Tabs">
+            <div className="border-b border-gray-100">
+                <nav className="-mb-px flex space-x-2 pb-4" aria-label="Tabs">
                     <button
                         onClick={() => { setActiveTab("colors"); setSortConfig(null); }}
                         className={`
-                            whitespace-nowrap py-2 px-6 rounded-full font-bold text-xs uppercase tracking-wider font-istok transition-all
+                            whitespace-nowrap py-2 px-6 rounded-full font-bold text-xs uppercase tracking-[0.2em] font-istok transition-all
                             ${activeTab === "colors"
-                                ? "bg-blue-50 text-[#0047AB]"
-                                : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"}
+                                ? "bg-[#0e4d80] text-white shadow-md shadow-blue-900/10"
+                                : "text-gray-400 hover:text-[#0e4d80] hover:bg-white"}
                         `}
                     >
                         Colors
@@ -292,10 +292,10 @@ export default function AdminAttributesPage() {
                     <button
                         onClick={() => { setActiveTab("sizes"); setSortConfig(null); }}
                         className={`
-                            whitespace-nowrap py-2 px-6 rounded-full font-bold text-xs uppercase tracking-wider font-istok transition-all
+                            whitespace-nowrap py-2 px-6 rounded-full font-bold text-xs uppercase tracking-[0.2em] font-istok transition-all
                             ${activeTab === "sizes"
-                                ? "bg-red-50 text-[#D2042D]"
-                                : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"}
+                                ? "bg-[#0e4d80] text-white shadow-md shadow-blue-900/10"
+                                : "text-gray-400 hover:text-[#0e4d80] hover:bg-white"}
                         `}
                     >
                         Sizes
@@ -303,10 +303,10 @@ export default function AdminAttributesPage() {
                     <button
                         onClick={() => { setActiveTab("tags"); setSortConfig(null); }}
                         className={`
-                            whitespace-nowrap py-2 px-6 rounded-full font-bold text-xs uppercase tracking-wider font-istok transition-all
+                            whitespace-nowrap py-2 px-6 rounded-full font-bold text-xs uppercase tracking-[0.2em] font-istok transition-all
                             ${activeTab === "tags"
-                                ? "bg-gray-100 text-[#0e4d80]"
-                                : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"}
+                                ? "bg-[#0e4d80] text-white shadow-md shadow-blue-900/10"
+                                : "text-gray-400 hover:text-[#0e4d80] hover:bg-white"}
                         `}
                     >
                         Tags
@@ -315,9 +315,9 @@ export default function AdminAttributesPage() {
             </div>
 
             {/* Content Area */}
-            <div className="card-sport overflow-hidden">
+            <div className="card-sport overflow-hidden bg-white">
                 <table className="min-w-full divide-y divide-gray-100">
-                    <thead className="bg-gray-100 sticky top-0 z-10">
+                    <thead className="bg-white sticky top-0 z-10 border-b border-gray-100">
                         <tr>
                             <th
                                 className="px-6 py-4 text-left cursor-pointer group hover:bg-gray-200 transition-colors"
@@ -382,13 +382,13 @@ export default function AdminAttributesPage() {
                                                     setEditingColor(color);
                                                     setIsColorModalOpen(true);
                                                 }}
-                                                className="text-[#0047AB] hover:text-[#003380] font-bold uppercase text-xs tracking-wider"
+                                                className="text-[#0e4d80] hover:text-[#0a3a60] font-bold uppercase text-xs tracking-wider"
                                             >
                                                 Edit
                                             </button>
                                             <button
                                                 onClick={() => setItemToDelete({ type: "color", id: color.id, name: color.name })}
-                                                className="text-[#D2042D] hover:text-[#9e0322] font-bold uppercase text-xs tracking-wider ml-2"
+                                                className="text-[#0e4d80]/50 hover:text-[#0e4d80] font-bold uppercase text-xs tracking-wider ml-2"
                                             >
                                                 Delete
                                             </button>
@@ -418,13 +418,13 @@ export default function AdminAttributesPage() {
                                                     setEditingSize(size as Size);
                                                     setIsSizeModalOpen(true);
                                                 }}
-                                                className="text-[#0047AB] hover:text-[#003380] font-bold uppercase text-xs tracking-wider"
+                                                className="text-[#0e4d80] hover:text-[#0a3a60] font-bold uppercase text-xs tracking-wider"
                                             >
                                                 Edit
                                             </button>
                                             <button
                                                 onClick={() => setItemToDelete({ type: "size", id: size.id, name: size.name })}
-                                                className="text-[#D2042D] hover:text-[#9e0322] font-bold uppercase text-xs tracking-wider ml-2"
+                                                className="text-[#0e4d80]/50 hover:text-[#0e4d80] font-bold uppercase text-xs tracking-wider ml-2"
                                             >
                                                 Delete
                                             </button>
@@ -454,13 +454,13 @@ export default function AdminAttributesPage() {
                                                     setEditingTag(tag);
                                                     setIsTagModalOpen(true);
                                                 }}
-                                                className="text-[#0047AB] hover:text-[#003380] font-bold uppercase text-xs tracking-wider"
+                                                className="text-[#0e4d80] hover:text-[#0a3a60] font-bold uppercase text-xs tracking-wider"
                                             >
                                                 Edit
                                             </button>
                                             <button
                                                 onClick={() => setItemToDelete({ type: "tag", id: tag.id, name: tag.name })}
-                                                className="text-[#D2042D] hover:text-[#9e0322] font-bold uppercase text-xs tracking-wider ml-2"
+                                                className="text-[#0e4d80]/50 hover:text-[#0e4d80] font-bold uppercase text-xs tracking-wider ml-2"
                                             >
                                                 Delete
                                             </button>

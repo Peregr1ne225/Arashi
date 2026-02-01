@@ -66,7 +66,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         <AuthGuard requireAdmin={true}>
             <div className="bg-[#FDFDFB] h-[calc(100vh-3.75rem)] flex flex-col lg:flex-row w-full overflow-hidden">
                 {/* Sidebar Navigation */}
-                <aside className="w-full lg:w-72 shrink-0 bg-white lg:sticky lg:top-0 lg:h-full lg:overflow-y-auto border-r border-gray-100 p-8 space-y-10 group scrollbar-hide">
+                <aside className="w-full lg:w-72 shrink-0 bg-white lg:sticky lg:top-0 lg:h-full lg:overflow-y-auto border-r border-gray-100 p-6 space-y-8 group scrollbar-hide">
                     <div>
                         <h1 className="font-koulen text-4xl tracking-tight text-[#0e4d80] flex items-center gap-2">
                             ADMIN <span className="text-[#0e4d80]/60">PANEL</span>

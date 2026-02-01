@@ -62,7 +62,7 @@ export default function TagForm({ initialData, onSubmit, onCancel, isLoading }: 
             </div>
 
             {error && (
-                <div className="mb-4 bg-red-50 text-red-600 p-3 rounded text-sm font-bold font-istok">
+                <div className="mb-4 bg-red-50 text-red-600 p-4 rounded-2xl text-[10px] font-bold font-istok uppercase tracking-wider border border-red-100">
                     {error}
                 </div>
             )}
@@ -78,7 +78,7 @@ export default function TagForm({ initialData, onSubmit, onCancel, isLoading }: 
                         value={name}
                         onChange={handleNameChange}
                         placeholder="e.g. New Arrival"
-                        className="block w-full px-4 py-3 border border-gray-300 rounded shadow-sm focus:ring-blue-500 focus:border-blue-500 font-istok text-base"
+                        className="block w-full px-4 py-3 border border-gray-100 bg-gray-50 rounded-2xl shadow-sm focus:ring-4 focus:ring-[#0e4d80]/5 focus:border-[#0e4d80] outline-none font-istok text-base transition-all"
                         required
                     />
                 </div>
@@ -105,7 +105,7 @@ export default function TagForm({ initialData, onSubmit, onCancel, isLoading }: 
                             setIsAutoSlug(false);
                         }}
                         placeholder="e.g. new-arrival"
-                        className={`block w-full px-4 py-3 border border-gray-300 rounded shadow-sm focus:ring-blue-500 focus:border-blue-500 font-istok text-base ${isAutoSlug ? "bg-gray-50" : "bg-white"}`}
+                        className={`block w-full px-4 py-3 border border-gray-100 rounded-2xl shadow-sm focus:ring-4 focus:ring-[#0e4d80]/5 focus:border-[#0e4d80] outline-none font-istok text-base transition-all ${isAutoSlug ? "bg-gray-100/50 text-gray-400" : "bg-gray-50 text-gray-900"}`}
                         required
                     />
                 </div>
@@ -116,16 +116,16 @@ export default function TagForm({ initialData, onSubmit, onCancel, isLoading }: 
                     type="button"
                     onClick={onCancel}
                     disabled={isLoading}
-                    className="bg-white py-2 px-6 border border-gray-300 rounded shadow-sm text-sm font-bold text-gray-700 hover:bg-gray-50 uppercase tracking-wider font-istok"
+                    className="bg-white py-3 px-8 border border-gray-200 rounded-full shadow-sm text-[10px] font-bold text-gray-600 hover:bg-gray-50 uppercase tracking-[0.2em] font-istok transition-all"
                 >
-                    Cancel
+                    Discard
                 </button>
                 <button
                     type="submit"
                     disabled={isLoading}
-                    className="inline-flex justify-center py-2 px-8 border border-transparent shadow-lg text-sm font-bold rounded text-white bg-linear-to-b from-[#0e4d80] to-[#D2042D] hover:opacity-90 focus:outline-none disabled:opacity-50 uppercase tracking-wider font-istok transform transition-transform hover:scale-105"
+                    className="inline-flex justify-center py-3 px-10 border border-transparent shadow-lg text-[10px] font-bold rounded-full text-white bg-[#0e4d80] hover:bg-[#0b3d66] focus:outline-none disabled:opacity-50 uppercase tracking-[0.2em] font-istok transform transition-all active:scale-95"
                 >
-                    {isLoading ? "Saving..." : initialData ? "Update Tag" : "Create Tag"}
+                    {isLoading ? "SAVING..." : initialData ? "UPDATE TAG" : "SAVE TAG"}
                 </button>
             </div>
         </form>

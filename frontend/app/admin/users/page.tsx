@@ -238,7 +238,7 @@ export default function AdminUsersPage() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
                 <div>
                     <h1 className="font-koulen text-4xl tracking-wide text-[#0e4d80]">
-                        Users <span className="text-[#D2042D]">Management</span>
+                        Users <span className="text-[#0e4d80]/60">Management</span>
                     </h1>
                     <p className="font-istok text-xs text-gray-500 uppercase tracking-[0.2em] mt-1 font-bold">
                         Manage System Users
@@ -295,8 +295,8 @@ export default function AdminUsersPage() {
 
                 <div className="card-sport p-6 flex flex-col justify-between">
                     <div className="flex items-center justify-between mb-4">
-                        <Shield className="h-6 w-6 text-[#D2042D]" />
-                        <span className="text-2xl font-koulen text-[#D2042D]">
+                        <Shield className="h-6 w-6 text-[#0e4d80]" />
+                        <span className="text-2xl font-koulen text-[#0e4d80]">
                             {stats.admin_users}
                         </span>
                     </div>
@@ -310,7 +310,7 @@ export default function AdminUsersPage() {
                     </div>
                     <div className="w-full bg-gray-100 h-1 mt-3 rounded-full overflow-hidden">
                         <div
-                            className="bg-[#D2042D] h-full rounded-full"
+                            className="bg-[#0e4d80] h-full rounded-full"
                             style={{
                                 width: `${stats.total_users > 0 ? (stats.admin_users / stats.total_users) * 100 : 0}%`,
                             }}
@@ -352,7 +352,7 @@ export default function AdminUsersPage() {
                     </div>
                     <input
                         type="text"
-                        className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-md leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors"
+                        className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-2xl leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0e4d80] focus:border-[#0e4d80] sm:text-sm transition-all"
                         placeholder="Search users..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
@@ -364,7 +364,7 @@ export default function AdminUsersPage() {
             {/* Table */}
             <div className="card-sport overflow-hidden">
                 <table className="min-w-full divide-y divide-gray-100 table-fixed relative">
-                    <thead className="bg-gray-100 sticky top-0 z-10">
+                    <thead className="bg-white sticky top-0 z-10 border-b border-gray-100">
                         <tr>
                             <th className="w-16 px-4 py-4 text-center font-istok text-[10px] text-gray-500 uppercase tracking-widest">
                                 ID
@@ -413,7 +413,7 @@ export default function AdminUsersPage() {
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex flex-col">
-                                                <span className="font-koulen text-lg text-black tracking-wide uppercase group-hover:text-[#D2042D] transition-colors">
+                                                <span className="font-koulen text-lg text-black tracking-wide uppercase group-hover:text-[#0e4d80] transition-colors">
                                                     {targetUser.username}
                                                 </span>
                                                 <span className="font-istok text-xs text-gray-400">
@@ -463,8 +463,8 @@ export default function AdminUsersPage() {
                                                     className={`
                                 px-3 py-1.5 rounded-full text-[10px] uppercase tracking-wider font-bold transition-all duration-200 flex items-center gap-1
                                 ${targetUser.is_superuser
-                                                            ? 'bg-white text-[#D2042D] shadow-sm'
-                                                            : 'text-gray-400 hover:text-[#D2042D]'}
+                                                            ? 'bg-white text-purple-600 shadow-sm'
+                                                            : 'text-gray-400 hover:text-purple-600'}
                                 ${!user?.is_superuser ? 'opacity-30 cursor-not-allowed' : ''}
                             `}
                                                 >
@@ -503,7 +503,7 @@ export default function AdminUsersPage() {
                                                 <button
                                                     onClick={() => handleDeleteClick(targetUser)}
                                                     disabled={isDeleting}
-                                                    className="text-[#D2042D] hover:text-[#9e0322] font-bold uppercase text-xs tracking-wider cursor-pointer disabled:opacity-50"
+                                                    className="text-[#0e4d80] hover:text-[#0a3a60] font-bold uppercase text-xs tracking-wider cursor-pointer disabled:opacity-50"
                                                 >
                                                     Delete
                                                 </button>

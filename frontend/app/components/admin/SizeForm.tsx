@@ -52,7 +52,7 @@ export default function SizeForm({ initialData, onSubmit, onCancel, isLoading }:
             </div>
 
             {error && (
-                <div className="mb-4 bg-red-50 text-red-600 p-3 rounded text-sm font-bold font-istok">
+                <div className="mb-4 bg-red-50 text-red-600 p-4 rounded-2xl text-[10px] font-bold font-istok uppercase tracking-wider border border-red-100">
                     {error}
                 </div>
             )}
@@ -73,7 +73,7 @@ export default function SizeForm({ initialData, onSubmit, onCancel, isLoading }:
                                 setSlug(e.target.value.toLowerCase().replace(/\s+/g, "-"));
                             }
                         }}
-                        className="block w-full px-4 py-3 border border-gray-300 rounded shadow-sm focus:ring-blue-500 focus:border-blue-500 font-istok text-base"
+                        className="block w-full px-4 py-3 border border-gray-100 bg-gray-50 rounded-2xl shadow-sm focus:ring-4 focus:ring-[#0e4d80]/5 focus:border-[#0e4d80] outline-none font-istok text-base transition-all"
                         placeholder="e.g. Large, XL, 42"
                         required
                     />
@@ -88,7 +88,7 @@ export default function SizeForm({ initialData, onSubmit, onCancel, isLoading }:
                         type="text"
                         value={slug}
                         onChange={(e) => setSlug(e.target.value)}
-                        className="block w-full px-4 py-3 border border-gray-300 rounded shadow-sm focus:ring-blue-500 focus:border-blue-500 font-istok text-base"
+                        className="block w-full px-4 py-3 border border-gray-100 bg-gray-50 rounded-2xl shadow-sm focus:ring-4 focus:ring-[#0e4d80]/5 focus:border-[#0e4d80] outline-none font-istok text-base transition-all"
                         placeholder="e.g. large, xl, 42"
                     />
                     <p className="mt-1 text-xs text-gray-500 font-istok">
@@ -102,16 +102,16 @@ export default function SizeForm({ initialData, onSubmit, onCancel, isLoading }:
                 <button
                     type="button"
                     onClick={onCancel}
-                    className="bg-white py-2 px-6 border border-gray-300 rounded shadow-sm text-sm font-bold text-gray-700 hover:bg-gray-50 uppercase tracking-wider font-istok"
+                    className="bg-white py-3 px-8 border border-gray-200 rounded-full shadow-sm text-[10px] font-bold text-gray-600 hover:bg-gray-50 uppercase tracking-[0.2em] font-istok transition-all"
                 >
-                    Cancel
+                    Discard
                 </button>
                 <button
                     type="submit"
                     disabled={isLoading}
-                    className="inline-flex justify-center py-2 px-8 border border-transparent shadow-lg text-sm font-bold rounded text-white bg-linear-to-b from-[#0e4d80] to-[#D2042D] hover:opacity-90 focus:outline-none disabled:opacity-50 uppercase tracking-wider font-istok transform transition-transform hover:scale-105"
+                    className="inline-flex justify-center py-3 px-10 border border-transparent shadow-lg text-[10px] font-bold rounded-full text-white bg-[#0e4d80] hover:bg-[#0b3d66] focus:outline-none disabled:opacity-50 uppercase tracking-[0.2em] font-istok transform transition-all active:scale-95"
                 >
-                    {isLoading ? "Saving..." : (initialData ? "Update Size" : "Create Size")}
+                    {isLoading ? "SAVING..." : (initialData ? "UPDATE SIZE" : "SAVE SIZE")}
                 </button>
             </div>
         </form>

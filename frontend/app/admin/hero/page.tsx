@@ -103,7 +103,7 @@ export default function AdminHeroPage() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="font-koulen text-4xl tracking-wide text-[#0e4d80]">
-                        Hero <span className="text-[#D2042D]">Manager</span>
+                        Hero <span className="text-[#0e4d80]/60">Manager</span>
                     </h1>
                     <p className="font-istok text-xs text-gray-500 uppercase tracking-[0.2em] mt-1 font-bold">
                         Manage Hero Section Images
@@ -120,7 +120,7 @@ export default function AdminHeroPage() {
                     />
                     <label
                         htmlFor="hero-upload"
-                        className="flex items-center justify-center gap-2 cursor-pointer font-istok text-[11px] uppercase tracking-widest font-bold px-6 py-3 bg-linear-to-b from-[#0e4d80] to-[#D2042D] text-white hover:brightness-110 hover:shadow-xl hover:shadow-[#0e4d80]/20 hover:-translate-y-0.5 active:scale-95 transition-all duration-300 rounded-full shadow-lg shadow-black/10"
+                        className="flex items-center justify-center gap-2 cursor-pointer font-istok text-[11px] uppercase tracking-widest font-bold px-8 py-3 bg-[#0e4d80] text-white hover:brightness-110 hover:shadow-xl hover:shadow-[#0e4d80]/20 hover:-translate-y-0.5 active:scale-95 transition-all duration-300 rounded-full shadow-lg shadow-black/10"
                     >
                         {isUploading ? (
                             <span className="animate-pulse">Uploading...</span>
@@ -136,7 +136,7 @@ export default function AdminHeroPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {images.map((img) => (
-                    <div key={img.id} className={`bg-white rounded-2xl border ${img.is_active ? 'border-gray-200' : 'border-gray-200 opacity-75'} shadow-sm overflow-hidden group`}>
+                    <div key={img.id} className={`bg-white rounded-4xl border ${img.is_active ? 'border-gray-100' : 'border-gray-100 opacity-75'} shadow-sm overflow-hidden group transition-all hover:shadow-md`}>
                         <div className="relative aspect-video bg-gray-100">
                             <Image
                                 src={img.image}
@@ -163,16 +163,16 @@ export default function AdminHeroPage() {
                                         type="number"
                                         value={img.order}
                                         onChange={(e) => handleOrderChange(img, parseInt(e.target.value) || 0)}
-                                        className="w-16 h-8 text-sm font-bold text-center border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
+                                        className="w-16 h-10 text-sm font-bold text-center border border-gray-100 bg-gray-50 rounded-2xl focus:border-[#0e4d80] focus:ring-0 outline-none transition-all"
                                     />
                                 </div>
                                 <div className="flex flex-col">
                                     <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-0.5">Status</label>
                                     <button
                                         onClick={() => handleToggleActive(img)}
-                                        className={`h-8 px-3 rounded-lg text-xs font-bold uppercase tracking-wider border transition-colors ${img.is_active
-                                            ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100'
-                                            : 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100'
+                                        className={`h-10 px-4 rounded-full text-[10px] font-bold uppercase tracking-[0.15em] border transition-all ${img.is_active
+                                            ? 'bg-green-50 text-green-700 border-green-100 hover:bg-green-100'
+                                            : 'bg-gray-50 text-gray-400 border-gray-100 hover:bg-gray-100'
                                             }`}
                                     >
                                         {img.is_active ? 'Active' : 'Inactive'}
@@ -184,10 +184,10 @@ export default function AdminHeroPage() {
                 ))}
 
                 {images.length === 0 && !isLoading && (
-                    <div className="col-span-full py-12 flex flex-col items-center justify-center text-gray-400 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50">
-                        <Upload size={48} className="mb-4 opacity-50" />
-                        <p className="font-semibold">No hero images found.</p>
-                        <p className="text-sm">Upload an image to get started.</p>
+                    <div className="col-span-full py-20 flex flex-col items-center justify-center text-gray-400 border-2 border-dashed border-gray-100 rounded-4xl bg-gray-50/50">
+                        <Upload size={48} className="mb-4 text-[#0e4d80]/20" />
+                        <p className="font-koulen text-xl text-gray-500 uppercase tracking-wide">No hero banners found</p>
+                        <p className="font-istok text-xs uppercase tracking-widest mt-1">Upload an image to get started</p>
                     </div>
                 )}
             </div>

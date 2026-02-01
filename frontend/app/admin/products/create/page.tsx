@@ -72,18 +72,20 @@ export default function CreateProductPage() {
         <div>
           <button
             onClick={() => router.back()}
-            className="font-istok text-[10px] uppercase tracking-widest text-gray-400 hover:text-black mb-4 flex items-center"
+            className="font-istok text-[10px] uppercase tracking-[0.2em] text-gray-400 hover:text-[#0e4d80] mb-6 flex items-center transition-colors font-bold"
           >
             ← Back to Products
           </button>
-          <h2 className="font-koulen text-[28px] text-black uppercase tracking-tight">Create New Product</h2>
-          <div className="h-0.5 w-8 bg-[#D2042D]"></div>
+          <h2 className="font-koulen text-4xl text-[#0e4d80] uppercase tracking-wide">
+            New <span className="text-[#0e4d80]/60">Product</span>
+          </h2>
+          <div className="h-1 w-12 bg-[#0e4d80]/20 mt-2 rounded-full"></div>
         </div>
         <Link
           href="/admin/categories"
-          className="font-istok text-[10px] uppercase tracking-widest bg-white border border-gray-200 hover:border-[#D2042D] hover:text-[#D2042D] px-4 py-2 rounded-sm font-bold text-gray-600 transition-all shadow-sm"
+          className="font-istok text-[10px] uppercase tracking-[0.2em] bg-white border border-gray-100 hover:border-[#0e4d80] hover:text-[#0e4d80] px-6 py-3 rounded-full font-bold text-gray-400 transition-all shadow-sm shadow-blue-900/5"
         >
-          Manage Categories
+          Categories
         </Link>
       </div>
 

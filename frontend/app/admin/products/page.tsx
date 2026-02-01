@@ -394,7 +394,7 @@ export default function AdminProductsPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="font-koulen text-4xl tracking-wide text-[#0e4d80]">
-            Products <span className="text-[#D2042D]">Manager</span>
+            Products <span className="text-[#0e4d80]/60">Manager</span>
           </h1>
           <p className="font-istok text-xs text-gray-500 uppercase tracking-[0.2em] mt-1 font-bold">
             Manage Products
@@ -496,7 +496,7 @@ export default function AdminProductsPage() {
 
       <div className="card-sport overflow-hidden">
         <table className="min-w-full divide-y divide-gray-100 table-fixed">
-          <thead className="bg-gray-100 sticky top-0 z-10">
+          <thead className="bg-white sticky top-0 z-10 border-b border-gray-100">
             <tr>
               <th className="w-10 px-4 py-4"></th>
               <th className="px-6 py-4 text-left font-istok text-[10px] text-gray-500 uppercase tracking-widest">

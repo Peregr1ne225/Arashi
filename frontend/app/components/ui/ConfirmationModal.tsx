@@ -50,18 +50,18 @@ export default function ConfirmationModal({
                 <div className="mb-6">
                     <h3
                         id="modal-title"
-                        className={`text-xl font-bold font-koulen uppercase tracking-wide mb-2 ${variant === "danger" ? "text-red-600" : "text-black"}`}
+                        className={`text-2xl font-bold font-koulen uppercase tracking-wide mb-2 ${variant === "danger" ? "text-red-600" : "text-[#0e4d80]"}`}
                     >
                         {title}
                     </h3>
-                    <p className="text-gray-600 font-istok text-lg">{message}</p>
+                    <p className="text-gray-500 font-istok text-lg leading-relaxed">{message}</p>
                 </div>
 
                 <div className="flex gap-4 justify-end">
                     <button
                         onClick={onCancel}
                         disabled={isLoading}
-                        className="px-6 py-2 rounded-full border border-gray-200 text-black font-istok uppercase tracking-wider font-bold text-sm hover:bg-white hover:border-gray-300 transition-all disabled:opacity-50 cursor-pointer min-w-[100px]"
+                        className="px-8 py-3 rounded-full border border-gray-100 text-gray-400 font-istok uppercase tracking-[0.2em] font-bold text-[10px] hover:bg-white hover:text-gray-600 hover:border-gray-200 transition-all disabled:opacity-50 cursor-pointer min-w-[120px]"
                     >
                         {cancelText}
                     </button>
@@ -69,8 +69,8 @@ export default function ConfirmationModal({
                         onClick={onConfirm}
                         disabled={isLoading}
                         className={`
-                            px-6 py-2 rounded-full font-istok uppercase tracking-wider font-bold text-sm transition-all disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer text-white min-w-[100px] shadow-lg shadow-blue-900/10
-                            ${variant === "danger" ? "bg-red-600 hover:bg-red-700" : "bg-[#1e1c15] hover:bg-black"}
+                            px-8 py-3 rounded-full font-istok uppercase tracking-[0.2em] font-bold text-[10px] transition-all disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer text-white min-w-[120px] shadow-lg
+                            ${variant === "danger" ? "bg-red-600 hover:bg-red-700 shadow-red-900/10" : "bg-[#0e4d80] hover:bg-[#0b3d66] shadow-blue-900/10"}
                         `}
                     >
                         {isLoading && (

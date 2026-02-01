@@ -187,7 +187,7 @@ export default function AdminCategoriesPage() {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-gray-200 pb-8">
                 <div>
                     <h2 className="font-koulen text-4xl tracking-wide text-[#0e4d80]">
-                        Taxonomy <span className="text-[#D2042D]">Manager</span>
+                        Taxonomy <span className="text-[#0e4d80]/60">Manager</span>
                     </h2>
                     <p className="font-istok text-xs text-gray-500 uppercase tracking-[0.2em] mt-1 font-bold">
                         Manage Categories
@@ -195,7 +195,7 @@ export default function AdminCategoriesPage() {
                 </div>
                 <button
                     onClick={() => handleOpenForm()}
-                    className="font-istok text-[11px] uppercase tracking-widest font-bold px-8 py-3 bg-[#0047AB] text-white hover:opacity-90 transition-all rounded-full shadow-xl hover:shadow-2xl hover:-translate-y-1"
+                    className="font-istok text-[11px] uppercase tracking-widest font-bold px-8 py-3 bg-[#0e4d80] text-white hover:opacity-90 transition-all rounded-full shadow-xl hover:shadow-2xl hover:-translate-y-1"
                 >
                     + New Category
                 </button>
@@ -237,7 +237,7 @@ export default function AdminCategoriesPage() {
                         </div>
                         <div className="w-full bg-gray-100 h-1 mt-3 rounded-full overflow-hidden">
                             <div
-                                className="bg-linear-to-r from-[#0047AB] to-[#D2042D] h-full rounded-full"
+                                className="bg-linear-to-r from-[#0e4d80] to-[#0a3a60] h-full rounded-full"
                                 style={{
                                     width: `${Math.min(100, ((category.product_count || 0) / (topCategories[0]?.product_count || 1)) * 100)}%`,
                                 }}
@@ -260,7 +260,7 @@ export default function AdminCategoriesPage() {
                     </div>
                     <input
                         type="text"
-                        className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-md leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors"
+                        className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-2xl leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0e4d80] focus:border-[#0047AB] sm:text-sm transition-all shadow-sm"
                         placeholder="Search categories..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
@@ -269,10 +269,9 @@ export default function AdminCategoriesPage() {
             </div>
 
             {/* Table */}
-            {/* Table */}
             <div className="card-sport overflow-hidden">
                 <table className="min-w-full divide-y divide-gray-100">
-                    <thead className="bg-gray-100 sticky top-0 z-10">
+                    <thead className="bg-white sticky top-0 z-10 border-b border-gray-100">
                         <tr>
                             <th className="px-6 py-4 text-left font-istok text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold">
                                 Visual
@@ -315,7 +314,7 @@ export default function AdminCategoriesPage() {
                                         className="hover:bg-gray-50/80 transition-colors group"
                                     >
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="h-12 w-12 relative bg-white border border-gray-200 rounded-lg overflow-hidden p-1 shadow-sm group-hover:border-[#D2042D]/30 transition-colors">
+                                            <div className="h-12 w-12 relative bg-white border border-gray-100 rounded-2xl overflow-hidden p-1 shadow-sm group-hover:border-[#0e4d80]/30 transition-all">
                                                 {category.image ? (
                                                     <Image
                                                         src={getImageUrl(category.image)}
@@ -332,7 +331,7 @@ export default function AdminCategoriesPage() {
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex flex-col">
-                                                <span className="font-koulen text-lg text-black tracking-wide uppercase group-hover:text-[#D2042D] transition-colors">
+                                                <span className="font-koulen text-lg text-black tracking-wide uppercase group-hover:text-[#0e4d80] transition-colors">
                                                     {category.name}
                                                 </span>
                                                 <span className="font-mono text-[10px] text-gray-400">
@@ -342,8 +341,8 @@ export default function AdminCategoriesPage() {
                                         </td>
                                         <td className="px-6 py-4 font-istok">
                                             <span
-                                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${(category.product_count || 0) > 0
-                                                    ? "bg-blue-50 text-blue-700"
+                                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${(category.product_count || 0) > 0
+                                                    ? "bg-[#0e4d80]/5 text-[#0e4d80] border border-[#0e4d80]/10"
                                                     : "bg-gray-100 text-gray-400"
                                                     }`}
                                             >
@@ -370,13 +369,13 @@ export default function AdminCategoriesPage() {
                                             <div className="flex justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
                                                 <button
                                                     onClick={() => handleOpenForm(category)}
-                                                    className="text-[#0047AB] hover:text-[#003380] font-bold uppercase text-xs tracking-wider"
+                                                    className="text-[#0e4d80] hover:text-[#0a3a60] font-bold uppercase text-xs tracking-wider"
                                                 >
                                                     Edit
                                                 </button>
                                                 <button
                                                     onClick={() => handleDeleteClick(category)}
-                                                    className="text-[#D2042D] hover:text-[#9e0322] font-bold uppercase text-xs tracking-wider ml-2"
+                                                    className="text-[#0e4d80]/50 hover:text-[#0e4d80] font-bold uppercase text-xs tracking-wider ml-2"
                                                 >
                                                     Delete
                                                 </button>

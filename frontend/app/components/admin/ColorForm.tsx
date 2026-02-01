@@ -57,7 +57,7 @@ export default function ColorForm({ initialData, onSubmit, onCancel, isLoading }
             </div>
 
             {error && (
-                <div className="mb-4 bg-red-50 text-red-600 p-3 rounded text-sm font-bold font-istok">
+                <div className="mb-4 bg-red-50 text-red-600 p-4 rounded-2xl text-[10px] font-bold font-istok uppercase tracking-wider border border-red-100">
                     {error}
                 </div>
             )}
@@ -72,7 +72,7 @@ export default function ColorForm({ initialData, onSubmit, onCancel, isLoading }
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="block w-full px-4 py-3 border border-gray-300 rounded shadow-sm focus:ring-blue-500 focus:border-blue-500 font-istok text-base"
+                        className="block w-full px-4 py-3 border border-gray-100 bg-gray-50 rounded-2xl shadow-sm focus:ring-4 focus:ring-[#0e4d80]/5 focus:border-[#0e4d80] outline-none font-istok text-base transition-all"
                         placeholder="e.g. Midnight Blue"
                         required
                     />
@@ -88,13 +88,13 @@ export default function ColorForm({ initialData, onSubmit, onCancel, isLoading }
                             type="color"
                             value={code}
                             onChange={(e) => setCode(e.target.value)}
-                            className="h-10 w-20 p-1 border border-gray-300 rounded shadow-sm cursor-pointer"
+                            className="h-12 w-20 p-1 border border-gray-100 bg-gray-50 rounded-2xl shadow-sm cursor-pointer"
                         />
                         <input
                             type="text"
                             value={code}
                             onChange={(e) => setCode(e.target.value)}
-                            className="flex-1 px-4 py-3 border border-gray-300 rounded shadow-sm focus:ring-blue-500 focus:border-blue-500 font-istok uppercase text-base"
+                            className="flex-1 px-4 py-3 border border-gray-100 bg-gray-50 rounded-2xl shadow-sm focus:ring-4 focus:ring-[#0e4d80]/5 focus:border-[#0e4d80] outline-none font-istok uppercase text-base transition-all"
                             placeholder="#000000"
                             pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
                             required
@@ -108,16 +108,16 @@ export default function ColorForm({ initialData, onSubmit, onCancel, isLoading }
                 <button
                     type="button"
                     onClick={onCancel}
-                    className="bg-white py-2 px-6 border border-gray-300 rounded shadow-sm text-sm font-bold text-gray-700 hover:bg-gray-50 uppercase tracking-wider font-istok"
+                    className="bg-white py-3 px-8 border border-gray-200 rounded-full shadow-sm text-[10px] font-bold text-gray-600 hover:bg-gray-50 uppercase tracking-[0.2em] font-istok transition-all"
                 >
-                    Cancel
+                    Discard
                 </button>
                 <button
                     type="submit"
                     disabled={isLoading}
-                    className="inline-flex justify-center py-2 px-8 border border-transparent shadow-lg text-sm font-bold rounded text-white bg-linear-to-b from-[#0e4d80] to-[#D2042D] hover:opacity-90 focus:outline-none disabled:opacity-50 uppercase tracking-wider font-istok transform transition-transform hover:scale-105"
+                    className="inline-flex justify-center py-3 px-10 border border-transparent shadow-lg text-[10px] font-bold rounded-full text-white bg-[#0e4d80] hover:bg-[#0b3d66] focus:outline-none disabled:opacity-50 uppercase tracking-[0.2em] font-istok transform transition-all active:scale-95"
                 >
-                    {isLoading ? "Saving..." : (initialData ? "Update Color" : "Create Color")}
+                    {isLoading ? "SAVING..." : (initialData ? "UPDATE COLOR" : "SAVE COLOR")}
                 </button>
             </div>
         </form>
