@@ -1,17 +1,7 @@
 "use client";
 
 import { useGLTF, useAnimations } from "@react-three/drei";
-import { Suspense, useEffect } from "react";
-
-// Fallback while model is loading
-function Loader() {
-    return (
-        <mesh visible={false}>
-            <boxGeometry />
-            <meshStandardMaterial />
-        </mesh>
-    );
-}
+import { useEffect } from "react";
 
 interface AvatarPartProps {
     url: string;

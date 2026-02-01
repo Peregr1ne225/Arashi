@@ -15,7 +15,7 @@ const ACTIONS = [
     { id: "Sit", icon: "🪑", label: "Sit" },
 ];
 
-const ENVIRONMENTS = [
+const ENVIRONMENTS: { id: 'apartment' | 'city' | 'dawn' | 'forest' | 'lobby' | 'night' | 'park' | 'studio' | 'sunset' | 'warehouse', label: string }[] = [
     { id: "city", label: "City" },
     { id: "sunset", label: "Sunset" },
     { id: "studio", label: "Studio" },
@@ -27,7 +27,7 @@ export default function ModelPage() {
     const [selectedShirt, setSelectedShirt] = useState<string | null>(null);
     const [selectedPant, setSelectedPant] = useState<string | null>(null);
     const [actionName, setActionName] = useState<string>("Idle");
-    const [environment, setEnvironment] = useState<string>("city");
+    const [environment, setEnvironment] = useState<'apartment' | 'city' | 'dawn' | 'forest' | 'lobby' | 'night' | 'park' | 'studio' | 'sunset' | 'warehouse'>("city");
 
     // Hardcoded for MVP
     const BASE_URL = "http://localhost:8000";

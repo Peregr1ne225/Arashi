@@ -11,7 +11,7 @@ interface AvatarSceneProps {
     selectedShirt: string | null;
     selectedPant: string | null;
     actionName: string;
-    environmentPreset: string;
+    environmentPreset: 'apartment' | 'city' | 'dawn' | 'forest' | 'lobby' | 'night' | 'park' | 'studio' | 'sunset' | 'warehouse';
 }
 
 export default function AvatarScene({
@@ -23,12 +23,12 @@ export default function AvatarScene({
     environmentPreset
 }: AvatarSceneProps) {
 
-    const baseModelUrl = `${baseUrl}/static/models/${avatarId}/base.glb`;
+    const baseModelUrl = `${baseUrl}/media/models/${avatarId}/base.glb`;
     const shirtUrl = selectedShirt
-        ? `${baseUrl}/static/models/${avatarId}/shirts/${selectedShirt}.glb`
+        ? `${baseUrl}/media/models/${avatarId}/shirts/${selectedShirt}.glb`
         : null;
     const pantUrl = selectedPant
-        ? `${baseUrl}/static/models/${avatarId}/pants/${selectedPant}.glb`
+        ? `${baseUrl}/media/models/${avatarId}/pants/${selectedPant}.glb`
         : null;
 
     return (
@@ -42,7 +42,7 @@ export default function AvatarScene({
                     shadow-mapSize={2048}
                     castShadow
                 />
-                <Environment preset={environmentPreset as any} />
+                <Environment preset={environmentPreset} />
 
                 <group position={[0, -1, 0]}>
                     <Suspense fallback={null}>
