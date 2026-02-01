@@ -2,13 +2,14 @@ from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
 from apps.products.views import ProductViewSet, ProductReviewViewSet
-from apps.cms.views import HeroImageViewSet
+from apps.cms.views import HeroImageViewSet, SiteContentViewSet
 
 # Create a router and register our viewsets with it.
 router = DefaultRouter()
 router.register(r"products", ProductViewSet)
 router.register(r"reviews", ProductReviewViewSet, basename="review")
 router.register(r"hero", HeroImageViewSet, basename="hero-image")
+router.register(r"site-content", SiteContentViewSet, basename="site-content")
 
 # API endpoint documentation
 urlpatterns = [

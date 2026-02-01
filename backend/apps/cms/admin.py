@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import HeroImage
+from .models import HeroImage, SiteContent
 
 
 @admin.register(HeroImage)
@@ -32,3 +32,10 @@ class HeroImageAdmin(admin.ModelAdmin):
         return "-"
 
     image_preview.short_description = "Preview"
+
+
+@admin.register(SiteContent)
+class SiteContentAdmin(admin.ModelAdmin):
+    list_display = ["key", "updated_at"]
+    search_fields = ["key"]
+    readonly_fields = ["updated_at"]

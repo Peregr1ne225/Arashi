@@ -759,6 +759,12 @@ export interface HeroImage {
   order: number;
 }
 
+export interface SiteContent {
+  key: string;
+  content: Record<string, unknown>;
+  updated_at: string;
+}
+
 /**
  * CMS API client
  */
@@ -796,6 +802,37 @@ export const cmsApi = {
   async deleteHeroImage(id: number): Promise<void> {
     const response = await api.delete(`/hero/${id}/`);
     if (!response.ok) throw new Error("Failed to delete hero image");
+  },
+
+  async getSiteContent(key: string): Promise<SiteContent | null> {
+    const response = await api.get(`/site-content/${key}/`);
+    if (response.status === 404) return null;
+    if (!response.ok) throw new Error("Failed to fetch site content");
+    return response.json();
+  },
+
+  async updateSiteContent(
+    key: string,
+    content: Record<string, unknown>,
+  ): Promise<SiteContent> {
+    // Try to update first, if 404 then create (though ViewSet handles create usually,
+    // but lookup by key in update might fail if not exists?
+    // Actually, ViewSet update expects ID usually unless lookup_field is set.
+    // We set lookup_field to 'key'. So UPDATE should work if it exists.
+    // To 'create' passing the key in the URL might be tricky for standard ModelViewSet if it's strictly REST.
+    // Let's rely on standard: POST to /site-content/ to create, PATCH to /site-content/{key}/ to update.
+
+    // First try GET to see if it exists
+    const existing = await this.getSiteContent(key);
+    if (existing) {
+      const response = await api.patch(`/site-content/${key}/`, { content });
+      if (!response.ok) throw new Error("Failed to update site content");
+      return response.json();
+    } else {
+      const response = await api.post("/site-content/", { key, content });
+      if (!response.ok) throw new Error("Failed to create site content");
+      return response.json();
+    }
   },
 
   async updateHeroImage(

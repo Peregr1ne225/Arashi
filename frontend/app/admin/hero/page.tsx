@@ -5,6 +5,7 @@ import Image from "next/image";
 import { cmsApi, HeroImage } from "@/app/lib/api/client";
 import { Trash2, Upload, Plus } from "lucide-react";
 import DeleteHeroModal from "@/app/components/admin/hero/DeleteHeroModal";
+import MessageModal from "@/app/components/ui/MessageModal";
 
 export default function AdminHeroPage() {
     const [images, setImages] = useState<HeroImage[]>([]);
@@ -16,9 +17,64 @@ export default function AdminHeroPage() {
     const [imageToDelete, setImageToDelete] = useState<HeroImage | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
 
+    // Content State
+    const [isSavingContent, setIsSavingContent] = useState(false);
+    const [heroContent, setHeroContent] = useState({
+        smallText: "NEW COLLECTION 2026",
+        headingLine1: "CHASE THE",
+        headingHighlight: "UNSEEN",
+        button1Text: "Go To Shop",
+        button1Link: "/products",
+        button2Text: "View New",
+        button2Link: "/new",
+    });
+
+    // Message Modal State
+    const [messageModal, setMessageModal] = useState({
+        isOpen: false,
+        title: "",
+        message: "",
+        type: "info" as "success" | "error" | "info",
+    });
+
     useEffect(() => {
         fetchImages();
+        fetchContent();
     }, []);
+
+    const fetchContent = async () => {
+        try {
+            const data = await cmsApi.getSiteContent("homepage_hero");
+            if (data && data.content) {
+                setHeroContent((prev) => ({ ...prev, ...data.content }));
+            }
+        } catch (error) {
+            console.error("Failed to fetch hero content:", error);
+        }
+    };
+
+    const handleContentSave = async () => {
+        setIsSavingContent(true);
+        try {
+            await cmsApi.updateSiteContent("homepage_hero", heroContent);
+            setMessageModal({
+                isOpen: true,
+                title: "Success",
+                message: "Hero content updated successfully!",
+                type: "success",
+            });
+        } catch (error) {
+            console.error("Failed to save content", error);
+            setMessageModal({
+                isOpen: true,
+                title: "Error",
+                message: "Failed to save content. Please try again.",
+                type: "error",
+            });
+        } finally {
+            setIsSavingContent(false);
+        }
+    };
 
     const fetchImages = async () => {
         try {
@@ -46,9 +102,20 @@ export default function AdminHeroPage() {
         try {
             await cmsApi.uploadHeroImage(formData);
             await fetchImages();
+            setMessageModal({
+                isOpen: true,
+                title: "Success",
+                message: "Image uploaded successfully!",
+                type: "success",
+            });
         } catch (error) {
             console.error("Upload failed:", error);
-            alert("Failed to upload image");
+            setMessageModal({
+                isOpen: true,
+                title: "Error",
+                message: "Failed to upload image.",
+                type: "error",
+            });
         } finally {
             setIsUploading(false);
             e.target.value = ""; // Reset input
@@ -69,9 +136,20 @@ export default function AdminHeroPage() {
             setImages(prev => prev.filter(img => img.id !== imageToDelete.id));
             setIsDeleteModalOpen(false);
             setImageToDelete(null);
+            setMessageModal({
+                isOpen: true,
+                title: "Deleted",
+                message: "Hero image deleted successfully.",
+                type: "success",
+            });
         } catch (error) {
             console.error("Delete failed:", error);
-            alert("Failed to delete image");
+            setMessageModal({
+                isOpen: true,
+                title: "Error",
+                message: "Failed to delete image.",
+                type: "error",
+            });
         } finally {
             setIsDeleting(false);
         }
@@ -131,6 +209,97 @@ export default function AdminHeroPage() {
                             </>
                         )}
                     </label>
+                </div>
+            </div>
+
+            {/* Hero Text Configuration */}
+            <div className="bg-white rounded-4xl border border-gray-100 shadow-sm p-6 md:p-8">
+                <div className="flex items-center justify-between mb-6">
+                    <h2 className="font-koulen text-2xl text-[#0e4d80]">Text Configuration</h2>
+                    <button
+                        onClick={handleContentSave}
+                        disabled={isSavingContent}
+                        className="px-6 py-2 bg-[#0e4d80] text-white rounded-full font-istok text-xs font-bold uppercase tracking-widest hover:brightness-110 disabled:opacity-50 transition-all"
+                    >
+                        {isSavingContent ? "Saving..." : "Save Changes"}
+                    </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                        <h3 className="font-bold text-gray-500 text-xs uppercase tracking-wide">Headings</h3>
+                        <div>
+                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Small Top Text</label>
+                            <input
+                                type="text"
+                                value={heroContent.smallText}
+                                onChange={(e) => setHeroContent({ ...heroContent, smallText: e.target.value })}
+                                className="w-full h-10 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:border-[#0e4d80] focus:ring-0 outline-none transition-all"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Main Heading Line 1</label>
+                            <input
+                                type="text"
+                                value={heroContent.headingLine1}
+                                onChange={(e) => setHeroContent({ ...heroContent, headingLine1: e.target.value })}
+                                className="w-full h-10 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:border-[#0e4d80] focus:ring-0 outline-none transition-all"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Highlighted Text</label>
+                            <input
+                                type="text"
+                                value={heroContent.headingHighlight}
+                                onChange={(e) => setHeroContent({ ...heroContent, headingHighlight: e.target.value })}
+                                className="w-full h-10 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:border-[#0e4d80] focus:ring-0 outline-none transition-all"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="space-y-4">
+                        <h3 className="font-bold text-gray-500 text-xs uppercase tracking-wide">Buttons</h3>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Button 1 Text</label>
+                                <input
+                                    type="text"
+                                    value={heroContent.button1Text}
+                                    onChange={(e) => setHeroContent({ ...heroContent, button1Text: e.target.value })}
+                                    className="w-full h-10 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:border-[#0e4d80] focus:ring-0 outline-none transition-all"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Button 1 Link</label>
+                                <input
+                                    type="text"
+                                    value={heroContent.button1Link}
+                                    onChange={(e) => setHeroContent({ ...heroContent, button1Link: e.target.value })}
+                                    className="w-full h-10 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:border-[#0e4d80] focus:ring-0 outline-none transition-all"
+                                />
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Button 2 Text</label>
+                                <input
+                                    type="text"
+                                    value={heroContent.button2Text}
+                                    onChange={(e) => setHeroContent({ ...heroContent, button2Text: e.target.value })}
+                                    className="w-full h-10 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:border-[#0e4d80] focus:ring-0 outline-none transition-all"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Button 2 Link</label>
+                                <input
+                                    type="text"
+                                    value={heroContent.button2Link}
+                                    onChange={(e) => setHeroContent({ ...heroContent, button2Link: e.target.value })}
+                                    className="w-full h-10 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:border-[#0e4d80] focus:ring-0 outline-none transition-all"
+                                />
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -198,6 +367,14 @@ export default function AdminHeroPage() {
                 onConfirm={confirmDelete}
                 isLoading={isDeleting}
                 imageTitle={imageToDelete?.title}
+            />
+
+            <MessageModal
+                isOpen={messageModal.isOpen}
+                title={messageModal.title}
+                message={messageModal.message}
+                type={messageModal.type}
+                onClose={() => setMessageModal({ ...messageModal, isOpen: false })}
             />
         </div>
     );

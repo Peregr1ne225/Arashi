@@ -51,7 +51,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             href: "/admin/attributes",
             icon: SlidersHorizontal,
         },
-        { id: "hero", label: "Hero Images", href: "/admin/hero", icon: ImageIcon },
+        { id: "hero", label: "Hero", href: "/admin/hero", icon: ImageIcon },
         { id: "users", label: "Users", href: "/admin/users", icon: UserIcon },
     ];
 

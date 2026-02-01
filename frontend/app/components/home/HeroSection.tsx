@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import { cmsApi } from "@/app/lib/api/client";
 
 interface HeroSectionProps {
     heroImages?: string[];
@@ -14,8 +15,33 @@ const DEFAULT_HERO_IMAGES = [
     "https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=2071&auto=format&fit=crop", // Fashion 3
 ];
 
+const DEFAULT_CONTENT = {
+    smallText: "NEW COLLECTION 2026",
+    headingLine1: "CHASE THE",
+    headingHighlight: "UNSEEN",
+    button1Text: "Go To Shop",
+    button1Link: "/products",
+    button2Text: "View New",
+    button2Link: "/new",
+};
+
 export default function HeroSection({ heroImages = DEFAULT_HERO_IMAGES }: HeroSectionProps) {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [content, setContent] = useState(DEFAULT_CONTENT);
+
+    useEffect(() => {
+        const fetchContent = async () => {
+            try {
+                const data = await cmsApi.getSiteContent("homepage_hero");
+                if (data && data.content) {
+                    setContent({ ...DEFAULT_CONTENT, ...data.content });
+                }
+            } catch (error) {
+                console.error("Failed to fetch hero content:", error);
+            }
+        };
+        fetchContent();
+    }, []);
 
     // Auto-rotate images
     useEffect(() => {
@@ -51,30 +77,30 @@ export default function HeroSection({ heroImages = DEFAULT_HERO_IMAGES }: HeroSe
                 <div className="container mx-auto px-10">
                     <div className="max-w-2xl space-y-8">
                         <h2 className="font-istok text-xs md:text-sm tracking-[0.4em] uppercase text-white/90 font-bold pl-1 animate-in fade-in slide-in-from-left-4 duration-700 delay-100">
-                            NEW COLLECTION 2026
+                            {content.smallText}
                         </h2>
 
                         <h1 className="font-istok text-[48px] md:text-[86px] lg:text-[100px] leading-[0.9] text-white uppercase font-black tracking-tight animate-in fade-in slide-in-from-left-4 duration-700 delay-200">
-                            CHASE THE <br />
-                            <span className="text-transparent bg-clip-text bg-linear-to-r from-accent to-white italic pr-4">UNSEEN</span>
+                            {content.headingLine1} <br />
+                            <span className="text-transparent bg-clip-text bg-linear-to-r from-accent to-white italic pr-4">{content.headingHighlight}</span>
                         </h1>
 
                         <div className="pt-4 flex flex-col sm:flex-row items-center gap-4 animate-in fade-in slide-in-from-left-4 duration-700 delay-300">
                             <Link
-                                href="/products"
+                                href={content.button1Link}
                                 className="group flex items-center justify-center px-10 py-4 bg-white rounded-full hover:bg-black hover:text-white transition-all duration-300 transform hover:scale-105"
                             >
                                 <span className="font-istok text-sm text-black group-hover:text-white font-bold uppercase tracking-widest">
-                                    Go To Shop
+                                    {content.button1Text}
                                 </span>
                             </Link>
 
                             <Link
-                                href="/new"
+                                href={content.button2Link}
                                 className="group flex items-center justify-center px-10 py-4 border border-white rounded-full hover:bg-white hover:text-black transition-all duration-300 transform hover:scale-105"
                             >
                                 <span className="font-istok text-sm text-white group-hover:text-black font-bold uppercase tracking-widest">
-                                    View New
+                                    {content.button2Text}
                                 </span>
                             </Link>
                         </div>

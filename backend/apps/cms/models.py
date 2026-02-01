@@ -32,3 +32,23 @@ def cleanup_hero_image(sender, instance, **kwargs):
     """
     if instance.image:
         instance.image.delete(save=False)
+
+
+class SiteContent(models.Model):
+    """
+    Generic model to store site content configuration (JSON) by key.
+    Example keys: 'homepage_hero', 'footer_links', 'contact_info'
+    """
+
+    key = models.CharField(
+        max_length=100,
+        unique=True,
+        help_text="Unique key to identify this content block",
+    )
+    content = models.JSONField(
+        default=dict, help_text="JSON structure containing the content"
+    )
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.key

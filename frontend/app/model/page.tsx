@@ -31,7 +31,7 @@ export default function ModelPage() {
 
     // Hardcoded for MVP
     const BASE_URL = "http://localhost:8000";
-    const AVATAR_ID = "avatar1";
+    const AVATAR_ID = "avatar2";
 
     return (
         <div className="flex h-screen w-full bg-neutral-50 overflow-hidden">
