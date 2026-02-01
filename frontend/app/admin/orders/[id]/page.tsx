@@ -16,8 +16,9 @@ import {
     Package as PackageIcon,
     Calendar,
     Clock,
-    Save
+    Save,
 } from "lucide-react";
+import MessageModal from "@/app/components/ui/MessageModal";
 
 // Unwrap params for server/client components
 export default function AdminOrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -29,6 +30,14 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
     const [status, setStatus] = useState("");
     const [trackingNumber, setTrackingNumber] = useState("");
     const [orderId, setOrderId] = useState<string | null>(null);
+
+    // Message Modal
+    const [messageModal, setMessageModal] = useState({
+        isOpen: false,
+        title: "",
+        message: "",
+        type: "info" as "success" | "error" | "info",
+    });
 
     useEffect(() => {
         // Unwrap params
@@ -53,7 +62,12 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
             setTrackingNumber(data.tracking_number || "");
         } catch (error) {
             console.error("Failed to fetch order", error);
-            alert("Failed to load order");
+            setMessageModal({
+                isOpen: true,
+                title: "Error",
+                message: "Failed to load order.",
+                type: "error",
+            });
         } finally {
             setIsLoading(false);
         }
@@ -73,7 +87,12 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
             // alert("Order updated successfully"); // Removed for cleaner UX
         } catch (error) {
             console.error("Failed to update status", error);
-            alert("Failed to update order status");
+            setMessageModal({
+                isOpen: true,
+                title: "Error",
+                message: "Failed to update order status.",
+                type: "error",
+            });
         } finally {
             setIsUpdating(false);
         }
@@ -359,6 +378,13 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
 
                 </div>
             </div>
+            <MessageModal
+                isOpen={messageModal.isOpen}
+                title={messageModal.title}
+                message={messageModal.message}
+                type={messageModal.type}
+                onClose={() => setMessageModal({ ...messageModal, isOpen: false })}
+            />
         </div>
     );
 }

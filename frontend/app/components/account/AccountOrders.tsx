@@ -16,6 +16,7 @@ const ReviewModal = dynamic(() => import("@/app/components/product/ReviewModal")
     ssr: false,
 });
 import ConfirmationModal from "@/app/components/ui/ConfirmationModal";
+import MessageModal from "@/app/components/ui/MessageModal";
 
 export default function AccountOrders() {
     const [orders, setOrders] = useState<Order[]>([]);
@@ -32,6 +33,14 @@ export default function AccountOrders() {
     const [orderToCancel, setOrderToCancel] = useState<string | number | null>(
         null,
     );
+
+    // Message Modal
+    const [messageModal, setMessageModal] = useState({
+        isOpen: false,
+        title: "",
+        message: "",
+        type: "info" as "success" | "error" | "info",
+    });
 
     const router = useRouter();
 
@@ -99,7 +108,13 @@ export default function AccountOrders() {
         } catch (err) {
             const message =
                 err instanceof Error ? err.message : "Failed to cancel order";
-            alert(message);
+            setMessageModal({
+                isOpen: true,
+                title: "Cancel Failed",
+                message,
+                type: "error",
+            });
+            setCancelModalOpen(false);
         } finally {
             setLoading(false);
         }
@@ -112,7 +127,12 @@ export default function AccountOrders() {
             router.push("/cart");
         } catch (err) {
             const message = err instanceof Error ? err.message : "Failed to reorder";
-            alert(message);
+            setMessageModal({
+                isOpen: true,
+                title: "Reorder Failed",
+                message,
+                type: "error",
+            });
             setLoading(false);
         }
     };
@@ -125,7 +145,12 @@ export default function AccountOrders() {
         } catch (err) {
             const message =
                 err instanceof Error ? err.message : "Failed to initiate payment";
-            alert(message);
+            setMessageModal({
+                isOpen: true,
+                title: "Payment Error",
+                message,
+                type: "error",
+            });
             setLoading(false);
         }
     };
@@ -386,6 +411,13 @@ export default function AccountOrders() {
                 onConfirm={handleConfirmCancel}
                 onCancel={() => setCancelModalOpen(false)}
                 isLoading={loading}
+            />
+            <MessageModal
+                isOpen={messageModal.isOpen}
+                title={messageModal.title}
+                message={messageModal.message}
+                type={messageModal.type}
+                onClose={() => setMessageModal({ ...messageModal, isOpen: false })}
             />
         </div>
     );

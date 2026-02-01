@@ -7,6 +7,7 @@ import { Category } from "@/app/types/category";
 import { Color, Size, Tag } from "@/app/types/attributes";
 import { getImageUrl } from "@/app/lib/utils/image";
 import { X, Plus, Trash2 } from "lucide-react";
+import MessageModal from "@/app/components/ui/MessageModal";
 
 interface ProductFormProps {
     initialData?: Product;
@@ -136,6 +137,14 @@ export default function ProductForm({
     const [newFiles, setNewFiles] = useState<File[]>([]);
     const [newPreviews, setNewPreviews] = useState<string[]>([]);
 
+    // Message Modal
+    const [messageModal, setMessageModal] = useState({
+        isOpen: false,
+        title: "",
+        message: "",
+        type: "info" as "success" | "error" | "info",
+    });
+
     // Sync with initialData changes - REMOVED because we use key={id} in parent
     // causing re-mount on change.
 
@@ -169,7 +178,12 @@ export default function ProductForm({
     // Variant Handlers
     const handleAddVariant = () => {
         if (!newVariantColor || !newVariantSize) {
-            alert("Please select both Color and Size");
+            setMessageModal({
+                isOpen: true,
+                title: "Validation Error",
+                message: "Please select both Color and Size.",
+                type: "error",
+            });
             return;
         }
 
@@ -187,7 +201,12 @@ export default function ProductForm({
             (v) => v.color_id === colorObj.id && v.size_id === sizeObj.id,
         );
         if (exists) {
-            alert("This variant already exists!");
+            setMessageModal({
+                isOpen: true,
+                title: "Duplicate Variant",
+                message: "This variant already exists!",
+                type: "error",
+            });
             return;
         }
 
@@ -275,7 +294,12 @@ export default function ProductForm({
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!name || !price || !categoryId) {
-            alert("Please fill in all required fields (Name, Price, Category)");
+            setMessageModal({
+                isOpen: true,
+                title: "Missing Fields",
+                message: "Please fill in all required fields (Name, Price, Category).",
+                type: "error",
+            });
             return;
         }
 
@@ -378,6 +402,13 @@ export default function ProductForm({
 
     return (
         <form onSubmit={handleSubmit} className="space-y-8 px-1">
+            <MessageModal
+                isOpen={messageModal.isOpen}
+                title={messageModal.title}
+                message={messageModal.message}
+                type={messageModal.type}
+                onClose={() => setMessageModal({ ...messageModal, isOpen: false })}
+            />
             {/* Basic Information Section */}
             <div className="bg-white rounded-4xl border border-gray-100 shadow-sm overflow-hidden">
                 <div className="bg-linear-to-r from-[#0e4d80] to-[#0a3a60] px-8 py-5">

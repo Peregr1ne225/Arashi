@@ -6,6 +6,7 @@ import { useAuth } from "@/app/hooks/useAuth";
 import { usersApi } from "@/app/lib/api/client";
 import { User } from "@/app/types/user";
 import ConfirmationModal from "@/app/components/ui/ConfirmationModal";
+import MessageModal from "@/app/components/ui/MessageModal";
 import { Search, Shield, User as UserIcon, Ban, CheckCircle, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { SortIcon } from "@/app/components/admin/SortIcon";
 
@@ -64,6 +65,14 @@ export default function AdminUsersPage() {
         currentRole: 'user' | 'admin' | 'superuser';
     } | null>(null);
     const [statusConfirmation, setStatusConfirmation] = useState<{ user: User } | null>(null);
+
+    // Message Modal
+    const [messageModal, setMessageModal] = useState({
+        isOpen: false,
+        title: "",
+        message: "",
+        type: "info" as "success" | "error" | "info",
+    });
 
     const fetchAllData = useCallback(async () => {
         setIsLoading(true);
@@ -148,7 +157,12 @@ export default function AdminUsersPage() {
             setUserToDelete(null);
         } catch (error) {
             console.error("Failed to delete user", error);
-            alert("Failed to delete user");
+            setMessageModal({
+                isOpen: true,
+                title: "Error",
+                message: "Failed to delete user.",
+                type: "error",
+            });
         } finally {
             setIsDeleting(false);
         }
@@ -193,7 +207,12 @@ export default function AdminUsersPage() {
 
         } catch (error) {
             console.error("Failed to update user role", error);
-            alert("Failed to update user role");
+            setMessageModal({
+                isOpen: true,
+                title: "Error",
+                message: "Failed to update user role.",
+                type: "error",
+            });
         } finally {
             setIsToggling(false);
             setRoleConfirmation(null);
@@ -614,6 +633,13 @@ export default function AdminUsersPage() {
                     variant={statusConfirmation.user.is_active ? "danger" : "default"}
                 />
             )}
+            <MessageModal
+                isOpen={messageModal.isOpen}
+                title={messageModal.title}
+                message={messageModal.message}
+                type={messageModal.type}
+                onClose={() => setMessageModal({ ...messageModal, isOpen: false })}
+            />
         </div>
     );
 }

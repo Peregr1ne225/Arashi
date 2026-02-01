@@ -8,6 +8,7 @@ import ColorForm from "@/app/components/admin/ColorForm";
 import SizeForm from "@/app/components/admin/SizeForm";
 import TagForm from "@/app/components/admin/TagForm";
 import { SortIcon } from "@/app/components/admin/SortIcon";
+import MessageModal from "@/app/components/ui/MessageModal";
 
 export default function AdminAttributesPage() {
     const [activeTab, setActiveTab] = useState<"colors" | "sizes" | "tags">("colors");
@@ -27,6 +28,14 @@ export default function AdminAttributesPage() {
 
     const [itemToDelete, setItemToDelete] = useState<{ type: "color" | "size" | "tag"; id: number; name: string } | null>(null);
     const [isSaving, setIsSaving] = useState(false);
+
+    // Message Modal
+    const [messageModal, setMessageModal] = useState({
+        isOpen: false,
+        title: "",
+        message: "",
+        type: "info" as "success" | "error" | "info",
+    });
 
     // Sorting State
     const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
@@ -123,7 +132,12 @@ export default function AdminAttributesPage() {
             setEditingColor(null);
         } catch (error) {
             console.error("Failed to save color:", error);
-            alert("Failed to save color");
+            setMessageModal({
+                isOpen: true,
+                title: "Error",
+                message: "Failed to save color.",
+                type: "error",
+            });
         } finally {
             setIsSaving(false);
         }
@@ -137,7 +151,12 @@ export default function AdminAttributesPage() {
             setItemToDelete(null);
         } catch (error) {
             console.error("Failed to delete color:", error);
-            alert("Failed to delete color");
+            setMessageModal({
+                isOpen: true,
+                title: "Error",
+                message: "Failed to delete color.",
+                type: "error",
+            });
         }
     };
 
@@ -155,7 +174,12 @@ export default function AdminAttributesPage() {
             setEditingSize(null);
         } catch (error) {
             console.error("Failed to save size:", error);
-            alert("Failed to save size");
+            setMessageModal({
+                isOpen: true,
+                title: "Error",
+                message: "Failed to save size.",
+                type: "error",
+            });
         } finally {
             setIsSaving(false);
         }
@@ -169,7 +193,12 @@ export default function AdminAttributesPage() {
             setItemToDelete(null);
         } catch (error) {
             console.error("Failed to delete size:", error);
-            alert("Failed to delete size");
+            setMessageModal({
+                isOpen: true,
+                title: "Error",
+                message: "Failed to delete size.",
+                type: "error",
+            });
         }
     };
 
@@ -187,7 +216,12 @@ export default function AdminAttributesPage() {
             setEditingTag(null);
         } catch (error) {
             console.error("Failed to save tag:", error);
-            alert("Failed to save tag");
+            setMessageModal({
+                isOpen: true,
+                title: "Error",
+                message: "Failed to save tag.",
+                type: "error",
+            });
         } finally {
             setIsSaving(false);
         }
@@ -201,7 +235,12 @@ export default function AdminAttributesPage() {
             setItemToDelete(null);
         } catch (error) {
             console.error("Failed to delete tag:", error);
-            alert("Failed to delete tag");
+            setMessageModal({
+                isOpen: true,
+                title: "Error",
+                message: "Failed to delete tag.",
+                type: "error",
+            });
         }
     };
 
@@ -554,6 +593,13 @@ export default function AdminAttributesPage() {
                 title={`Delete ${itemToDelete?.type === "color" ? "Color" : itemToDelete?.type === "size" ? "Size" : "Tag"}`}
                 message={`Are you sure you want to delete "${itemToDelete?.name}"?`}
                 confirmText="Delete"
+            />
+            <MessageModal
+                isOpen={messageModal.isOpen}
+                title={messageModal.title}
+                message={messageModal.message}
+                type={messageModal.type}
+                onClose={() => setMessageModal({ ...messageModal, isOpen: false })}
             />
         </div>
     );

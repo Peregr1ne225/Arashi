@@ -11,6 +11,7 @@ import { api } from "@/app/lib/api";
 import { ordersApi } from "@/app/lib/api/orders";
 import { CreateOrderData } from "@/app/types/order";
 import { getImageUrl } from "@/app/lib/utils/image";
+import MessageModal from "@/app/components/ui/MessageModal";
 
 interface OrderFormData {
   full_name: string;
@@ -81,6 +82,14 @@ export default function CheckoutPage() {
     shipping_address: "",
   });
   const [errors, setErrors] = useState<Partial<OrderFormData>>({});
+
+  // Message Modal
+  const [messageModal, setMessageModal] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    type: "info" as "success" | "error" | "info",
+  });
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -204,7 +213,12 @@ export default function CheckoutPage() {
     } catch (error) {
       console.error("Error placing order:", error);
       // In a real app, you'd show a toast notification here
-      alert(error instanceof Error ? error.message : "Failed to place order");
+      setMessageModal({
+        isOpen: true,
+        title: "Order Failed",
+        message: error instanceof Error ? error.message : "Failed to place order",
+        type: "error",
+      });
       setIsSubmitting(false);
     }
   };
@@ -428,6 +442,13 @@ export default function CheckoutPage() {
           </div>
         </div>
       </div>
+      <MessageModal
+        isOpen={messageModal.isOpen}
+        title={messageModal.title}
+        message={messageModal.message}
+        type={messageModal.type}
+        onClose={() => setMessageModal({ ...messageModal, isOpen: false })}
+      />
     </div>
   );
 }

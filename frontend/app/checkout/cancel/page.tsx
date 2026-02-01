@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useCart } from "@/app/contexts/CartContext";
 import { ordersApi } from "@/app/lib/api/orders";
+import MessageModal from "@/app/components/ui/MessageModal";
 
 function CheckoutCancelContent() {
     const { clearCart } = useCart();
@@ -13,6 +14,14 @@ function CheckoutCancelContent() {
     const orderIdParam = searchParams.get("order_id");
     const [loading, setLoading] = useState(true);
     const initialized = useRef(false);
+
+    // Message Modal
+    const [messageModal, setMessageModal] = useState({
+        isOpen: false,
+        title: "",
+        message: "",
+        type: "info" as "success" | "error" | "info",
+    });
 
     useEffect(() => {
         if (initialized.current) return;
@@ -50,7 +59,12 @@ function CheckoutCancelContent() {
             }
         } catch (error) {
             console.error("Error reordering:", error);
-            alert("Failed to reorder items.");
+            setMessageModal({
+                isOpen: true,
+                title: "Error",
+                message: "Failed to reorder items.",
+                type: "error",
+            });
             setLoading(false);
         }
     };
@@ -105,6 +119,13 @@ function CheckoutCancelContent() {
                     </div>
                 </div>
             </div>
+            <MessageModal
+                isOpen={messageModal.isOpen}
+                title={messageModal.title}
+                message={messageModal.message}
+                type={messageModal.type}
+                onClose={() => setMessageModal({ ...messageModal, isOpen: false })}
+            />
         </div>
     );
 }

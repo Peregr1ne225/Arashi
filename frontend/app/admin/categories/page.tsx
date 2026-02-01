@@ -11,6 +11,7 @@ import { revalidateCategories } from "@/app/lib/actions";
 import CategoryForm from "@/app/components/admin/CategoryForm";
 import ConfirmationModal from "@/app/components/ui/ConfirmationModal";
 import { Search } from "lucide-react";
+import MessageModal from "@/app/components/ui/MessageModal";
 import { SortIcon } from "@/app/components/admin/SortIcon";
 
 export default function AdminCategoriesPage() {
@@ -77,6 +78,15 @@ export default function AdminCategoriesPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [editingCategory, setEditingCategory] = useState<Category | null>(null);
     const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
+
+    // Message Modal
+    const [messageModal, setMessageModal] = useState({
+        isOpen: false,
+        title: "",
+        message: "",
+        type: "info" as "success" | "error" | "info",
+    });
+
     const fetchAllData = useCallback(async () => {
         setIsLoading(true);
         try {
@@ -130,7 +140,12 @@ export default function AdminCategoriesPage() {
             handleCloseForm();
         } catch (error) {
             console.error("Failed to save category", error);
-            alert("Failed to save category");
+            setMessageModal({
+                isOpen: true,
+                title: "Error",
+                message: "Failed to save category.",
+                type: "error",
+            });
         } finally {
             setIsSubmitting(false);
         }
@@ -150,7 +165,12 @@ export default function AdminCategoriesPage() {
             setCategoryToDelete(null);
         } catch (error) {
             console.error("Failed to delete category", error);
-            alert("Failed to delete category");
+            setMessageModal({
+                isOpen: true,
+                title: "Error",
+                message: "Failed to delete category.",
+                type: "error",
+            });
         }
     };
 
@@ -413,6 +433,13 @@ export default function AdminCategoriesPage() {
                 title="Delete Category"
                 message={`Are you sure you want to delete "${getCategoryPath(categoryToDelete)}"? all related products will be affected.`}
                 confirmText="Delete Category"
+            />
+            <MessageModal
+                isOpen={messageModal.isOpen}
+                title={messageModal.title}
+                message={messageModal.message}
+                type={messageModal.type}
+                onClose={() => setMessageModal({ ...messageModal, isOpen: false })}
             />
         </div >
     );

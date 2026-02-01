@@ -10,6 +10,7 @@ import { revalidateProducts } from "@/app/lib/actions";
 import ProductForm from "@/app/components/admin/ProductForm";
 
 import Link from "next/link";
+import MessageModal from "@/app/components/ui/MessageModal";
 
 export default function CreateProductPage() {
   const { user, isAuthenticated, loading } = useAuth();
@@ -20,6 +21,14 @@ export default function CreateProductPage() {
   const [colors, setColors] = useState<Color[]>([]);
   const [sizes, setSizes] = useState<Size[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
+
+  // Message Modal
+  const [messageModal, setMessageModal] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    type: "info" as "success" | "error" | "info",
+  });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -58,7 +67,12 @@ export default function CreateProductPage() {
       router.push("/admin/products");
     } catch (error) {
       console.error("Failed to create product - Full error:", error);
-      alert("Failed to create product");
+      setMessageModal({
+        isOpen: true,
+        title: "Error",
+        message: "Failed to create product.",
+        type: "error",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -97,6 +111,13 @@ export default function CreateProductPage() {
           availableTags={tags}
           onSubmit={handleSubmit}
           isLoading={isSubmitting}
+        />
+        <MessageModal
+          isOpen={messageModal.isOpen}
+          title={messageModal.title}
+          message={messageModal.message}
+          type={messageModal.type}
+          onClose={() => setMessageModal({ ...messageModal, isOpen: false })}
         />
       </div>
     </div>

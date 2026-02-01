@@ -26,6 +26,7 @@ import {
   DollarSign,
   TrendingUp,
 } from "lucide-react";
+import MessageModal from "@/app/components/ui/MessageModal";
 import { SortIcon } from "@/app/components/admin/SortIcon";
 
 interface ProductStats {
@@ -92,6 +93,14 @@ export default function AdminProductsPage() {
   const [availableColors, setAvailableColors] = useState<Color[]>([]);
   const [availableSizes, setAvailableSizes] = useState<Size[]>([]);
   const [availableTags, setAvailableTags] = useState<Tag[]>([]);
+
+  // Message Modal
+  const [messageModal, setMessageModal] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    type: "info" as "success" | "error" | "info",
+  });
 
   // Dashboard Stats
   const [stats, setStats] = useState<ProductStats>({
@@ -186,7 +195,12 @@ export default function AdminProductsPage() {
       setProductToDelete(null);
     } catch (error) {
       console.error("Failed to delete product", error);
-      alert("Failed to delete product");
+      setMessageModal({
+        isOpen: true,
+        title: "Error",
+        message: "Failed to delete product.",
+        type: "error",
+      });
     } finally {
       setIsDeleting(false);
     }
@@ -213,7 +227,12 @@ export default function AdminProductsPage() {
           p.id === product.id ? { ...p, is_active: !newStatus } : p,
         ),
       );
-      alert("Failed to update status");
+      setMessageModal({
+        isOpen: true,
+        title: "Error",
+        message: "Failed to update status.",
+        type: "error",
+      });
     }
   };
   const toggleProductExpansion = (productId: number) => {
@@ -258,7 +277,12 @@ export default function AdminProductsPage() {
       await revalidateProducts();
     } catch (error) {
       console.error("Failed to update variant status", error);
-      alert("Failed to update variant status");
+      setMessageModal({
+        isOpen: true,
+        title: "Error",
+        message: "Failed to update variant status.",
+        type: "error",
+      });
     }
   };
 
@@ -297,7 +321,12 @@ export default function AdminProductsPage() {
       setVariantToDelete(null);
     } catch (error) {
       console.error("Failed to delete variant", error);
-      alert("Failed to delete variant");
+      setMessageModal({
+        isOpen: true,
+        title: "Error",
+        message: "Failed to delete variant.",
+        type: "error",
+      });
     } finally {
       setIsDeletingVariant(false);
     }
@@ -316,7 +345,12 @@ export default function AdminProductsPage() {
       await revalidateProducts();
     } catch (error) {
       console.error("Failed to upload image", error);
-      alert("Failed to upload image");
+      setMessageModal({
+        isOpen: true,
+        title: "Upload Error",
+        message: "Failed to upload image.",
+        type: "error",
+      });
     } finally {
       setUploadingColorId(null);
     }
@@ -346,7 +380,12 @@ export default function AdminProductsPage() {
       await revalidateProducts();
     } catch (error) {
       console.error("Failed to update variant stock", error);
-      alert("Failed to update variant stock");
+      setMessageModal({
+        isOpen: true,
+        title: "Error",
+        message: "Failed to update variant stock.",
+        type: "error",
+      });
     } finally {
       setIsUpdatingVariant(false);
     }
@@ -383,7 +422,12 @@ export default function AdminProductsPage() {
       closeEditModal();
     } catch (error) {
       console.error("Failed to update product", error);
-      alert("Failed to update product");
+      setMessageModal({
+        isOpen: true,
+        title: "Error",
+        message: "Failed to update product.",
+        type: "error",
+      });
     } finally {
       setIsSavingProduct(false);
     }
@@ -1033,6 +1077,13 @@ export default function AdminProductsPage() {
           </div>
         </div>
       )}
+      <MessageModal
+        isOpen={messageModal.isOpen}
+        title={messageModal.title}
+        message={messageModal.message}
+        type={messageModal.type}
+        onClose={() => setMessageModal({ ...messageModal, isOpen: false })}
+      />
     </div>
   );
 }

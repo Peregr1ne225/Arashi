@@ -9,6 +9,7 @@ import { Order } from "@/app/types/order";
 import { useAuth } from "@/app/hooks/useAuth";
 import { getImageUrl } from "@/app/lib/utils/image";
 import ConfirmationModal from "@/app/components/ui/ConfirmationModal";
+import MessageModal from "@/app/components/ui/MessageModal";
 
 export default function OrderDetailPage() {
     const params = useParams();
@@ -18,6 +19,14 @@ export default function OrderDetailPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [cancelModalOpen, setCancelModalOpen] = useState(false);
+
+    // Message Modal
+    const [messageModal, setMessageModal] = useState({
+        isOpen: false,
+        title: "",
+        message: "",
+        type: "info" as "success" | "error" | "info",
+    });
 
     // Redirect if not logged in
     useEffect(() => {
@@ -283,7 +292,12 @@ export default function OrderDetailPage() {
                                                         err instanceof Error
                                                             ? err.message
                                                             : "Failed to reorder";
-                                                    alert(message);
+                                                    setMessageModal({
+                                                        isOpen: true,
+                                                        title: "Order Error",
+                                                        message,
+                                                        type: "error",
+                                                    });
                                                 } finally {
                                                     setLoading(false);
                                                 }
@@ -325,13 +339,26 @@ export default function OrderDetailPage() {
                     } catch (err) {
                         const message =
                             err instanceof Error ? err.message : "Failed to cancel order";
-                        alert(message);
+                        setMessageModal({
+                            isOpen: true,
+                            title: "Cancel Failed",
+                            message,
+                            type: "error",
+                        });
+                        setCancelModalOpen(false); // Close modal on error too? or keep open? close for now so they see error
                     } finally {
                         setLoading(false);
                     }
                 }}
                 onCancel={() => setCancelModalOpen(false)}
                 isLoading={loading}
+            />
+            <MessageModal
+                isOpen={messageModal.isOpen}
+                title={messageModal.title}
+                message={messageModal.message}
+                type={messageModal.type}
+                onClose={() => setMessageModal({ ...messageModal, isOpen: false })}
             />
         </div>
     );
