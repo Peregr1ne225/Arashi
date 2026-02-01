@@ -1,11 +1,7 @@
-
 import { productsApi } from "@/app/lib/api/client";
-import CatalogLayout from "@/app/components/layout/CatalogLayout";
 import ProductCatalog from "@/app/components/product/ProductCatalog";
 import Link from "next/link";
-// import SearchPageWrapper from "@/app/components/search/SearchPageWrapper"; // Removed
-
-import { Product } from "@/app/types";
+import CatalogDataLoader from "@/app/components/utils/CatalogDataLoader";
 
 // Server Component - No "use client" directive for better performance
 interface SearchPageProps {
@@ -16,15 +12,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const resolvedSearchParams = await searchParams;
   const query = resolvedSearchParams.q || "";
 
-  // Fetch data
-  const response = await productsApi.getProducts({
-    q: query,
-    page_size: 50
-  });
-
-  const products = response.results || [];
-  const count = response.count || 0;
-
   // Breadcrumb
   const breadcrumb = (
     <>
@@ -34,21 +21,26 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     </>
   );
 
+  const productPromise = productsApi.getProducts({
+    q: query,
+    page_size: 50
+  });
+
   return (
-    <CatalogLayout
-      // Title hidden as per previous request to remove "Search" h1
-      // title={query ? `Search Results: ${query}` : "All Products"} 
-      description={query ? `Found ${count} results for "${query}"` : "Browse all products"}
-      breadcrumb={breadcrumb}
-    >
-      <ProductCatalog
-        key={query} // Crucial: Force reset on new search
-        initialProducts={products}
-        initialCount={count}
-        fetchMode="search"
-        fetchParams={{ q: query }}
-      />
-    </CatalogLayout>
+    <CatalogDataLoader productPromise={productPromise}>
+      {({ products, categories, count }) => (
+        <ProductCatalog
+          key={query} // Crucial: Force reset on new search
+          initialProducts={products}
+          initialCategories={categories}
+          initialCount={count}
+          fetchMode="search"
+          fetchParams={{ q: query }}
+          title={query ? `Results for "${query}"` : "Search Products"}
+          breadcrumb={breadcrumb}
+        />
+      )}
+    </CatalogDataLoader>
   );
 }
 

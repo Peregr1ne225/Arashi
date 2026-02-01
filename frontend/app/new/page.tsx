@@ -1,50 +1,38 @@
-import { Suspense } from "react";
-import NewArrivalsContent from "./NewArrivalsContent";
+import ProductCatalog from "@/app/components/product/ProductCatalog";
 import { productsApi } from "@/app/lib/api/client";
-import { ProductListResponse } from "@/app/types";
-import CatalogLayout from "@/app/components/layout/CatalogLayout";
+import CatalogDataLoader from "@/app/components/utils/CatalogDataLoader";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
-// This is a Server Component
-export default async function NewArrivalsPage() {
-  // Fetch initial data on the server
-  // We can replicate the default params used in the client component
-  let initialData: ProductListResponse = { results: [], count: 0, next: null, previous: null };
+export default function NewArrivalsPage() {
+  const productPromise = productsApi.getProducts({
+    is_new: true,
+    page_size: 50, // Match default catalog size
+    ordering: "-created_at"
+  });
 
-  try {
-    initialData = await productsApi.getProducts({
-      is_new: true,
-      page: 1,
-      page_size: 12,
-      ordering: "-created_at"
-    });
-  } catch (error) {
-    console.warn("Failed to fetch new arrivals (likely during build):", error);
-  }
-
-  // Breadcrumb
   const breadcrumb = (
-    <>
-      <Link href="/" className="hover:text-white transition-colors">Home</Link>
-      <span className="mx-2 text-accent">/</span>
-      <span className="text-white">New Arrivals</span>
-    </>
+    <div className="font-istok font-bold text-[12px] tracking-[1px] text-black/60 uppercase">
+      <Link href="/" className="hover:text-black transition-colors">Home</Link>
+      <span className="mx-2">/</span>
+      <span className="text-black">New Arrivals</span>
+    </div>
   );
 
   return (
-    <CatalogLayout
-      title="New Drops"
-      description="Fresh Gear // Just Landed"
-      breadcrumb={breadcrumb}
-    >
-      <Suspense fallback={<div className="text-white">Loading new arrivals...</div>}>
-        <NewArrivalsContent
-          initialProducts={initialData.results || []} // Ensure array
-          initialCount={initialData.count || 0}
+    <CatalogDataLoader productPromise={productPromise}>
+      {({ products, categories, count }) => (
+        <ProductCatalog
+          initialProducts={products}
+          initialCategories={categories}
+          initialCount={count}
+          fetchMode="products"
+          fetchParams={{ is_new: true, ordering: "-created_at" }}
+          title="New Arrivals"
+          breadcrumb={breadcrumb}
         />
-      </Suspense>
-    </CatalogLayout>
+      )}
+    </CatalogDataLoader>
   );
 }

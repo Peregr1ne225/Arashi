@@ -1,48 +1,38 @@
-
 import { productsApi } from "@/app/lib/api/client";
-import CatalogLayout from "@/app/components/layout/CatalogLayout";
 import ProductCatalog from "@/app/components/product/ProductCatalog";
 import Link from "next/link";
-
-interface PageProps {
-    searchParams: { [key: string]: string | string[] | undefined };
-}
-
-import { ProductListResponse } from "@/app/types";
+import CatalogDataLoader from "@/app/components/utils/CatalogDataLoader";
+import ProductSearch from "@/app/components/product/ProductSearch";
 
 export const dynamic = "force-dynamic";
 
-export default async function ProductsPage({ searchParams }: PageProps) {
-    // Fetch data
-    let response: ProductListResponse = { results: [], count: 0, next: null, previous: null };
-    try {
-        response = await productsApi.getProducts({ page_size: 50 });
-    } catch (error) {
-        console.warn("Failed to fetch products (likely during build):", error);
-    }
-
-    const products = response.results || [];
-    const count = response.count || 0;
-
+export default function ProductsPage() {
+    // Create logic for breadcrumb first as it doesn't need data
     const breadcrumb = (
-        <>
-            <Link href="/" className="hover:text-gray-900">Home</Link>
+        <div className="font-istok font-bold text-[12px] tracking-[1px] text-black/60 uppercase">
+            <Link href="/" className="hover:text-black transition-colors">Home</Link>
             <span className="mx-2">/</span>
-            <span className="text-gray-900">Products</span>
-        </>
+            <span className="text-black">Products</span>
+        </div>
     );
 
+    const productPromise = productsApi.getProducts({ page_size: 50 });
+
     return (
-        <CatalogLayout
-            title="All Products"
-            description="Browse our collection of high-quality products."
-            breadcrumb={breadcrumb}
-        >
-            <ProductCatalog
-                initialProducts={products}
-                initialCount={count}
-                fetchMode="products"
-            />
-        </CatalogLayout>
+        <CatalogDataLoader productPromise={productPromise}>
+            {({ products, categories, count }) => (
+                <ProductCatalog
+                    initialProducts={products}
+                    initialCategories={categories}
+                    initialCount={count}
+                    fetchMode="products"
+                    title="All Products"
+                    breadcrumb={breadcrumb}
+                    headerContent={
+                        <ProductSearch />
+                    }
+                />
+            )}
+        </CatalogDataLoader>
     );
 }
