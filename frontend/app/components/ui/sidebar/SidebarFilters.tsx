@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { categoriesApi } from "@/app/lib/api/client";
+import { useState, useEffect, useMemo, useRef } from "react";
 
 // Define the category interface
 interface Category {
@@ -26,7 +25,7 @@ interface SidebarFiltersProps {
     sortBy: string;
   };
   currentCategory?: string; // For highlighting the current category
-  availableCategoryIds?: number[]; // For filtering displayed categories
+  categories?: Category[]; // Passed from server
   maxPrice?: number; // Dynamic max price limit
 }
 
@@ -39,22 +38,69 @@ export default function SidebarFilters({
     sortBy: "featured",
   },
   currentCategory = "",
-  availableCategoryIds,
+  categories: initialCategories = [],
   maxPrice = 1000,
 }: SidebarFiltersProps) {
-  const [rawCategories, setRawCategories] = useState<Category[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [categoriesLoading, setCategoriesLoading] = useState(true);
-
-  // Use passed maxPrice if valid, else default
+  // Determine the effective max price limit
   const limitMax = maxPrice > 0 ? maxPrice : 1000;
 
-  const [filters, setFilters] = useState({
-    ...initialFilters,
-    category: initialFilters.category || currentCategory, // Prefer initialFilter, then prop
-    maxPrice: (initialFilters.maxPrice > 0 && initialFilters.maxPrice < limitMax) ? initialFilters.maxPrice : limitMax
+  // Initialize filters once, handling the "unlimited" case for maxPrice
+  const [filters, setFilters] = useState(() => {
+    const init = {
+      ...initialFilters,
+      category: initialFilters.category || currentCategory,
+    };
+    // If maxPrice is 0 or sliderMax, treat it as the limit
+    if (init.maxPrice === 0 || init.maxPrice >= limitMax) {
+      init.maxPrice = limitMax;
+    }
+    return init;
   });
 
+  // Track the initial state we last synced with to detect external changes (URL/Navigation)
+  const [lastInitialFilters, setLastInitialFilters] = useState(initialFilters);
+  const [lastCurrentCategory, setLastCurrentCategory] =
+    useState(currentCategory);
+  const [lastLimitMax, setLastLimitMax] = useState(limitMax);
+
+  // Synchronously adjust internal filters if Source of Truth (Props/URL) changes
+  if (
+    initialFilters !== lastInitialFilters ||
+    currentCategory !== lastCurrentCategory ||
+    limitMax !== lastLimitMax
+  ) {
+    setLastInitialFilters(initialFilters);
+    setLastCurrentCategory(currentCategory);
+    setLastLimitMax(limitMax);
+
+    setFilters((prev) => {
+      const nextCategory = initialFilters.category || currentCategory;
+      const nextMax =
+        initialFilters.maxPrice === 0 || initialFilters.maxPrice >= limitMax
+          ? limitMax
+          : initialFilters.maxPrice;
+
+      // Only update if there's an actual meaningful change
+      if (
+        prev.category !== nextCategory ||
+        prev.sortBy !== initialFilters.sortBy ||
+        prev.minPrice !== initialFilters.minPrice ||
+        prev.maxPrice !== nextMax
+      ) {
+        return {
+          ...initialFilters,
+          category: nextCategory,
+          maxPrice: nextMax,
+        };
+      }
+      return prev;
+    });
+  }
+
+  const hasMounted = useRef(false);
+  useEffect(() => {
+    hasMounted.current = true;
+  }, []);
   // Helper to build category tree
   const buildCategoryTree = (categories: Category[]): Category[] => {
     const categoryMap: { [key: number]: Category } = {};
@@ -80,34 +126,18 @@ export default function SidebarFilters({
     return roots;
   };
 
-
-
-  // Fetch categories from API
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const flatCategories = await categoriesApi.getCategories();
-        setRawCategories(flatCategories);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      } finally {
-        setCategoriesLoading(false);
-      }
-    };
-
-    fetchCategories();
-  }, []);
-
-  // Re-build tree when rawCategories, currentCategory, or availableCategoryIds changes
-  useEffect(() => {
-    if (rawCategories.length === 0) return;
+  // useMemo for category tree to avoid double render
+  // useMemo will re-run only when dependencies change
+  const categories = useMemo(() => {
+    if (initialCategories.length === 0) return [];
 
     // We must clone the raw categories because buildCategoryTree mutates objects (children array)
-    // A clean clone ensures we don't accumulate duplicates in children arrays on re-renders
-    const clonedCategories = rawCategories.map(c => ({ ...c, children: [] }));
-    const tree = buildCategoryTree(clonedCategories);
-    setCategories(tree);
-  }, [rawCategories, currentCategory, availableCategoryIds]);
+    const clonedCategories = initialCategories.map((c) => ({
+      ...c,
+      children: [],
+    }));
+    return buildCategoryTree(clonedCategories);
+  }, [initialCategories]);
 
   // Update parent component when filters change
   const handleFilterChange = (newFilters: Partial<typeof filters>) => {
@@ -130,40 +160,44 @@ export default function SidebarFilters({
     onFiltersChange(defaultFilters);
   };
 
-  // Update URL when filters change
+  // Consolidated debounced update for Parent Component
   useEffect(() => {
-    // Skip initial render sync if needed, but for now allow it or simple wait for mount
-    const url = new URL(window.location.href);
+    if (!hasMounted.current) return;
 
-    // Only update URL parameters if they differ from defaults
-    if (filters.minPrice > 0) {
-      url.searchParams.set("minPrice", filters.minPrice.toString());
-    } else {
-      url.searchParams.delete("minPrice");
-    }
+    const timer = setTimeout(() => {
+      const { minPrice, maxPrice, sortBy, category } = filters;
+      const {
+        minPrice: initialMin,
+        maxPrice: initialMax,
+        sortBy: initialSort,
+        category: initialCat,
+      } = initialFilters;
 
-    if (filters.maxPrice < limitMax) {
-      url.searchParams.set("maxPrice", filters.maxPrice.toString());
-    } else {
-      url.searchParams.delete("maxPrice");
-    }
+      const isMinChanged = minPrice !== initialMin;
+      const isMaxChanged =
+        initialMax === 0
+          ? maxPrice !== limitMax && maxPrice !== 0
+          : maxPrice !== initialMax;
+      const isSortChanged = sortBy !== initialSort;
+      const isCatChanged = category !== initialCat;
 
-    if (filters.sortBy !== "featured") {
-      url.searchParams.set("sortBy", filters.sortBy);
-    } else {
-      url.searchParams.delete("sortBy");
-    }
+      if (isMinChanged || isMaxChanged || isSortChanged || isCatChanged) {
+        // Notify Parent to fetch (No URL sync as requested)
+        onFiltersChange(filters);
+      }
+    }, 600);
 
-    window.history.replaceState(null, "", url.pathname + url.search);
-  }, [filters, limitMax]);
-
+    return () => clearTimeout(timer);
+  }, [filters, initialFilters, limitMax, onFiltersChange, currentCategory]);
   // State for expanded parent categories
-  const [expandedCategories, setExpandedCategories] = useState<Set<number>>(new Set());
+  const [expandedCategories, setExpandedCategories] = useState<Set<number>>(
+    new Set(),
+  );
 
   const toggleCategory = (id: number, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setExpandedCategories(prev => {
+    setExpandedCategories((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(id)) {
         newSet.delete(id);
@@ -175,28 +209,42 @@ export default function SidebarFilters({
   };
 
   // Function to render categories recursively if they have children
-  const renderCategories = (categories: Category[], level = 0) => {
+  const renderCategories = (
+    categories: Category[],
+    level = 0,
+    parentPath = "",
+  ) => {
     return categories.map((category) => {
       const hasChildren = category.children && category.children.length > 0;
       const isExpanded = expandedCategories.has(category.id);
+      const currentPath = parentPath
+        ? `${parentPath}/${category.slug}`
+        : category.slug;
 
       return (
         <div key={category.id}>
           <div
-            className={`flex items-center group py-1.5 px-2 rounded-md transition-all ${filters.category === category.slug ? 'bg-black text-white shadow-sm' : 'hover:bg-gray-100 text-gray-600'}`}
+            className={`flex items-center group py-1 transition-all`}
             style={{ marginLeft: `${level * 16}px` }}
           >
             {/* Toggle Button for Parents */}
             {hasChildren ? (
               <button
                 onClick={(e) => toggleCategory(category.id, e)}
-                className="p-1 mr-1 hover:bg-black/10 rounded"
+                className="p-1 mr-1 hover:bg-black/5 rounded text-gray-500 hover:text-black"
               >
                 <svg
-                  className={`w-3 h-3 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
-                  fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                  className={`w-3 h-3 transition-transform ${isExpanded ? "rotate-90" : ""}`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
                 </svg>
               </button>
             ) : (
@@ -204,21 +252,32 @@ export default function SidebarFilters({
             )}
 
             <label className="flex-1 flex items-center cursor-pointer">
+              <div
+                className={`w-4 h-4 mr-3 border rounded-none flex items-center justify-center transition-colors ${filters.category === currentPath ? "border-black bg-black" : "border-gray-300 group-hover:border-black"}`}
+              >
+                {filters.category === currentPath && (
+                  <div className="w-2 h-2 bg-white" />
+                )}
+              </div>
               <input
                 type="radio"
                 name="category"
-                checked={filters.category === category.slug}
-                onChange={() => handleFilterChange({ category: category.slug })}
+                checked={filters.category === currentPath}
+                onChange={() => handleFilterChange({ category: currentPath })}
                 className="hidden"
               />
-              <span className="text-sm font-medium">{category.name}</span>
+              <span
+                className={`text-sm font-istok font-bold ${filters.category === currentPath ? "text-black" : "text-gray-500 group-hover:text-black"}`}
+              >
+                {category.name}
+              </span>
             </label>
           </div>
 
           {/* Children Container */}
           {hasChildren && isExpanded && (
             <div className="transition-all duration-200">
-              {renderCategories(category.children!, level + 1)}
+              {renderCategories(category.children!, level + 1, currentPath)}
             </div>
           )}
         </div>
@@ -233,46 +292,36 @@ export default function SidebarFilters({
   });
 
   // Toggle section helper
-  const toggleSection = (section: 'categories' | 'price') => {
-    setOpenSections(prev => ({ ...prev, [section]: !prev[section] }));
+  const toggleSection = (section: "categories" | "price") => {
+    setOpenSections((prev) => ({ ...prev, [section]: !prev[section] }));
   };
 
-  // Debounced input handler for manual price typing
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (filters.minPrice !== initialFilters.minPrice || filters.maxPrice !== initialFilters.maxPrice) {
-        // Only trigger if changed from props/initial, to avoid loops
-        onFiltersChange(filters);
-      }
-    }, 600);
-    return () => clearTimeout(timer);
-  }, [filters.minPrice, filters.maxPrice]);
-
-
   return (
-
-    <div className="w-full lg:w-72 space-y-8">
-      <div className="bg-neutral-900 border border-white/10 skew-box overflow-hidden">
-
+    <div className="w-full space-y-6">
+      <div className="bg-transparent">
         {/* Header */}
-        <div className="p-6 border-b border-white/10 flex justify-between items-center bg-black/50">
-          <h3 className="text-xl font-black uppercase italic tracking-tighter text-white">Filters</h3>
+        <div className="pb-4 border-b border-black/10 flex justify-between items-center mb-6">
+          <h3 className="font-koulen text-[24px] uppercase tracking-wide text-black">
+            Filters
+          </h3>
           <button
             onClick={clearFilters}
-            className="text-xs font-bold text-accent hover:text-white transition-colors uppercase tracking-widest border border-accent px-2 py-1 transform -skew-x-12 hover:bg-accent hover:text-black"
+            className="text-xs font-istok font-bold text-gray-400 hover:text-black transition-colors uppercase tracking-wider underline decoration-1 underline-offset-2"
           >
-            Reset
+            Reset All
           </button>
         </div>
 
         {/* Sort Options - Compact */}
-        <div className="p-6 border-b border-white/10">
-          <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 block">Sort by</label>
+        <div className="mb-8">
+          <label className="text-[14px] font-koulen text-black uppercase tracking-wide mb-3 block">
+            Sort by
+          </label>
           <div className="relative">
             <select
               value={filters.sortBy}
               onChange={(e) => handleFilterChange({ sortBy: e.target.value })}
-              className="w-full pl-4 pr-10 py-3 text-sm bg-black border border-white/20 text-white font-bold uppercase tracking-wider focus:border-accent focus:ring-0 cursor-pointer appearance-none transition-all hover:border-white skew-box"
+              className="w-full pl-0 pr-8 py-2 text-base font-istok bg-transparent border-b border-gray-200 rounded-none focus:border-black focus:ring-0 cursor-pointer appearance-none transition-all hover:border-gray-400 text-gray-700 font-bold"
             >
               <option value="featured">Featured</option>
               <option value="price-low-high">Price: Low to High</option>
@@ -282,31 +331,59 @@ export default function SidebarFilters({
               <option value="rating">Rating</option>
             </select>
             {/* Custom Arrow */}
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-accent">
-              <svg className="h-4 w-4 transform skew-x-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 9l-7 7-7-7" /></svg>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center text-black">
+              <svg
+                className="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
             </div>
           </div>
         </div>
 
         {/* Categories Section */}
-        <div className="border-b border-white/10">
+        <div className="mb-8 border-b border-black/10 pb-6">
           <button
-            onClick={() => toggleSection('categories')}
-            className="w-full px-6 py-4 flex justify-between items-center hover:bg-white/5 transition-colors group"
+            onClick={() => toggleSection("categories")}
+            className="w-full flex justify-between items-center group mb-4"
           >
-            <span className="font-bold text-sm text-white uppercase tracking-wider">Category</span>
+            <span className="font-koulen text-[18px] text-black">Category</span>
             <svg
-              className={`w-4 h-4 text-gray-500 group-hover:text-accent transition-transform duration-200 ${openSections.categories ? 'rotate-180' : ''}`}
-              fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              className={`w-4 h-4 text-black transition-transform duration-200 ${openSections.categories ? "rotate-180" : ""}`}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
             </svg>
           </button>
 
-          <div className={`overflow-hidden transition-all duration-300 ${openSections.categories ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}`}>
-            <div className="px-6 pb-6 pt-2 space-y-2">
+          <div
+            className={`overflow-hidden transition-all duration-300 ${openSections.categories ? "max-h-500 opacity-100" : "max-h-0 opacity-0"}`}
+          >
+            <div className="space-y-1">
               {!currentCategory && (
-                <label className={`flex items-center cursor-pointer group py-2 px-3 border border-transparent transition-all skew-box ${!filters.category ? 'bg-accent text-black border-accent' : 'hover:border-white/20 text-gray-400 hover:text-white'}`}>
+                <label
+                  className={`flex items-center cursor-pointer group py-1 transition-all`}
+                >
+                  <div
+                    className={`w-4 h-4 mr-3 border rounded-none flex items-center justify-center transition-colors ${!filters.category ? "border-black bg-black" : "border-gray-300 group-hover:border-black"}`}
+                  >
+                    {!filters.category && <div className="w-2 h-2 bg-white" />}
+                  </div>
                   <input
                     type="radio"
                     name="category"
@@ -314,15 +391,15 @@ export default function SidebarFilters({
                     onChange={() => handleFilterChange({ category: "" })}
                     className="hidden"
                   />
-                  <span className="text-sm font-bold uppercase tracking-wide skew-box-reverse">All Categories</span>
+                  <span
+                    className={`text-sm font-istok font-bold ${!filters.category ? "text-black" : "text-gray-500 group-hover:text-black"}`}
+                  >
+                    All Categories
+                  </span>
                 </label>
               )}
 
-              {categoriesLoading ? (
-                <div className="text-xs text-gray-500 px-2 py-2 uppercase tracking-widest">Loading data...</div>
-              ) : (
-                renderCategories(categories)
-              )}
+              {renderCategories(categories)}
             </div>
           </div>
         </div>
@@ -330,69 +407,148 @@ export default function SidebarFilters({
         {/* Price Section */}
         <div>
           <button
-            onClick={() => toggleSection('price')}
-            className="w-full px-6 py-4 flex justify-between items-center hover:bg-white/5 transition-colors group"
+            onClick={() => toggleSection("price")}
+            className="w-full flex justify-between items-center group mb-4"
           >
-            <span className="font-bold text-sm text-white uppercase tracking-wider">Price Range</span>
+            <span className="font-koulen text-[18px] text-black">
+              Price Range
+            </span>
             <svg
-              className={`w-4 h-4 text-gray-500 group-hover:text-accent transition-transform duration-200 ${openSections.price ? 'rotate-180' : ''}`}
-              fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              className={`w-4 h-4 text-black transition-transform duration-200 ${openSections.price ? "rotate-180" : ""}`}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
             </svg>
           </button>
 
-          <div className={`overflow-hidden transition-all duration-300 ${openSections.price ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'}`}>
-            <div className="px-6 pb-8 pt-2">
+          <div
+            className={`overflow-hidden transition-all duration-300 ${openSections.price ? "max-h-64 opacity-100" : "max-h-0 opacity-0"}`}
+          >
+            <div className="pt-1">
               {/* Inputs */}
-              <div className="flex items-center gap-2 mb-6">
+              <div className="flex items-center gap-4 mb-6">
                 <div className="relative flex-1">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-accent text-xs font-bold">฿</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-istok">
+                    ฿
+                  </span>
                   <input
                     type="number"
-                    value={filters.minPrice || ''}
-                    onChange={(e) => setFilters({ ...filters, minPrice: Number(e.target.value) })}
-                    placeholder="0"
-                    className="w-full pl-8 pr-2 py-2 text-sm bg-black border border-white/20 text-white font-bold focus:border-accent focus:ring-0 skew-box placeholder-gray-700"
+                    value={filters.minPrice || ""}
+                    onChange={(e) =>
+                      setFilters({
+                        ...filters,
+                        minPrice: Number(e.target.value),
+                      })
+                    }
+                    placeholder="Min"
+                    className="w-full pl-8 pr-3 py-2 text-sm font-istok font-bold border border-gray-200 rounded-full focus:border-black focus:ring-0 placeholder:text-gray-300 bg-gray-50 transition-colors"
                   />
                 </div>
-                <span className="text-gray-500 text-xs font-bold">-</span>
+                <span className="text-gray-400 text-xs">-</span>
                 <div className="relative flex-1">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-accent text-xs font-bold">฿</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-istok">
+                    ฿
+                  </span>
                   <input
                     type="number"
-                    value={filters.maxPrice || ''}
-                    onChange={(e) => setFilters({ ...filters, maxPrice: Number(e.target.value) })}
+                    value={filters.maxPrice || ""}
+                    onChange={(e) =>
+                      setFilters({
+                        ...filters,
+                        maxPrice: Number(e.target.value),
+                      })
+                    }
                     placeholder="Max"
-                    className="w-full pl-8 pr-2 py-2 text-sm bg-black border border-white/20 text-white font-bold focus:border-accent focus:ring-0 skew-box placeholder-gray-700"
+                    className="w-full pl-8 pr-3 py-2 text-sm font-istok font-bold border border-gray-200 rounded-full focus:border-black focus:ring-0 placeholder:text-gray-300 bg-gray-50 transition-colors"
                   />
                 </div>
               </div>
 
-              {/* Slider */}
-              <div className="px-1 relative">
+              {/* Dual Slider */}
+              <div className="relative h-2 rounded-full bg-gray-200 mt-6 mb-8 mx-1">
+                {/* Track Highlight */}
+                <div
+                  className="absolute h-full bg-black rounded-full z-10"
+                  style={{
+                    left: `${(filters.minPrice / limitMax) * 100}%`,
+                    right: `${100 - (filters.maxPrice / limitMax) * 100}%`,
+                  }}
+                />
+
+                {/* Min Thumb Input */}
                 <input
                   type="range"
                   min="0"
                   max={limitMax}
-                  step="10"
+                  step="1"
+                  value={filters.minPrice}
+                  onChange={(e) => {
+                    const val = Math.min(
+                      Number(e.target.value),
+                      filters.maxPrice - 1,
+                    );
+                    setFilters({ ...filters, minPrice: val });
+                  }}
+                  className="absolute w-full h-full appearance-none bg-transparent pointer-events-none z-20 slider-thumb cursor-pointer"
+                />
+
+                {/* Max Thumb Input */}
+                <input
+                  type="range"
+                  min="0"
+                  max={limitMax}
+                  step="1"
                   value={filters.maxPrice}
                   onChange={(e) => {
-                    setFilters({ ...filters, maxPrice: Number(e.target.value) });
+                    const val = Math.max(
+                      Number(e.target.value),
+                      filters.minPrice + 1,
+                    );
+                    setFilters({ ...filters, maxPrice: val });
                   }}
-                  onMouseUp={() => onFiltersChange(filters)}
-                  onTouchEnd={() => onFiltersChange(filters)}
-                  className="w-full h-2 bg-gray-800 rounded-none appearance-none cursor-pointer accent-accent"
+                  className="absolute w-full h-full appearance-none bg-transparent pointer-events-none z-20 slider-thumb cursor-pointer"
                 />
-                <div className="flex justify-between mt-3 text-xs text-gray-500 font-bold tracking-widest uppercase">
+
+                {/* Legend */}
+                <div className="flex justify-between mt-4 text-xs text-gray-400 font-istok font-bold tracking-wide">
                   <span>0</span>
                   <span>{limitMax}</span>
                 </div>
               </div>
+
+              <style>{`
+                .slider-thumb::-webkit-slider-thumb {
+                    pointer-events: auto;
+                    appearance: none;
+                    width: 16px;
+                    height: 16px;
+                    background: black;
+                    border: 2px solid white;
+                    border-radius: 50%;
+                    cursor: pointer;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+                }
+                .slider-thumb::-moz-range-thumb {
+                    pointer-events: auto;
+                    width: 16px;
+                    height: 16px;
+                    background: black;
+                    border: 2px solid white;
+                    border-radius: 50%;
+                    cursor: pointer;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+                }
+              `}</style>
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );
