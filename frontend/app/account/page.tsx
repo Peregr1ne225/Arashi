@@ -24,7 +24,7 @@ function AccountContent() {
 export default function AccountPage() {
   return (
     <AuthGuard>
-      <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <Suspense fallback={<div className="min-h-screen bg-[#FDFDFB] flex items-center justify-center"><div className="h-8 w-8 border-4 border-gray-200 border-t-black rounded-full animate-spin"></div></div>}>
         <AccountContent />
       </Suspense>
     </AuthGuard>
