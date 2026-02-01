@@ -1,7 +1,7 @@
-import { Product } from "@/app/types";
+import { Product, ProductCardData, toProductCardData } from "@/app/types/product";
 import ProductGridClient from "./ProductGridClient";
 
-// Server component that fetches data and passes it to the client component
+// Server component that handles RSC boundary crossing
 interface ProductGridProps {
   products: Product[];
   title?: string;
@@ -9,18 +9,20 @@ interface ProductGridProps {
   viewAllLink?: string;
 }
 
-// This is a server component that handles data fetching
-// and passes the data to the client component
+// This is a server component at the RSC boundary
+// It converts full Product objects to minimal ProductCardData
+// to reduce serialization overhead when passing to client components
 export default function ProductGrid({
   products,
   title,
   loading = false,
   viewAllLink,
 }: ProductGridProps) {
-  // Any server-side data processing can happen here
-  // For now, we're just passing the props directly to the client component
+  // Convert full Products to minimal ProductCardData at RSC boundary
+  // This reduces serialization from ~25+ fields to ~12 fields per product
+  const productCardData: ProductCardData[] = products.map(toProductCardData);
 
   return (
-    <ProductGridClient products={products} title={title} loading={loading} viewAllLink={viewAllLink} />
+    <ProductGridClient products={productCardData} title={title} loading={loading} viewAllLink={viewAllLink} />
   );
 }

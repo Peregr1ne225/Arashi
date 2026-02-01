@@ -271,7 +271,7 @@ function ProductCatalogContent({
                 <div className="lg:hidden mb-6">
                     <button
                         onClick={() => setIsMobileFiltersOpen(true)}
-                        className="w-full py-4 bg-[#1e1c15] text-white rounded-[10px] font-koulen text-[18px] tracking-wide flex items-center justify-center gap-2 uppercase hover:bg-black transition-colors"
+                        className="w-full py-4 bg-[#0e4d80] text-white rounded-full font-koulen text-[18px] tracking-wide flex items-center justify-center gap-2 uppercase hover:bg-[#0a3a60] shadow-lg transition-all"
                     >
                         <svg
                             className="w-5 h-5"
@@ -299,18 +299,18 @@ function ProductCatalogContent({
                 >
                     <div
                         className={`
-                        absolute inset-y-0 left-0 w-[80%] max-w-xs bg-white shadow-xl transform transition-transform duration-300
+                        absolute inset-y-0 left-0 w-[85%] max-w-xs bg-white shadow-2xl transform transition-transform duration-300 rounded-r-4xl overflow-hidden
                         ${isMobileFiltersOpen ? "translate-x-0" : "-translate-x-full"}
                     `}
                     >
-                        <div className="flex justify-between items-center p-4 border-b">
-                            <span className="font-semibold text-lg">Filters</span>
+                        <div className="flex justify-between items-center p-6 border-b border-gray-100">
+                            <span className="font-koulen text-2xl uppercase tracking-wide text-black">Filters</span>
                             <button
                                 onClick={() => setIsMobileFiltersOpen(false)}
-                                className="p-2"
+                                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                             >
                                 <svg
-                                    className="w-6 h-6"
+                                    className="w-6 h-6 text-gray-500"
                                     fill="none"
                                     viewBox="0 0 24 24"
                                     stroke="currentColor"
@@ -346,8 +346,8 @@ function ProductCatalogContent({
                 {/* Grid Area with Overlay Loading */}
                 <div className="flex-1 relative min-h-100">
                     {isLoading && (
-                        <div className="absolute inset-0 bg-white/60 z-40 flex justify-center items-start pt-24 backdrop-blur-[1px] transition-all duration-200">
-                            <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-neutral-900 shadow-lg"></div>
+                        <div className="absolute inset-0 bg-[#FDFDFB]/80 z-40 flex justify-center items-start pt-32 backdrop-blur-[2px] transition-all duration-200">
+                            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0e4d80] shadow-lg"></div>
                         </div>
                     )}
 
@@ -356,7 +356,7 @@ function ProductCatalogContent({
                             <p className="text-red-500 mb-4">{error}</p>
                             <button
                                 onClick={() => fetchProducts(initialFilters)}
-                                className="px-4 py-2 bg-neutral-900 text-white rounded"
+                                className="px-6 py-2 bg-[#0e4d80] text-white rounded-full font-koulen tracking-wider uppercase hover:bg-[#0a3a60] transition-colors"
                             >
                                 Try Again
                             </button>
@@ -375,7 +375,7 @@ function ProductCatalogContent({
                                             <button
                                                 onClick={handleLoadMore}
                                                 disabled={isLoading}
-                                                className="px-8 py-3 bg-white border border-black text-black font-koulen text-[16px] tracking-wider uppercase hover:bg-black hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed min-w-50"
+                                                className="px-10 py-3 bg-white border border-gray-200 text-[#0e4d80] font-koulen text-[16px] tracking-wider uppercase hover:bg-[#0e4d80] hover:text-white hover:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed min-w-50 rounded-full shadow-md hover:shadow-lg transform active:scale-95"
                                             >
                                                 {isLoading ? "Loading..." : "Load More"}
                                             </button>
