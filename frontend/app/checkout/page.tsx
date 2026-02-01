@@ -7,9 +7,10 @@ import Image from "next/image";
 import { useAuth } from "@/app/hooks/useAuth";
 import { useCart } from "@/app/contexts/CartContext";
 import { CartItem } from "@/app/contexts/CartContext";
-import { Product } from "@/app/types";
 import { api } from "@/app/lib/api";
-import { ordersApi, CreateOrderData, Order } from "@/app/lib/api/orders";
+import { ordersApi } from "@/app/lib/api/orders";
+import { CreateOrderData } from "@/app/types/order";
+import { getImageUrl } from "@/app/lib/utils/image";
 
 interface OrderFormData {
   full_name: string;
@@ -19,12 +20,12 @@ interface OrderFormData {
 
 const CheckoutItem = ({ item }: { item: CartItem }) => {
   const [imgSrc, setImgSrc] = useState(
-    item.product.image || item.product.image_url || "/placeholder-product.svg"
+    getImageUrl(item.product.images?.[0] || "/placeholder-product.svg"),
   );
 
   return (
-    <div className="flex gap-4 border-b border-white/5 pb-4 last:border-0">
-      <div className="relative w-20 h-20 flex-shrink-0 bg-black border border-white/10 overflow-hidden skew-box-sm">
+    <div className="flex gap-4 items-start">
+      <div className="relative w-16 h-20 shrink-0 bg-gray-100 rounded-md overflow-hidden border border-gray-100">
         <Image
           src={imgSrc}
           alt={item.product.name}
@@ -33,28 +34,36 @@ const CheckoutItem = ({ item }: { item: CartItem }) => {
           onError={() => setImgSrc("/placeholder-product.svg")}
         />
       </div>
-      <div className="flex-1">
-        <h3 className="font-bold text-lg uppercase italic tracking-tighter text-white line-clamp-1">
+      <div className="flex-1 min-w-0">
+        <h3 className="font-bold text-sm uppercase tracking-wide text-black truncate pr-4 font-istok">
           {item.product.name}
         </h3>
-        <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-1">
-          QTY: {item.quantity}
+        <p className="text-xs font-bold uppercase tracking-wider text-gray-500 font-istok mt-1">
+          Qty: {item.quantity}
         </p>
-        <div className="font-black text-accent italic tracking-tighter text-lg">
-          {/* Display original price if discounted */}
-          {item.product.originalPrice ? (
-            <>
-              <span className="line-through mr-2 text-gray-600 text-sm font-bold decoration-accent">
-                ฿{Number(item.product.originalPrice).toFixed(2)}
-              </span>
-              <span>
-                ฿{Number(item.price).toFixed(2)}
-              </span>
-            </>
-          ) : (
-            <span>฿{Number(item.price).toFixed(2)}</span>
-          )}
-        </div>
+        {(item.color_name || item.size_name) && (
+          <p className="text-xs text-gray-400 font-istok mt-1">
+            {item.color_name && <span>{item.color_name}</span>}
+            {item.color_name && item.size_name && <span> / </span>}
+            {item.size_name && <span>{item.size_name}</span>}
+          </p>
+        )}
+      </div>
+      <div className="flex flex-col items-end">
+        {item.product.originalPrice ? (
+          <>
+            <span className="font-bold text-red-600 text-sm font-istok">
+              ฿{Number(item.price).toFixed(2)}
+            </span>
+            <span className="text-xs text-gray-400 line-through font-istok">
+              ฿{Number(item.product.originalPrice).toFixed(2)}
+            </span>
+          </>
+        ) : (
+          <span className="font-bold text-sm text-black font-istok">
+            ฿{Number(item.price).toFixed(2)}
+          </span>
+        )}
       </div>
     </div>
   );
@@ -62,11 +71,9 @@ const CheckoutItem = ({ item }: { item: CartItem }) => {
 
 export default function CheckoutPage() {
   const { user, isAuthenticated } = useAuth();
-  const { items, totalPrice, clearCart } = useCart();
+  const { items, totalPrice } = useCart();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [orderComplete, setOrderComplete] = useState(false);
-  const [orderData, setOrderData] = useState<Order | null>(null);
   const [saveToProfile, setSaveToProfile] = useState(false);
   const [formData, setFormData] = useState<OrderFormData>({
     full_name: "",
@@ -84,10 +91,10 @@ export default function CheckoutPage() {
 
   // Redirect to cart if empty
   useEffect(() => {
-    if (isAuthenticated && items.length === 0 && !orderComplete) {
+    if (isAuthenticated && items.length === 0) {
       router.push("/cart");
     }
-  }, [isAuthenticated, items, router, orderComplete]);
+  }, [isAuthenticated, items, router]);
 
   // Pre-fill form with user data if available
   useEffect(() => {
@@ -168,7 +175,6 @@ export default function CheckoutPage() {
           };
 
           await api.patch("/auth/profile/update/", updateData);
-
         } catch (profileError) {
           console.warn("Failed to update profile:", profileError);
           // Don't stop order creation if profile update fails
@@ -195,7 +201,6 @@ export default function CheckoutPage() {
       } else {
         throw new Error("No checkout URL received");
       }
-
     } catch (error) {
       console.error("Error placing order:", error);
       // In a real app, you'd show a toast notification here
@@ -204,116 +209,65 @@ export default function CheckoutPage() {
     }
   };
 
+  const totalOriginalPrice = items.reduce((sum, item) => {
+    const original = item.product.originalPrice
+      ? Number(item.product.originalPrice)
+      : item.price;
+    return sum + original * item.quantity;
+  }, 0);
+
+  const discount =
+    totalOriginalPrice > totalPrice ? totalOriginalPrice - totalPrice : 0;
+
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-background container mx-auto px-4 py-8 flex items-center justify-center">
-        <div className="text-accent font-bold uppercase tracking-widest animate-pulse">Loading Authenticated Session...</div>
-      </div>
-    );
-  }
-
-  if (orderComplete && orderData) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-16 max-w-2xl">
-          <div className="bg-neutral-900 border border-accent rounded-none skew-box p-8 text-center shadow-[0_0_50px_rgba(204,255,0,0.1)]">
-            <div className="w-20 h-20 mx-auto bg-accent/20 border border-accent rounded-full flex items-center justify-center mb-6 animate-bounce">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-10 w-10 text-accent"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={3}
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-            </div>
-            <h1 className="text-4xl font-black uppercase italic tracking-tighter text-white mb-4">
-              Victory! Order Placed
-            </h1>
-            <p className="text-gray-400 mb-8 font-bold uppercase tracking-wide">
-              Your order #{orderData.id} is confirmed and entering the locker.
-            </p>
-            <div className="space-y-4">
-              <Link
-                href="/account"
-                className="btn-primary w-full py-4 block"
-              >
-                View My Orders //
-              </Link>
-              <Link
-                href="/"
-                className="block w-full py-4 border border-white/20 text-white hover:border-accent hover:text-accent font-bold uppercase tracking-widest transition skew-box"
-              >
-                Continue Shopping
-              </Link>
-            </div>
-          </div>
-        </div>
+      <div className="min-h-screen bg-[#F5F5F0] container mx-auto px-4 py-8 pt-20 flex flex-col items-center justify-center">
+        <div className="h-8 w-8 border-4 border-gray-200 border-t-black rounded-full animate-spin"></div>
       </div>
     );
   }
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-background container mx-auto px-4 py-16 flex items-center justify-center">
-        <div className="bg-neutral-900 border border-white/10 skew-box p-12 text-center">
-          <h2 className="text-2xl font-black uppercase italic tracking-tighter text-white mb-4">Locker is Empty</h2>
-          <Link href="/" className="text-accent hover:underline font-bold uppercase tracking-wide">Go to Catalog</Link>
+      <div className="min-h-screen bg-[#F5F5F0] container mx-auto px-4 py-20 flex flex-col items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold font-koulen uppercase tracking-wide text-black mb-4">
+            Your Bag is Empty
+          </h1>
+          <Link
+            href="/"
+            className="inline-block py-3 px-8 bg-[#1e1c15] text-white rounded-[10px] font-koulen uppercase tracking-widest text-lg hover:bg-black transition-all"
+          >
+            Start Shopping
+          </Link>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background text-white">
-      <div className="container mx-auto px-4 py-12">
-        <h1 className="text-6xl font-black uppercase italic tracking-tighter text-white mb-12 border-b border-white/10 pb-6">
-          Checkout // <span className="text-accent">Game Plan</span>
+    <div className="min-h-screen bg-[#F5F5F0] pt-24 pb-20">
+      <div className="container mx-auto px-4 lg:px-8 max-w-7xl">
+        <h1 className="text-4xl font-bold mb-8 text-black font-koulen uppercase tracking-widest border-b border-black/5 pb-4">
+          Checkout
         </h1>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Order Summary */}
-          <div>
-            <h2 className="text-2xl font-black uppercase italic tracking-tighter text-white mb-6 flex items-center gap-3">
-              <span className="bg-accent text-black w-8 h-8 flex items-center justify-center text-lg skew-box font-bold">1</span>
-              Your Gear
-            </h2>
-            <div className="bg-neutral-900 border border-white/10 skew-box p-6 space-y-6">
-              {items.map((item) => (
-                <CheckoutItem key={item.id} item={item} />
-              ))}
-
-              <div className="pt-6 border-t border-dashed border-white/20">
-                <div className="flex justify-between font-black text-2xl uppercase italic tracking-tighter text-white">
-                  <span>Total</span>
-                  <span className="text-accent">฿{totalPrice.toFixed(2)}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Shipping Information Form */}
-          <div>
-            <h2 className="text-2xl font-black uppercase italic tracking-tighter text-white mb-6 flex items-center gap-3">
-              <span className="bg-white text-black w-8 h-8 flex items-center justify-center text-lg skew-box font-bold">2</span>
-              Shipping Details
-            </h2>
-            <div className="bg-neutral-900 border-2 border-dashed border-accent/20 p-8 skew-box relative">
-              {/* Ticket cutouts */}
-              <div className="absolute -left-3 top-1/2 w-6 h-6 bg-background rounded-full transform -translate-y-1/2"></div>
-              <div className="absolute -right-3 top-1/2 w-6 h-6 bg-background rounded-full transform -translate-y-1/2"></div>
-
-              <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+          {/* Main Content (Forms) */}
+          <div className="lg:col-span-7 space-y-8">
+            {/* Information Section */}
+            <div className="bg-white rounded-4xl shadow-sm p-6 md:p-8 border border-gray-100">
+              <h2 className="text-xl font-bold mb-6 text-black font-istok uppercase tracking-wider flex items-center">
+                <span className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-sm mr-3 font-koulen">
+                  1
+                </span>
+                Information
+              </h2>
+              <div className="space-y-6">
                 <div>
                   <label
                     htmlFor="full_name"
-                    className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2"
+                    className="block text-sm font-bold text-gray-700 mb-2 font-istok uppercase tracking-wide"
                   >
                     Full Name
                   </label>
@@ -323,12 +277,12 @@ export default function CheckoutPage() {
                     name="full_name"
                     value={formData.full_name}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-3 bg-black border ${errors.full_name ? "border-red-500" : "border-white/20"} rounded-none text-white font-bold tracking-wide focus:outline-none focus:border-accent skew-box placeholder-gray-700 transition-colors`}
-                    placeholder="ENTER YOUR FULL NAME"
+                    placeholder="John Doe"
+                    className={`w-full px-4 py-3 border rounded-2xl focus:outline-none focus:ring-1 focus:ring-black/20 focus:border-black font-istok transition-colors ${errors.full_name ? "border-red-500 bg-red-50" : "border-gray-200 bg-gray-50/50"}`}
                     required
                   />
                   {errors.full_name && (
-                    <p className="text-red-500 text-xs mt-2 font-bold uppercase tracking-wide">
+                    <p className="text-red-500 text-xs mt-1 font-bold font-istok">
                       {errors.full_name}
                     </p>
                   )}
@@ -337,7 +291,7 @@ export default function CheckoutPage() {
                 <div>
                   <label
                     htmlFor="phone_number"
-                    className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2"
+                    className="block text-sm font-bold text-gray-700 mb-2 font-istok uppercase tracking-wide"
                   >
                     Phone Number
                   </label>
@@ -347,70 +301,129 @@ export default function CheckoutPage() {
                     name="phone_number"
                     value={formData.phone_number}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-3 bg-black border ${errors.phone_number ? "border-red-500" : "border-white/20"} rounded-none text-white font-bold tracking-wide focus:outline-none focus:border-accent skew-box placeholder-gray-700 transition-colors`}
-                    placeholder="ENTER PHONE NUMBER"
+                    placeholder="0812345678"
+                    className={`w-full px-4 py-3 border rounded-2xl focus:outline-none focus:ring-1 focus:ring-black/20 focus:border-black font-istok transition-colors ${errors.phone_number ? "border-red-500 bg-red-50" : "border-gray-200 bg-gray-50/50"}`}
                     required
                   />
                   {errors.phone_number && (
-                    <p className="text-red-500 text-xs mt-2 font-bold uppercase tracking-wide">
+                    <p className="text-red-500 text-xs mt-1 font-bold font-istok">
                       {errors.phone_number}
                     </p>
                   )}
                 </div>
+              </div>
+            </div>
 
+            {/* Shipping Section */}
+            <div className="bg-white rounded-4xl shadow-sm p-6 md:p-8 border border-gray-100">
+              <h2 className="text-xl font-bold mb-6 text-black font-istok uppercase tracking-wider flex items-center">
+                <span className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-sm mr-3 font-koulen">
+                  2
+                </span>
+                Shipping Address
+              </h2>
+              <div className="space-y-6">
                 <div>
-                  <label
-                    htmlFor="shipping_address"
-                    className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2"
-                  >
-                    Shipping Address
-                  </label>
                   <textarea
                     id="shipping_address"
                     name="shipping_address"
                     rows={4}
                     value={formData.shipping_address}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-3 bg-black border ${errors.shipping_address ? "border-red-500" : "border-white/20"} rounded-none text-white font-bold tracking-wide focus:outline-none focus:border-accent skew-box placeholder-gray-700 transition-colors resize-none`}
-                    placeholder="ENTER DELIVERY ADDRESS..."
+                    placeholder="Enter your full delivery address..."
+                    className={`w-full px-4 py-3 border rounded-2xl focus:outline-none focus:ring-1 focus:ring-black/20 focus:border-black font-istok transition-colors resize-none ${errors.shipping_address ? "border-red-500 bg-red-50" : "border-gray-200 bg-gray-50/50"}`}
                     required
                   />
                   {errors.shipping_address && (
-                    <p className="text-red-500 text-xs mt-2 font-bold uppercase tracking-wide">
+                    <p className="text-red-500 text-xs mt-1 font-bold font-istok">
                       {errors.shipping_address}
                     </p>
                   )}
                 </div>
 
                 {/* Save to Profile Checkbox */}
-                <div className="flex items-center group cursor-pointer">
+                <div className="flex items-center p-4 bg-gray-50 rounded-2xl border border-gray-100">
                   <input
                     id="save-to-profile"
                     name="save-to-profile"
                     type="checkbox"
                     checked={saveToProfile}
                     onChange={(e) => setSaveToProfile(e.target.checked)}
-                    className="h-5 w-5 bg-black border-white/20 rounded-none text-accent focus:ring-accent focus:ring-offset-black"
+                    className="h-5 w-5 text-black focus:ring-black border-gray-300 rounded cursor-pointer accent-black"
                   />
-                  <label htmlFor="save-to-profile" className="ml-3 block text-sm font-bold uppercase tracking-wide text-gray-400 group-hover:text-white transition-colors cursor-pointer select-none">
-                    Save to Locker Profile
+                  <label
+                    htmlFor="save-to-profile"
+                    className="ml-3 block text-sm font-bold text-gray-600 font-istok uppercase tracking-wider cursor-pointer select-none"
+                  >
+                    Save this information for next time
                   </label>
                 </div>
+              </div>
+            </div>
+          </div>
 
-                <div className="pt-6">
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="btn-primary w-full py-5 text-xl relative overflow-hidden group"
-                  >
-                    {isSubmitting ? "PROCESSING..." : "CONFIRM ORDER //"}
-                    <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 pointer-events-none"></div>
-                  </button>
-                  <p className="text-center mt-4 text-xs font-bold uppercase tracking-widest text-gray-600">
-                    Redirecting to Secure Payment
-                  </p>
+          {/* Right Column (Summary) */}
+          <div className="lg:col-span-5 space-y-8">
+            <div className="bg-white rounded-4xl shadow-sm p-6 md:p-8 border border-gray-100 sticky top-24">
+              <h2 className="text-lg font-bold mb-6 text-black font-istok uppercase tracking-wider border-b border-black/5 pb-4">
+                Order Summary
+              </h2>
+
+              <div className="space-y-4 mb-6 max-h-100 overflow-y-auto pr-2 custom-scrollbar">
+                {items.map((item) => (
+                  <CheckoutItem key={item.id} item={item} />
+                ))}
+              </div>
+
+              <div className="border-t border-black/5 pt-6 space-y-3">
+                <div className="flex justify-between font-istok text-sm font-bold uppercase tracking-wider text-gray-500">
+                  <span>
+                    Subtotal ({items.reduce((acc, i) => acc + i.quantity, 0)}{" "}
+                    items)
+                  </span>
+                  <span className="text-black">
+                    ฿{totalOriginalPrice.toFixed(2)}
+                  </span>
                 </div>
-              </form>
+
+                {discount > 0 && (
+                  <div className="flex justify-between font-istok text-sm font-bold uppercase tracking-wider text-red-600">
+                    <span>Discount</span>
+                    <span>-฿{discount.toFixed(2)}</span>
+                  </div>
+                )}
+
+                <div className="flex justify-between font-istok text-sm font-bold uppercase tracking-wider text-gray-500">
+                  <span>Shipping</span>
+                  <span className="text-green-600">FREE</span>
+                </div>
+
+                <div className="h-px bg-black/10 my-4" />
+
+                <div className="flex justify-between items-center font-istok font-bold uppercase tracking-wider text-black text-xl">
+                  <span>Total</span>
+                  <span>฿{totalPrice.toFixed(2)}</span>
+                </div>
+              </div>
+
+              <button
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="w-full mt-8 py-4 bg-[#0e4d80] text-white rounded-full font-koulen uppercase tracking-widest text-lg hover:bg-[#0a3a60] transition-all shadow-lg hover:shadow-xl cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed disabled:shadow-none flex items-center justify-center gap-2"
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  "Confirm Order"
+                )}
+              </button>
+
+              <p className="text-xs text-center text-gray-400 mt-4 font-istok font-medium">
+                Secure Checkout powered by Stripe
+              </p>
             </div>
           </div>
         </div>
