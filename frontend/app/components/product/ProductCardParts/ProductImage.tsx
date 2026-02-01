@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
 import { getImageUrl } from "@/app/lib/utils/image";
 
 interface ProductImageProps {
@@ -11,60 +10,27 @@ interface ProductImageProps {
   isNew?: boolean;
   isBestseller?: boolean;
   discount?: number;
+  previewImage?: string | null;
 }
 
 // Extracted badge components for better maintainability
 const DiscountBadge = ({ discount }: { discount: number }) => (
-  <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded z-10">
+  <div className="absolute top-3 left-3 bg-[#ff5252] text-white text-[10px] font-koulen uppercase tracking-widest px-3 py-1.5 rounded-full z-10 shadow-sm">
     -{discount}%
   </div>
 );
 
 const NewBadge = () => (
-  <div className="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded z-10">
+  <div className="absolute top-3 right-3 bg-[#1e1c15] text-white text-[10px] font-koulen uppercase tracking-widest px-3 py-1.5 rounded-full z-10 shadow-sm">
     NEW
   </div>
 );
 
 const BestsellerBadge = () => (
-  <div className="absolute top-2 right-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded z-10">
+  <div className="absolute top-3 right-3 bg-white text-black text-[10px] font-koulen uppercase tracking-widest px-3 py-1.5 rounded-full z-10 shadow-sm border border-black/10">
     BESTSELLER
   </div>
 );
-
-const WishlistButton = ({ productId }: { productId: number }) => {
-  const [isWishlisted, setIsWishlisted] = useState(false);
-
-  const toggleWishlist = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsWishlisted(!isWishlisted);
-    // In a real app, this would make an API call
-  };
-
-  return (
-    <button
-      className="p-2 hover:bg-white/20 rounded"
-      onClick={toggleWishlist}
-      aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className={`h-5 w-5 ${isWishlisted ? "fill-red-500 text-red-500" : "text-white"}`}
-        fill={isWishlisted ? "currentColor" : "none"}
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-        />
-      </svg>
-      <span className="text-xs text-white">Wishlist</span>
-    </button>
-  );
-};
 
 // Memoized to prevent unnecessary re-renders
 export default function ProductImage({
@@ -73,24 +39,37 @@ export default function ProductImage({
   isNew,
   isBestseller,
   discount,
+  previewImage,
 }: ProductImageProps) {
+  // Determine which image to show
+  // If previewImage is set (hover on color), use it.
+  // Otherwise use the first image from the list.
+  const mainImageSrc = previewImage
+    ? getImageUrl(previewImage)
+    : getImageUrl(images?.[0]) || "/placeholder-product.svg";
+
+  // Only show secondary image hover effect if we are NOT previewing a specific color
+  // AND there is a secondary image available.
+  const showSecondaryHover = !previewImage && images.length > 1;
+
   return (
     <div className="relative overflow-hidden">
       <Link href={`/product/${productId}`} className="block">
         <div className="aspect-w-3 aspect-h-4 w-full overflow-hidden relative">
           {/* Primary Image */}
           <Image
-            src={getImageUrl(images[0]) || "/placeholder-product.svg"}
+            src={mainImageSrc}
             alt={`Product ${productId}`}
             width={500}
             height={650}
-            className={`w-full h-80 object-cover object-center transition-opacity duration-500 ease-in-out ${images.length > 1 ? "group-hover:opacity-0" : ""
+            className={`w-full h-80 object-cover object-center transition-opacity duration-500 ease-in-out ${showSecondaryHover ? "group-hover:opacity-0" : ""
               }`}
             loading="lazy"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw"
           />
 
-          {/* Secondary Image (Hover) */}
-          {images.length > 1 && (
+          {/* Secondary Image (Hover) - Only render if allowed */}
+          {showSecondaryHover && (
             <Image
               src={getImageUrl(images[1])}
               alt={`Product ${productId} - Back`}
@@ -98,6 +77,7 @@ export default function ProductImage({
               height={650}
               className="absolute inset-0 w-full h-80 object-cover object-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-in-out"
               loading="lazy"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw"
             />
           )}
         </div>

@@ -1,6 +1,10 @@
 "use client";
 
+import { memo } from "react";
 import Link from "next/link";
+import NextImage from "next/image";
+import { ProductColor } from "@/app/types/product";
+import { getImageUrl } from "@/app/lib/utils/image";
 
 interface ProductInfoProps {
   productId: number;
@@ -9,6 +13,9 @@ interface ProductInfoProps {
   reviewCount: number;
   price: number;
   originalPrice?: number;
+  colors?: ProductColor[];
+  onColorHover?: (image: string | null) => void;
+  onColorLeave?: () => void;
 }
 
 // Extract rating component for better maintainability
@@ -39,36 +46,95 @@ const RatingStars = ({
   );
 };
 
-export default function ProductInfo({
+function ProductInfoComponent({
   productId,
   name,
   rating,
   reviewCount,
   price,
   originalPrice,
+  colors,
+  onColorHover,
+  onColorLeave,
 }: ProductInfoProps) {
   return (
-    <div className="p-3 pb-0">
+    <div className="px-1">
+      {/* Color Swatches */}
+      {colors && colors.length > 0 && (
+        <div className="flex gap-1 mb-2 flex-wrap h-6 content-center items-center">
+          {colors.slice(0, 4).map((color) => (
+            <div
+              key={color.id}
+              className="w-6 h-6 rounded-full border border-gray-200 shadow-sm relative overflow-hidden ring-1 ring-transparent hover:ring-black hover:scale-110 transition-all"
+              title={color.color_name}
+              style={{ backgroundColor: color.color_code }}
+              onMouseEnter={() => onColorHover?.(getImageUrl(color.image))}
+              onMouseLeave={() => onColorLeave?.()}
+            >
+              {color.image && (
+                <NextImage
+                  src={getImageUrl(color.image)}
+                  alt={color.color_name}
+                  fill
+                  className="object-cover"
+                  sizes="24px"
+                />
+              )}
+            </div>
+          ))}
+          {colors.length > 4 && (
+            <span className="text-[10px] text-gray-500 font-medium ml-1">
+              +{colors.length - 4}
+            </span>
+          )}
+        </div>
+      )}
+
       {/* Product Name */}
-      <h3 className="text-sm font-bold uppercase italic tracking-wider text-white line-clamp-2 mb-1 min-h-[2.5em]">
-        <Link href={`/product/${productId}`} className="hover:text-accent transition-colors">
+      <h3 className="text-[16px] leading-tight font-koulen text-black line-clamp-2 mb-2 min-h-[2.5em] tracking-wide uppercase">
+        <Link
+          href={`/product/${productId}`}
+          className="hover:underline decoration-1 underline-offset-2"
+        >
           {name}
         </Link>
       </h3>
 
       {/* Rating and Price Stack */}
-      <div className="mt-1">
-        <RatingStars rating={rating} reviewCount={reviewCount} />
-
-        <div className="flex items-center space-x-2 mt-1">
-          <span className={`text-base font-black italic ${originalPrice ? "text-accent" : "text-white"}`}>฿{price}</span>
-          {originalPrice && (
-            <span className="text-sm text-gray-400 line-through decoration-red-500">
-              ฿{originalPrice}
+      <div className="flex justify-between items-end mt-1">
+        <div className="flex flex-col">
+          <div className="flex items-center space-x-2">
+            <span
+              className={`text-[16px] font-koulen tracking-wide font-medium ${originalPrice ? "text-[#ff5252]" : "text-black"}`}
+            >
+              ฿{price.toLocaleString()}
             </span>
-          )}
+            {originalPrice && (
+              <span className="text-[12px] font-kodchasan text-gray-400 line-through decoration-gray-400">
+                ฿{originalPrice.toLocaleString()}
+              </span>
+            )}
+          </div>
+          <div className="mt-1">
+            <RatingStars rating={rating} reviewCount={reviewCount} />
+          </div>
         </div>
       </div>
     </div>
   );
 }
+
+// Memoize with custom comparison to prevent unnecessary re-renders
+export default memo(ProductInfoComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.productId === nextProps.productId &&
+    prevProps.name === nextProps.name &&
+    prevProps.rating === nextProps.rating &&
+    prevProps.reviewCount === nextProps.reviewCount &&
+    prevProps.price === nextProps.price &&
+    prevProps.originalPrice === nextProps.originalPrice &&
+    prevProps.colors === nextProps.colors &&
+    prevProps.onColorHover === nextProps.onColorHover &&
+    prevProps.onColorLeave === nextProps.onColorLeave
+  );
+});
