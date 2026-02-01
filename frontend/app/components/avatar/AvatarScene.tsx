@@ -32,7 +32,7 @@ export default function AvatarScene({
                     shadow-mapSize={2048}
                     castShadow
                 />
-                <Environment preset={environmentPreset} />
+                <Environment preset={environmentPreset} background blur={0} />
 
                 <group position={[0, -1, 0]}>
                     <Suspense fallback={null}>

@@ -22,6 +22,12 @@ const ENVIRONMENTS: { id: 'apartment' | 'city' | 'dawn' | 'forest' | 'lobby' | '
     { id: "sunset", label: "Sunset" },
     { id: "studio", label: "Studio" },
     { id: "park", label: "Park" },
+    { id: "apartment", label: "Apartment" },
+    { id: "dawn", label: "Dawn" },
+    { id: "forest", label: "Forest" },
+    { id: "lobby", label: "Lobby" },
+    { id: "night", label: "Night" },
+    { id: "warehouse", label: "Warehouse" },
 ];
 
 export default function ModelPage() {
