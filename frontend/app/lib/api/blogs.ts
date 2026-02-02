@@ -223,10 +223,16 @@ export const blogsApi = {
     async getComments(
         postId: number | string,
         page: number = 1,
+        ordering?: string,
     ): Promise<BlogCommentListResponse> {
         try {
+            const queryParams = new URLSearchParams();
+            queryParams.append("post", String(postId));
+            queryParams.append("page", String(page));
+            if (ordering) queryParams.append("ordering", ordering);
+
             const response = await apiFetch<BlogCommentListResponse>(
-                `/blogs/comments/?post=${postId}&page=${page}`,
+                `/blogs/comments/?${queryParams.toString()}`,
                 { skipAuth: true }
             );
             // Handle both array and paginated response

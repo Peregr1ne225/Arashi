@@ -24,7 +24,6 @@ export default function CommentSection({ postId, initialComments = [], children 
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const wsRef = useRef<WebSocket | null>(null);
-    const commentsEndRef = useRef<HTMLDivElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     const [connected, setConnected] = useState(false);
@@ -33,11 +32,13 @@ export default function CommentSection({ postId, initialComments = [], children 
     const [loadingMore, setLoadingMore] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    const [sortBy, setSortBy] = useState("-created_at");
+
     // Fetch comments on mount to ensure freshness (client-side)
     useEffect(() => {
         const fetchComments = async () => {
             try {
-                const response = await blogsApi.getComments(postId, 1);
+                const response = await blogsApi.getComments(postId, 1, sortBy);
                 setComments(response.results);
                 setTotalCount(response.count);
                 if (response.next) {
@@ -45,25 +46,19 @@ export default function CommentSection({ postId, initialComments = [], children 
                 } else {
                     setNextPage(null);
                 }
-                // Scroll to bottom after initial load
-                setTimeout(() => {
-                    if (scrollContainerRef.current) {
-                        scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
-                    }
-                }, 100);
             } catch (err) {
                 console.error("Failed to fetch fresh comments:", err);
             }
         };
 
         fetchComments();
-    }, [postId]);
+    }, [postId, sortBy]);
 
     const loadMoreComments = async () => {
         if (!nextPage || loadingMore) return;
         setLoadingMore(true);
         try {
-            const response = await blogsApi.getComments(postId, nextPage);
+            const response = await blogsApi.getComments(postId, nextPage, sortBy);
             // Append older comments to the end of the array (visually top)
             setComments((prev) => [...prev, ...response.results]);
             if (response.next) {
@@ -78,8 +73,28 @@ export default function CommentSection({ postId, initialComments = [], children 
         }
     };
 
+    const handleSortChange = (newSort: string) => {
+        setSortBy(newSort);
+        // Effect will trigger reload
+        setComments([]);
+        setNextPage(null);
+    };
+
     // Connect to WebSocket for real-time updates
     useEffect(() => {
+        // Only connect strictly for "Newest First" to avoid confusion when sorted otherwise
+        if (sortBy !== "-created_at") {
+            setConnected(false);
+            if (wsRef.current) {
+                wsRef.current.close();
+                wsRef.current = null;
+            }
+            return;
+        }
+
+        // Close existing if any (shouldn't happen often due to deps)
+        if (wsRef.current) wsRef.current.close();
+
         const wsUrl = getCommentsWebSocketUrl(postId);
         const ws = new WebSocket(wsUrl);
         wsRef.current = ws;
@@ -117,7 +132,7 @@ export default function CommentSection({ postId, initialComments = [], children 
         ws.onerror = () => setConnected(false);
 
         return () => ws.close();
-    }, [postId]);
+    }, [postId, sortBy]);
 
     // Cleanup preview URL
     useEffect(() => {
@@ -193,84 +208,9 @@ export default function CommentSection({ postId, initialComments = [], children 
     };
 
     return (
-        <div className="flex flex-col h-full bg-white">
-            {/* Comments List - Scrollable Area */}
-            <div
-                ref={scrollContainerRef}
-                className="flex-1 overflow-y-auto px-4 py-4 space-y-6 space-y-reverse no-scrollbar flex flex-col-reverse"
-            >
-                <div ref={commentsEndRef} />
-
-                {/* No comments yet (visually at bottom) */}
-                {comments.length === 0 && !loadingMore && (
-                    <div className="text-center py-8">
-                        <div className="text-3xl mb-2 opacity-10">💬</div>
-                        <p className="text-gray-400 text-sm font-medium">No comments yet.</p>
-                    </div>
-                )}
-
-                {comments.length > 0 && (
-
-                    <>
-                        {comments.map((comment) => (
-                            <CommentItem
-                                key={comment.id}
-                                comment={comment}
-                                onDelete={handleDeleteComment}
-                                onImageClick={setSelectedImage}
-                            />
-                        ))}
-
-                        {/* Load More Button (visually above comments) */}
-                        {nextPage && (
-                            <div className="flex justify-center py-4">
-                                <button
-                                    onClick={loadMoreComments}
-                                    disabled={loadingMore}
-                                    className="flex items-center gap-2 px-6 py-2 rounded-full border border-gray-100 text-[10px] font-bold text-gray-400 hover:text-black hover:border-gray-200 transition-all uppercase tracking-widest disabled:opacity-50"
-                                >
-                                    {loadingMore ? (
-                                        <div className="w-3 h-3 border-2 border-gray-200 border-t-black rounded-full animate-spin" />
-                                    ) : (
-                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                                        </svg>
-                                    )}
-                                    {loadingMore ? "Loading..." : "Load Older Comments"}
-                                </button>
-                            </div>
-                        )}
-
-                        {/* Discussion Header with Stats (visually at top of discussion) */}
-                        <div className="border-t border-gray-50 pt-4 mb-4">
-                            <div className="flex items-center justify-between mb-2">
-                                <h3 className="text-sm font-bold text-gray-900 font-istok uppercase tracking-widest">
-                                    Discussion
-                                </h3>
-                                {connected && (
-                                    <span className="flex items-center gap-1.5 text-[10px] font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full border border-green-100">
-                                        <span className="w-1 h-1 bg-green-500 rounded-full animate-pulse" />
-                                        LIVE
-                                    </span>
-                                )}
-                            </div>
-                            <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest font-istok">
-                                <span>{totalCount} Total</span>
-                                <span className="opacity-30">•</span>
-                                <span>Showing {comments.length}</span>
-                            </div>
-                        </div>
-
-                        {/* Children (e.g. Post Caption) (visually at the very top) */}
-                        {children && <div className="mb-2">{children}</div>}
-                    </>
-                )}
-                {/* Ref for auto-scroll if needed, but for newest first we might not want to jump */}
-                <div ref={commentsEndRef} />
-            </div>
-
-            {/* Comment Form - Fixed at Bottom */}
-            <div className="border-t border-gray-100 p-4 bg-white shrink-0">
+        <div className="flex flex-col bg-white">
+            {/* Comment Form - Top Input */}
+            <div className="border border-gray-100 rounded-3xl p-6 bg-gray-50/50 shadow-inner mb-8">
                 {isAuthenticated ? (
                     <form onSubmit={handleSubmit} className="relative">
                         {error && (
@@ -284,13 +224,13 @@ export default function CommentSection({ postId, initialComments = [], children 
                                 {user?.username?.charAt(0).toUpperCase() || "?"}
                             </div>
                             <div className="flex-1">
-                                <div className="bg-gray-50 rounded-2xl p-3 border border-transparent focus-within:border-gray-200 focus-within:bg-white transition-all duration-300">
+                                <div className="group bg-gray-50 rounded-2xl p-2 border-l-4 border-transparent focus-within:border-l-[#33A0E5] focus-within:bg-white focus-within:shadow-md transition-all duration-300 ease-in-out">
                                     <textarea
                                         value={newComment}
                                         onChange={(e) => setNewComment(e.target.value)}
                                         placeholder="Add a comment..."
                                         rows={2}
-                                        className="w-full bg-transparent border-none focus:ring-0 p-0 text-gray-800 placeholder-gray-400 resize-none text-sm"
+                                        className="w-full bg-transparent border-none focus:ring-0 focus:outline-none py-0 text-gray-800 placeholder-gray-400 resize-none text-sm leading-relaxed translate-y-[1px]"
                                     />
 
                                     {/* Image Preview */}
@@ -356,6 +296,86 @@ export default function CommentSection({ postId, initialComments = [], children 
                         >
                             Log In to Comment
                         </Link>
+                    </div>
+                )}
+            </div>
+
+            {/* Discussion Header with Stats */}
+            <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between border-b border-gray-50 pb-4 gap-4">
+                <div className="flex items-center gap-4">
+                    <h3 className="text-sm font-bold text-gray-900 font-istok uppercase tracking-widest">
+                        Discussion
+                    </h3>
+                    <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest font-istok">
+                        <span>{totalCount} Total</span>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-4">
+                    {/* Sort Dropdown */}
+                    <div className="relative">
+                        <select
+                            value={sortBy}
+                            onChange={(e) => handleSortChange(e.target.value)}
+                            className="pl-3 pr-8 py-1.5 rounded-lg border border-gray-100 bg-gray-50 text-[10px] font-bold text-gray-600 focus:bg-white focus:ring-1 focus:ring-gray-200 transition-all outline-none font-istok uppercase tracking-wider appearance-none cursor-pointer hover:border-gray-200"
+                        >
+                            <option value="-created_at">Newest First</option>
+                            <option value="created_at">Oldest First</option>
+                            <option value="-likes_count">Most Liked</option>
+                            <option value="likes_count">Least Liked</option>
+                        </select>
+                        <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                        </div>
+                    </div>
+
+                    {connected && (
+                        <span className="flex items-center gap-1.5 text-[10px] font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full border border-green-100">
+                            <span className="w-1 h-1 bg-green-500 rounded-full animate-pulse" />
+                            LIVE
+                        </span>
+                    )}
+                </div>
+            </div>
+
+            {/* Comments List - Standard Flow */}
+            <div className="space-y-6 mb-10">
+                {/* Visual Children (e.g. pinned content) */}
+                {children && <div className="mb-6">{children}</div>}
+
+                {comments.length === 0 && !loadingMore && (
+                    <div className="text-center py-12">
+                        <div className="text-3xl mb-2 opacity-10">💬</div>
+                        <p className="text-gray-400 text-sm font-medium">No comments yet. Be the first to share your thoughts!</p>
+                    </div>
+                )}
+
+                {comments.map((comment) => (
+                    <CommentItem
+                        key={comment.id}
+                        comment={comment}
+                        onDelete={handleDeleteComment}
+                        onImageClick={setSelectedImage}
+                    />
+                ))}
+
+                {/* Load More Button - Bottom of list */}
+                {nextPage && (
+                    <div className="flex justify-center py-8">
+                        <button
+                            onClick={loadMoreComments}
+                            disabled={loadingMore}
+                            className="flex items-center gap-2 px-6 py-2 rounded-full border border-gray-100 text-[10px] font-bold text-gray-400 hover:text-black hover:border-gray-200 transition-all uppercase tracking-widest disabled:opacity-50"
+                        >
+                            {loadingMore ? (
+                                <div className="w-3 h-3 border-2 border-gray-200 border-t-black rounded-full animate-spin" />
+                            ) : (
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                </svg>
+                            )}
+                            {loadingMore ? "Loading..." : "Load Older Comments"}
+                        </button>
                     </div>
                 )}
             </div>

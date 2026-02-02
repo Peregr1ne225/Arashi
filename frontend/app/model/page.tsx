@@ -76,7 +76,7 @@ export default function ModelPage() {
     const pantUrl = availablePants.find(p => p.slug === selectedPant)?.file || null;
 
     return (
-        <div className="flex h-screen w-full bg-neutral-50 overflow-hidden">
+        <div className="flex h-[calc(100vh-var(--header-height,72px))] w-full bg-neutral-50 overflow-hidden">
             {/* 3D Scene Area */}
             <div className="flex-1 relative">
                 <header className="absolute top-0 left-0 p-6 z-10 w-full flex items-center justify-between pointer-events-none">

@@ -93,22 +93,8 @@ export default function CommentItem({ comment, onDelete, onImageClick }: Comment
                 </div>
                 <p className="text-gray-800 leading-relaxed text-base font-sans mb-4">{comment.content}</p>
 
-                {/* Comment Stats */}
-                <div className="flex items-center gap-4 mb-4 relative">
-                    <button
-                        onClick={handleLike}
-                        disabled={loading}
-                        className={`flex items-center gap-1.5 transition-colors ${hasLiked ? "text-red-500" : "text-gray-400"} hover:text-red-500 group`}
-                    >
-                        <svg className="w-3.5 h-3.5" fill={hasLiked ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                        </svg>
-                        <span className="text-[10px] font-bold font-istok uppercase tracking-widest">{likesCount}</span>
-                    </button>
-                </div>
-
                 {comment.image && (
-                    <div className="mt-2 relative h-64 w-full max-w-md">
+                    <div className="mb-4 relative w-full aspect-square max-w-md mx-auto">
                         <NextImage
                             src={getImageUrl(comment.image)}
                             alt="Comment attachment"
@@ -118,6 +104,20 @@ export default function CommentItem({ comment, onDelete, onImageClick }: Comment
                         />
                     </div>
                 )}
+
+                {/* Comment Stats */}
+                <div className="flex items-center gap-4 mb-4 relative">
+                    <button
+                        onClick={handleLike}
+                        disabled={loading}
+                        className={`flex items-center gap-2 transition-colors ${hasLiked ? "text-red-500" : "text-gray-400"} hover:text-red-500 group`}
+                    >
+                        <svg className="w-5 h-5" fill={hasLiked ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                        <span className="text-xs font-bold font-istok uppercase tracking-widest">{likesCount}</span>
+                    </button>
+                </div>
             </div>
 
             <style jsx>{`

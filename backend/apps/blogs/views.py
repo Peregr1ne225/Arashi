@@ -182,6 +182,8 @@ class CommentViewSet(viewsets.ModelViewSet):
     permission_classes = [IsCommentManagerOrReadOnly]
     parser_classes = (MultiPartParser, FormParser, JSONParser)
     serializer_class = CommentSerializer
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ["created_at", "likes_count"]
 
     def get_queryset(self):
         queryset = Comment.objects.filter(is_active=True).annotate(

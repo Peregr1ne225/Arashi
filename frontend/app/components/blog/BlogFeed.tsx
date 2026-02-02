@@ -76,7 +76,7 @@ export default function BlogFeed({ initialPosts, initialCount = 0 }: BlogFeedPro
                             placeholder="SEARCH THE COMMUNITY..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full px-5 py-4 pl-12 rounded-2xl border border-gray-100 bg-white focus:border-[#33A0E5] focus:ring-4 focus:ring-blue-50 transition-all outline-none shadow-sm font-istok text-sm font-bold placeholder-gray-400"
+                            className="w-full px-5 py-3 pl-12 rounded-xl border-0 bg-gray-50 text-gray-900 focus:bg-white focus:ring-2 focus:ring-[#33A0E5]/20 transition-all outline-none font-istok text-sm font-bold placeholder-gray-400"
                         />
                         <svg
                             className="w-5 h-5 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-[#33A0E5] transition-colors"
@@ -96,25 +96,29 @@ export default function BlogFeed({ initialPosts, initialCount = 0 }: BlogFeedPro
 
                 {/* Sort Dropdown */}
                 <div className="sm:w-64">
-                    <select
-                        value={sortBy}
-                        onChange={(e) => handleSortChange(e.target.value)}
-                        className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-white text-gray-600 focus:border-[#33A0E5] focus:ring-4 focus:ring-blue-50 transition-all outline-none shadow-sm font-istok text-sm font-bold appearance-none cursor-pointer"
-                        style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%239CA3AF\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1.25rem center', backgroundSize: '1rem' }}
-                    >
-                        <option value="-created_at">NEWEST FIRST</option>
-                        <option value="created_at">OLDEST FIRST</option>
-                        <option value="-likes_count">MOST LIKED</option>
-                        <option value="likes_count">LEAST LIKED</option>
-                        <option value="-comment_count">MOST COMMENTED</option>
-                        <option value="comment_count">LEAST COMMENTED</option>
-                    </select>
+                    <div className="relative">
+                        <select
+                            value={sortBy}
+                            onChange={(e) => handleSortChange(e.target.value)}
+                            className="w-full px-5 py-3 rounded-xl border-0 bg-gray-50 text-gray-900 focus:bg-white focus:ring-2 focus:ring-[#33A0E5]/20 transition-all outline-none font-istok text-sm font-bold appearance-none cursor-pointer"
+                        >
+                            <option value="-created_at">NEWEST FIRST</option>
+                            <option value="created_at">OLDEST FIRST</option>
+                            <option value="-likes_count">MOST LIKED</option>
+                            <option value="likes_count">LEAST LIKED</option>
+                            <option value="-comment_count">MOST COMMENTED</option>
+                            <option value="comment_count">LEAST COMMENTED</option>
+                        </select>
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             {/* Posts Grid */}
             {posts.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-10">
+                <div className="flex flex-col gap-6 pb-10">
                     {posts.map((post) => (
                         <PostCard key={post.id} post={post} />
                     ))}
