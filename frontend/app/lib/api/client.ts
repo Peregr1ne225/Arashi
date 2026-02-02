@@ -179,6 +179,12 @@ export const categoriesApi = {
  */
 function fixImageUrl(url: string): string {
   if (!url) return "";
+
+  // Convert any absolute URL with /media/ to a relative path
+  if (url.includes("/media/")) {
+    return url.substring(url.indexOf("/media/"));
+  }
+
   // valid for docker internal network
   if (url.includes("backend:8000")) {
     return url.replace("http://backend:8000", "");
