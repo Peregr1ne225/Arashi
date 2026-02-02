@@ -1,12 +1,6 @@
 from django.contrib import admin
 
-from .models import Comment, CommentLike, Post, PostLike, Profile
-
-
-@admin.register(Profile)
-class ProfileAdmin(admin.ModelAdmin):
-    list_display = ["user", "profile_name", "created_at"]
-    search_fields = ["user__username", "profile_name"]
+from .models import Comment, CommentLike, Post, PostLike
 
 
 @admin.register(Post)

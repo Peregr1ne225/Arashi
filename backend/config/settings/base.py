@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     "apps.authentication",
     "apps.orders",
     "apps.cart",
+    "apps.blogs",
     "apps.cms",
     "apps.visualization",
 ]

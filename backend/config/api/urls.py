@@ -22,6 +22,7 @@ urlpatterns = [
     path("auth/", include("apps.authentication.urls")),
     path("orders/", include("apps.orders.urls")),
     path("cart/", include("apps.cart.urls")),
+    path("blogs/", include("apps.blogs.urls")),
 ]
 
 # API Root view information
