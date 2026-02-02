@@ -13,10 +13,10 @@ dependencies = [
     "django-filter>=23.5",
     "Pillow>=10.0.0",
     "django-environ>=0.10.0",
+    "channels>=4.0.0",
+    "channels-redis>=4.2.0",
+    "daphne>=4.0.0",
     "requests>=2.31.0",
-    "google-genai>=0.2.0",
     "stripe>=11.1.0",
     "whitenoise>=6.5.0",
-    "gunicorn>=23.0.0",
-    "uvicorn>=0.34.0"
 ]
