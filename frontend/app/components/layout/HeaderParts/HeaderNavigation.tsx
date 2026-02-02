@@ -33,6 +33,14 @@ export default function HeaderNavigation({
           </li>
           <li>
             <Link
+              href="/blogs"
+              className="font-istok text-[12px] uppercase tracking-[0.2em] font-bold text-gray-500 hover:text-[#0e4d80] px-6 py-3 rounded-full hover:bg-gray-50 transition-all inline-block"
+            >
+              Comunity
+            </Link>
+          </li>
+          <li>
+            <Link
               href="/model"
               className="font-istok text-[12px] uppercase tracking-[0.2em] font-bold text-gray-500 hover:text-[#0e4d80] px-6 py-3 rounded-full hover:bg-gray-50 transition-all inline-block"
             >
