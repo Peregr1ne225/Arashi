@@ -37,7 +37,7 @@ const istokWeb = Istok_Web({
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://arashi-sport.com"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://www.clubarashi.com"),
   title: {
     default: "Arashi - Premium Sportwear",
     template: "%s | Arashi"
@@ -55,7 +55,11 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Arashi - Premium Sportwear",
     description: "Your one-stop online sportwear destination. Chase the unseen.",
-    creator: "@arashi",
+    creator: "@Cream",
+  },
+  icons: {
+    icon: "/icon.svg",
+    apple: "/icon.svg",
   },
 };
 
