@@ -230,7 +230,7 @@ export default function CommentSection({ postId, initialComments = [], children 
                                         onChange={(e) => setNewComment(e.target.value)}
                                         placeholder="Add a comment..."
                                         rows={2}
-                                        className="w-full bg-transparent border-none focus:ring-0 focus:outline-none py-0 text-gray-800 placeholder-gray-400 resize-none text-sm leading-relaxed translate-y-[1px]"
+                                        className="w-full bg-transparent border-none focus:ring-0 focus:outline-none py-0 text-gray-800 placeholder-gray-400 resize-none text-sm leading-relaxed translate-y-px"
                                     />
 
                                     {/* Image Preview */}

@@ -10,7 +10,7 @@ interface PostImageProps {
     className?: string;
 }
 
-export default function PostImage({ src, alt, className = "aspect-[4/5]" }: PostImageProps) {
+export default function PostImage({ src, alt, className = "aspect-4/5" }: PostImageProps) {
     const [isOpen, setIsOpen] = useState(false);
 
     return (

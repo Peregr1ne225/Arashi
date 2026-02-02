@@ -84,7 +84,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                                 {post.author_name?.charAt(0) || "?"}
                             </div>
                             <div className="flex flex-col">
-                                <span className="text-base font-bold text-gray-900 font-istok tracking-tight leading-none mb-1 text-[13px] uppercase tracking-widest text-[#33A0E5]">
+                                <span className="font-bold font-istok leading-none mb-1 text-[13px] uppercase tracking-widest text-[#33A0E5]">
                                     {post.author_name || "Anonymous"}
                                 </span>
                                 <span className="text-xs text-gray-400 uppercase tracking-widest font-istok">
