@@ -37,9 +37,26 @@ const istokWeb = Istok_Web({
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Arashi - Sportwear Shopping",
-  description:
-    "Your one-stop online sportwear destination. We offer the latest trends in clothing, shoes, accessories, and more at affordable prices.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://arashi-sport.com"),
+  title: {
+    default: "Arashi - Premium Sportwear",
+    template: "%s | Arashi"
+  },
+  description: "Your one-stop online sportwear destination. We offer the latest trends in clothing, shoes, accessories, and more at affordable prices.",
+  openGraph: {
+    title: "Arashi - Premium Sportwear",
+    description: "Your one-stop online sportwear destination. Chase the unseen.",
+    url: "/",
+    siteName: "Arashi",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Arashi - Premium Sportwear",
+    description: "Your one-stop online sportwear destination. Chase the unseen.",
+    creator: "@arashi",
+  },
 };
 
 export default function RootLayout({

@@ -3,6 +3,9 @@ FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim AS builder
 
 WORKDIR /app
 
+ENV UV_COMPILE_BYTECODE=1
+ENV UV_LINK_MODE=copy
+
 # Copy dependency files
 COPY pyproject.toml uv.lock ./
 
@@ -14,15 +17,6 @@ FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
 WORKDIR /app
 
-# Enable bytecode compilation
-ENV UV_COMPILE_BYTECODE=1
-ENV UV_LINK_MODE=copy
-
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    PATH="/app/.venv/bin:$PATH"
-
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq5 \
@@ -30,28 +24,32 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     dos2unix \
     && rm -rf /var/lib/apt/lists/*
 
-# Create a non-root user
-RUN addgroup --system appgroup && \
-    adduser --system --ingroup appgroup --home /home/appuser appuser
-
 # Copy virtual environment from builder
 COPY --from=builder /app/.venv /app/.venv
+
+# Place binaries in the path
+ENV PATH="/app/.venv/bin:$PATH"
 
 # Copy application code
 COPY . .
 
-# Create directories for static and media with correct permissions
-RUN mkdir -p /app/staticfiles /app/media /app/logs && \
-    chown -R appuser:appgroup /app/staticfiles /app/media /app/logs /app
+# Create a non-root user
+RUN addgroup --system appgroup && adduser --system --ingroup appgroup --home /home/appuser appuser && mkdir -p /home/appuser && chown appuser:appgroup /home/appuser
 
-# Prepare entrypoint script
-RUN dos2unix ./entrypoint.prod.sh && chmod +x ./entrypoint.prod.sh
+# Create directories for static and media with correct permissions
+RUN mkdir -p /app/staticfiles /app/media /app/logs \
+    && chown -R appuser:appgroup /app/staticfiles /app/media /app/logs /app
+
 
 # Switch to non-root user
 USER appuser
-
-# Expose port
-EXPOSE 8000
+ENV HOME=/home/appuser
 
 # Entrypoint
-ENTRYPOINT ["./entrypoint.prod.sh"]
+COPY ./entrypoint.prod.sh /entrypoint.prod.sh
+USER root
+RUN dos2unix /entrypoint.prod.sh && chmod +x /entrypoint.prod.sh
+USER appuser
+
+# Run using uv run to ensure environment is set (though PATH is set, uv run handles signals well)
+ENTRYPOINT ["/entrypoint.prod.sh"]

@@ -43,6 +43,17 @@ export type {
   OrderListResponse,
 } from "./order";
 
+// Blog types
+export type {
+  BlogPost,
+  BlogPostDetail,
+  BlogComment,
+  BlogCommentListResponse,
+  BlogPostListResponse,
+  CreatePostData,
+  CreateCommentData,
+} from "./blog";
+
 // Common types
 export type { ApiResponse } from "./common";
 
