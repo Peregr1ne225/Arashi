@@ -76,8 +76,8 @@ export default function LoginForm({
                             name="username"
                             type="text"
                             required
-                            className="block w-full h-14 pl-16 pr-6 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-[#0e4d80]/20 focus:bg-white text-base font-istok font-bold text-[#0e4d80] focus:outline-none placeholder-gray-300 transition-all uppercase tracking-wide shadow-inner"
-                            placeholder="USERNAME"
+                            className="block w-full h-14 pl-16 pr-6 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-[#0e4d80]/20 focus:bg-white text-base font-istok font-bold text-[#0e4d80] focus:outline-none placeholder-gray-300 transition-all tracking-wide shadow-inner"
+                            placeholder="Username"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                         />
@@ -92,8 +92,8 @@ export default function LoginForm({
                             name="password"
                             type="password"
                             required
-                            className="block w-full h-14 pl-16 pr-6 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-[#0e4d80]/20 focus:bg-white text-base font-istok font-bold text-[#0e4d80] focus:outline-none placeholder-gray-300 transition-all uppercase tracking-wide shadow-inner"
-                            placeholder="PASSWORD"
+                            className="block w-full h-14 pl-16 pr-6 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-[#0e4d80]/20 focus:bg-white text-base font-istok font-bold text-[#0e4d80] focus:outline-none placeholder-gray-300 transition-all tracking-wide shadow-inner"
+                            placeholder="Password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                         />
