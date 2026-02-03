@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 595.28 401.65">
   <!-- Generator: Adobe Illustrator 29.1.0, SVG Export Plug-In . SVG Version: 2.1.0 Build 142)  -->
+  <style>
+    path { fill: black; }
+    @media (prefers-color-scheme: dark) {
+      path { fill: white; }
+    }
+  </style>
   <path d="M117.07,103.05s227.92,44.7,361.13-60.98c0,0-1.18,88.21-193,142.67,0,0,98.67,3.55,153.53-41.05,0,0-36.7,125.51-136.16,118.01,0,0,6.71,56.83,33.15,97.88,0,0-69.86-82.49-89.2-133.01,0,0,54.07,9.47,82.88-14.21,0,0-70.25,9.47-128.66-30,0,0,87.53,5.47,154.71-50.52,0,0-143.27,37.89-238.38-28.81Z"/>
 </svg>
