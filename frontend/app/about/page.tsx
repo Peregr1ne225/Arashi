@@ -3,6 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 function AboutContent() {
     const searchParams = useSearchParams();
@@ -92,16 +93,14 @@ function AboutContent() {
                                     </div>
 
                                     {/* IMAGE PLACEHOLDER 1 */}
-                                    <div className="relative aspect-square bg-gray-100 rounded-3xl overflow-hidden border-2 border-dashed border-gray-300 flex items-center justify-center group">
-                                        <div className="text-center p-6">
-                                            <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-                                                </svg>
-                                            </div>
-                                            <p className="font-koulen text-xl text-gray-400 uppercase">Brand Image Here</p>
-                                            <p className="font-istok text-xs text-gray-400 mt-2">Recommended: Action shot or fabric detail</p>
-                                        </div>
+                                    <div className="relative aspect-square bg-gray-100 rounded-3xl overflow-hidden shadow-lg border border-gray-100 group">
+                                        <Image
+                                            src="/About1.png"
+                                            alt="Arashi Essentials Brand Image"
+                                            fill
+                                            className="object-cover group-hover:scale-105 transition-transform duration-700"
+                                            priority
+                                        />
                                     </div>
                                 </div>
 
@@ -141,13 +140,15 @@ function AboutContent() {
                                         </div>
 
                                         {/* IMAGE PLACEHOLDER 2 */}
-                                        <div className="min-h-[300px] md:min-h-full bg-gray-800/50 border-l border-white/10 flex items-center justify-center relative overflow-hidden">
-                                            <div className="text-center p-8 opacity-50">
-                                                <p className="font-koulen text-2xl text-white uppercase tracking-widest">Lifestyle Image</p>
-                                                <p className="font-istok text-sm text-blue-200 mt-2">Gym or Outdoor setting</p>
-                                            </div>
-                                            {/* Placeholder pattern */}
-                                            <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
+                                        <div className="min-h-[300px] md:min-h-full bg-gray-800/50 border-l border-white/10 flex items-center justify-center relative overflow-hidden group">
+                                            <Image
+                                                src="/About2.png"
+                                                alt="Arashi Lifestyle"
+                                                fill
+                                                className="object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
+                                            />
+                                            {/* Overlay gradient for text readability if needed, though image seems dark enough */}
+                                            <div className="absolute inset-0 bg-linear-to-t from-[#0e4d80]/40 to-transparent"></div>
                                         </div>
                                     </div>
                                 </div>

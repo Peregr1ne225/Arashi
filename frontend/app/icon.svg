@@ -1,16 +1,5 @@
-<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Circular Background (Subtle Cream) -->
-  <circle cx="256" cy="256" r="240" fill="#FDFDFB" stroke="#0e4d80" stroke-width="4"/>
-  
-  <!-- Stylized "A" (Arashi / Storm / Peak) -->
-  <path d="M256 120L380 380H310L256 260L202 380H132L256 120Z" fill="#0e4d80"/>
-  
-  <!-- Accent Peak -->
-  <path d="M256 120L285 180H227L256 120Z" fill="#33A0E5"/>
-  
-  <!-- Dynamic "Storm" Swoosh -->
-  <path d="M190 320C220 300 292 300 322 320" stroke="#33A0E5" stroke-width="16" stroke-linecap="round"/>
-  
-  <!-- Bottom Foundation Line -->
-  <rect x="150" y="395" width="212" height="8" rx="4" fill="#0e4d80" opacity="0.2"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 595.28 401.65">
+  <!-- Generator: Adobe Illustrator 29.1.0, SVG Export Plug-In . SVG Version: 2.1.0 Build 142)  -->
+  <path d="M117.07,103.05s227.92,44.7,361.13-60.98c0,0-1.18,88.21-193,142.67,0,0,98.67,3.55,153.53-41.05,0,0-36.7,125.51-136.16,118.01,0,0,6.71,56.83,33.15,97.88,0,0-69.86-82.49-89.2-133.01,0,0,54.07,9.47,82.88-14.21,0,0-70.25,9.47-128.66-30,0,0,87.53,5.47,154.71-50.52,0,0-143.27,37.89-238.38-28.81Z"/>
 </svg>
