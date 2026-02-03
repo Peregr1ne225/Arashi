@@ -668,172 +668,170 @@ export default function ProductForm({
           </h3>
         </div>
 
+        {/* Add Variant Form */}
+        <div className="bg-gray-50 p-5 rounded-xl border border-gray-200 mb-6">
+          <h5 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2 uppercase tracking-wide">
+            <Plus size={16} /> Add New Variant
+          </h5>
+          <div className="flex flex-wrap gap-4 items-end">
+            <div className="flex-1 min-w-35">
+              <label className="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wide">
+                Color
+              </label>
+              <select
+                value={newVariantColor}
+                onChange={(e) => setNewVariantColor(e.target.value)}
+                className="block w-full rounded-lg border-gray-400 bg-white shadow-sm focus:border-[#0e4d80] focus:ring-[#0e4d80] text-base py-3 px-4 font-medium"
+              >
+                <option value="">Select Color</option>
+                {availableColors.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="min-w-30">
+              <label className="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wide">
+                Size
+              </label>
+              <select
+                value={newVariantSize}
+                onChange={(e) => setNewVariantSize(e.target.value)}
+                className="block w-full rounded-lg border-gray-400 bg-white shadow-sm focus:border-[#0e4d80] focus:ring-[#0e4d80] text-base py-3 px-4 font-medium"
+              >
+                <option value="">Select Size</option>
+                {availableSizes.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="w-24">
+              <label className="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wide">
+                Stock
+              </label>
+              <input
+                type="number"
+                min="0"
+                value={newVariantStock}
+                onChange={(e) => setNewVariantStock(e.target.value)}
+                className="block w-full rounded-lg border-gray-400 bg-white shadow-sm focus:border-[#0e4d80] focus:ring-[#0e4d80] text-sm py-2.5 px-4 font-medium"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={handleAddVariant}
+              disabled={!newVariantColor || !newVariantSize}
+              className="bg-linear-to-b from-[#0e4d80] to-[#D2042D] text-white px-6 py-2.5 rounded-lg text-sm font-bold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity shadow-md uppercase tracking-wide"
+            >
+              Add Variant
+            </button>
+          </div>
+        </div>
+
         {/* Variants Table */}
-        <div className="p-6">
-          <div className="border border-gray-200 rounded-xl overflow-hidden shadow-sm mb-6">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+        <div className="border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                  Color
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                  Size
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                  Stock
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {variants.length === 0 ? (
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    Color
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    Size
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    Stock
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    Actions
-                  </th>
+                  <td
+                    colSpan={5}
+                    className="px-6 py-12 text-center text-gray-400 text-sm font-medium"
+                  >
+                    No variants added yet. Use the form above to create one.
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {variants.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={5}
-                      className="px-6 py-12 text-center text-gray-400 text-sm font-medium"
-                    >
-                      No variants added yet. Use the form below to create one.
+              ) : (
+                variants.map((v, idx) => (
+                  <tr
+                    key={idx}
+                    className="group hover:bg-gray-50 transition-colors"
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-6 h-6 rounded-full border border-gray-300 shadow-sm ring-1 ring-black ring-opacity-10"
+                          style={{ backgroundColor: v.color_code }}
+                        ></div>
+                        <span className="text-sm font-bold text-gray-900">
+                          {v.color_name}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-800 border border-gray-200 uppercase">
+                        {v.size_name}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <input
+                        type="number"
+                        min="0"
+                        value={v.stock}
+                        onChange={(e) =>
+                          handleVariantChange(
+                            idx,
+                            "stock",
+                            parseInt(e.target.value) || 0,
+                          )
+                        }
+                        className="w-24 rounded-lg border-gray-300 shadow-sm focus:border-[#0e4d80] focus:ring-[#0e4d80] text-sm py-1.5 font-medium"
+                      />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleVariantChange(idx, "is_active", !v.is_active)
+                        }
+                        className={`px-3 py-1 text-xs font-bold rounded-full border flex items-center gap-1 w-fit transition-colors uppercase tracking-wide ${
+                          v.is_active
+                            ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+                            : "bg-red-50 text-red-700 border-red-200 hover:bg-red-100"
+                        }`}
+                      >
+                        <span
+                          className={`w-1.5 h-1.5 rounded-full ${v.is_active ? "bg-green-500" : "bg-red-500"}`}
+                        ></span>
+                        {v.is_active ? "Active" : "Archived"}
+                      </button>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveVariant(idx)}
+                        className="text-gray-400 hover:text-red-600 transition-colors p-1 rounded hover:bg-red-50"
+                      >
+                        <Trash2 size={18} />
+                      </button>
                     </td>
                   </tr>
-                ) : (
-                  variants.map((v, idx) => (
-                    <tr
-                      key={idx}
-                      className="group hover:bg-gray-50 transition-colors"
-                    >
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-3">
-                          <div
-                            className="w-6 h-6 rounded-full border border-gray-300 shadow-sm ring-1 ring-black ring-opacity-10"
-                            style={{ backgroundColor: v.color_code }}
-                          ></div>
-                          <span className="text-sm font-bold text-gray-900">
-                            {v.color_name}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-800 border border-gray-200 uppercase">
-                          {v.size_name}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <input
-                          type="number"
-                          min="0"
-                          value={v.stock}
-                          onChange={(e) =>
-                            handleVariantChange(
-                              idx,
-                              "stock",
-                              parseInt(e.target.value) || 0,
-                            )
-                          }
-                          className="w-24 rounded-lg border-gray-300 shadow-sm focus:border-[#0e4d80] focus:ring-[#0e4d80] text-sm py-1.5 font-medium"
-                        />
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleVariantChange(idx, "is_active", !v.is_active)
-                          }
-                          className={`px-3 py-1 text-xs font-bold rounded-full border flex items-center gap-1 w-fit transition-colors uppercase tracking-wide ${
-                            v.is_active
-                              ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
-                              : "bg-red-50 text-red-700 border-red-200 hover:bg-red-100"
-                          }`}
-                        >
-                          <span
-                            className={`w-1.5 h-1.5 rounded-full ${v.is_active ? "bg-green-500" : "bg-red-500"}`}
-                          ></span>
-                          {v.is_active ? "Active" : "Archived"}
-                        </button>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveVariant(idx)}
-                          className="text-gray-400 hover:text-red-600 transition-colors p-1 rounded hover:bg-red-50"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Add Variant Form */}
-          <div className="bg-gray-50 p-5 rounded-xl border border-gray-200">
-            <h5 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2 uppercase tracking-wide">
-              <Plus size={16} /> Add New Variant
-            </h5>
-            <div className="flex flex-wrap gap-4 items-end">
-              <div className="flex-1 min-w-35">
-                <label className="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wide">
-                  Color
-                </label>
-                <select
-                  value={newVariantColor}
-                  onChange={(e) => setNewVariantColor(e.target.value)}
-                  className="block w-full rounded-lg border-gray-400 bg-white shadow-sm focus:border-[#0e4d80] focus:ring-[#0e4d80] text-base py-3 px-4 font-medium"
-                >
-                  <option value="">Select Color</option>
-                  {availableColors.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="min-w-30">
-                <label className="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wide">
-                  Size
-                </label>
-                <select
-                  value={newVariantSize}
-                  onChange={(e) => setNewVariantSize(e.target.value)}
-                  className="block w-full rounded-lg border-gray-400 bg-white shadow-sm focus:border-[#0e4d80] focus:ring-[#0e4d80] text-base py-3 px-4 font-medium"
-                >
-                  <option value="">Select Size</option>
-                  {availableSizes.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="w-24">
-                <label className="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wide">
-                  Stock
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  value={newVariantStock}
-                  onChange={(e) => setNewVariantStock(e.target.value)}
-                  className="block w-full rounded-lg border-gray-400 bg-white shadow-sm focus:border-[#0e4d80] focus:ring-[#0e4d80] text-sm py-2.5 px-4 font-medium"
-                />
-              </div>
-              <button
-                type="button"
-                onClick={handleAddVariant}
-                disabled={!newVariantColor || !newVariantSize}
-                className="bg-linear-to-b from-[#0e4d80] to-[#D2042D] text-white px-6 py-2.5 rounded-lg text-sm font-bold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity shadow-md uppercase tracking-wide"
-              >
-                Add Variant
-              </button>
-            </div>
-          </div>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
 
