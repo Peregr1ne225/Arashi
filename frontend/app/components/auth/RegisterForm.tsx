@@ -327,8 +327,8 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
               name="username"
               type="text"
               required
-              className="block w-full h-14 pl-16 pr-6 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-[#0e4d80]/20 focus:bg-white text-base font-istok font-bold text-[#0e4d80] focus:outline-none placeholder-gray-300 transition-all uppercase tracking-wide shadow-inner"
-              placeholder="USERNAME"
+              className="block w-full h-14 pl-16 pr-6 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-[#0e4d80]/20 focus:bg-white text-base font-istok font-bold text-[#0e4d80] focus:outline-none placeholder-gray-300 transition-all tracking-wide shadow-inner"
+              placeholder="Username"
               value={formData.username}
               onChange={(e) => handleFieldChange("username", e.target.value)}
               onBlur={() => handleFieldBlur("username")}
@@ -350,8 +350,8 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
               name="email"
               type="email"
               required
-              className="block w-full h-14 pl-16 pr-6 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-[#0e4d80]/20 focus:bg-white text-base font-istok font-bold text-[#0e4d80] focus:outline-none placeholder-gray-300 transition-all uppercase tracking-wide shadow-inner"
-              placeholder="EMAIL ADDRESS"
+              className="block w-full h-14 pl-16 pr-6 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-[#0e4d80]/20 focus:bg-white text-base font-istok font-bold text-[#0e4d80] focus:outline-none placeholder-gray-300 transition-all tracking-wide shadow-inner"
+              placeholder="Email Address"
               value={formData.email}
               onChange={(e) => handleFieldChange("email", e.target.value)}
               onBlur={() => handleFieldBlur("email")}
@@ -374,8 +374,8 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
                 name="firstName"
                 type="text"
                 required
-                className="block w-full h-14 pl-14 pr-4 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-[#0e4d80]/20 focus:bg-white text-base font-istok font-bold text-[#0e4d80] focus:outline-none placeholder-gray-300 transition-all uppercase tracking-wide shadow-inner"
-                placeholder="NAME"
+                className="block w-full h-14 pl-14 pr-4 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-[#0e4d80]/20 focus:bg-white text-base font-istok font-bold text-[#0e4d80] focus:outline-none placeholder-gray-300 transition-all tracking-wide shadow-inner"
+                placeholder="Name"
                 value={formData.firstName}
                 onChange={(e) => handleFieldChange("firstName", e.target.value)}
                 onBlur={() => handleFieldBlur("firstName")}
@@ -395,8 +395,8 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
                 name="lastName"
                 type="text"
                 required
-                className="block w-full h-14 pl-14 pr-4 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-[#0e4d80]/20 focus:bg-white text-base font-istok font-bold text-[#0e4d80] focus:outline-none placeholder-gray-300 transition-all uppercase tracking-wide shadow-inner"
-                placeholder="NAME"
+                className="block w-full h-14 pl-14 pr-4 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-[#0e4d80]/20 focus:bg-white text-base font-istok font-bold text-[#0e4d80] focus:outline-none placeholder-gray-300 transition-all tracking-wide shadow-inner"
+                placeholder="Last Name"
                 value={formData.lastName}
                 onChange={(e) => handleFieldChange("lastName", e.target.value)}
                 onBlur={() => handleFieldBlur("lastName")}
@@ -420,8 +420,8 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
                 name="password"
                 type={showPassword ? "text" : "password"}
                 required
-                className="block w-full h-14 pl-16 pr-12 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-[#0e4d80]/20 focus:bg-white text-base font-istok font-bold text-[#0e4d80] focus:outline-none placeholder-gray-300 transition-all uppercase tracking-wide shadow-inner"
-                placeholder="PASSWORD"
+                className="block w-full h-14 pl-16 pr-12 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-[#0e4d80]/20 focus:bg-white text-base font-istok font-bold text-[#0e4d80] focus:outline-none placeholder-gray-300 transition-all tracking-wide shadow-inner"
+                placeholder="Password"
                 value={formData.password}
                 onChange={(e) => handleFieldChange("password", e.target.value)}
                 onBlur={() => handleFieldBlur("password")}
@@ -468,8 +468,8 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
                 name="confirmPassword"
                 type={showConfirmPassword ? "text" : "password"}
                 required
-                className="block w-full h-14 pl-24 pr-12 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-[#0e4d80]/20 focus:bg-white text-base font-istok font-bold text-[#0e4d80] focus:outline-none placeholder-gray-300 transition-all uppercase tracking-wide shadow-inner"
-                placeholder="PASSWORD"
+                className="block w-full h-14 pl-24 pr-12 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-[#0e4d80]/20 focus:bg-white text-base font-istok font-bold text-[#0e4d80] focus:outline-none placeholder-gray-300 transition-all tracking-wide shadow-inner"
+                placeholder="Confirm Password"
                 value={formData.confirmPassword}
                 onChange={(e) =>
                   handleFieldChange("confirmPassword", e.target.value)
