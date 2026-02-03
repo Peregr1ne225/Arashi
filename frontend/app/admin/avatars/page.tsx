@@ -212,15 +212,15 @@ export default function AdminAvatarsPage() {
                                     <h3 className="text-xl font-bold font-koulen">{avatar.name}</h3>
                                     <p className="text-sm text-neutral-500 font-istok mt-1">{avatar.assets.length} assets</p>
                                 </div>
-                                <div className="w-10 h-10 bg-neutral-100 rounded-full flex items-center justify-center">
+                                <div className="w-10 h-10 bg-neutral-100 rounded-full flex items-center justify-center transition-opacity duration-200 group-hover:opacity-0">
                                     <Package size={20} />
                                 </div>
                             </div>
                             <button
                                 onClick={(e) => { e.stopPropagation(); promptDeleteAvatar(avatar); }}
-                                className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 p-2 text-red-500 hover:bg-red-50 rounded-full transition-all"
+                                className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 w-10 h-10 flex items-center justify-center text-red-500 hover:bg-red-50 rounded-full transition-all"
                             >
-                                <Trash2 size={16} />
+                                <Trash2 size={20} />
                             </button>
                         </div>
                     ))}
