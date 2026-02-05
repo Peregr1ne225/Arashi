@@ -61,16 +61,16 @@ export default function UserDropdown() {
                             <>
                                 <div className="px-8 py-2 border-b border-gray-50 mb-4 pb-4">
                                     <div className="flex items-center gap-3 mb-2">
-                                        <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-[#0e4d80] font-bold font-istok text-xs">
+                                        <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-[#0e4d80] font-bold font-body text-xs">
                                             {(user?.username || "A").substring(0, 1).toUpperCase()}
                                         </div>
                                         <div className="overflow-hidden">
-                                            <p className="text-sm font-bold text-[#0e4d80] font-istok uppercase tracking-widest truncate">
+                                            <p className="text-sm font-bold text-[#0e4d80] font-body uppercase tracking-widest truncate">
                                                 {user?.username || "Account"}
                                             </p>
                                         </div>
                                     </div>
-                                    <p className="text-[10px] font-medium text-gray-400 font-istok uppercase tracking-wider truncate pl-11">
+                                    <p className="text-[10px] font-medium text-gray-400 font-body uppercase tracking-wider truncate pl-11">
                                         {user?.email}
                                     </p>
                                 </div>
@@ -82,7 +82,7 @@ export default function UserDropdown() {
                                                 <Link
                                                     key={item.href}
                                                     href={item.href}
-                                                    className="group flex items-center px-4 py-3 text-[11px] font-bold text-gray-500 font-istok uppercase tracking-[0.2em] hover:text-[#0e4d80] hover:bg-gray-50 rounded-xl transition-all"
+                                                    className="group flex items-center px-4 py-3 text-[11px] font-bold text-gray-500 font-body uppercase tracking-[0.2em] hover:text-[#0e4d80] hover:bg-gray-50 rounded-xl transition-all"
                                                     onClick={() => setIsOpen(false)}
                                                 >
                                                     <div className="w-1.5 h-1.5 bg-[#0e4d80] rounded-full opacity-0 -ml-3 group-hover:opacity-100 group-hover:ml-0 transition-all mr-3" />
@@ -95,7 +95,7 @@ export default function UserDropdown() {
                                 <div className="pt-4 mt-4 px-8 border-t border-gray-50">
                                     <button
                                         onClick={handleLogout}
-                                        className="text-[10px] font-bold text-red-400 font-istok uppercase tracking-[0.2em] hover:text-red-600 transition-colors w-full text-left py-2 hover:bg-red-50 rounded-lg px-2 -mx-2"
+                                        className="text-[10px] font-bold text-red-400 font-body uppercase tracking-[0.2em] hover:text-red-600 transition-colors w-full text-left py-2 hover:bg-red-50 rounded-lg px-2 -mx-2"
                                     >
                                         Sign out
                                     </button>
@@ -110,8 +110,8 @@ export default function UserDropdown() {
                                             <circle cx="12" cy="7" r="4"></circle>
                                         </svg>
                                     </div>
-                                    <p className="text-[10px] text-gray-400 font-istok font-bold uppercase tracking-widest">Member Access</p>
-                                    <h4 className="text-4xl text-[#0e4d80] font-mrs-sheppards leading-none mt-1">Arashi</h4>
+                                    <p className="text-[10px] text-gray-400 font-body font-bold uppercase tracking-widest">Member Access</p>
+                                    <h4 className="text-4xl text-[#0e4d80] font-display uppercase leading-none mt-1">Arashi</h4>
                                 </div>
 
                                 <button
@@ -119,7 +119,7 @@ export default function UserDropdown() {
                                         setIsOpen(false);
                                         setIsLoginModalOpen(true);
                                     }}
-                                    className="w-full py-4 bg-[#0e4d80] text-white rounded-full text-[11px] font-bold font-istok uppercase tracking-[0.2em] hover:bg-[#0b3d66] hover:shadow-lg hover:shadow-blue-900/20 transition-all transform hover:-translate-y-0.5"
+                                    className="w-full py-4 bg-[#0e4d80] text-white rounded-full text-[11px] font-bold font-body uppercase tracking-[0.2em] hover:bg-[#0b3d66] hover:shadow-lg hover:shadow-blue-900/20 transition-all transform hover:-translate-y-0.5"
                                 >
                                     Login / Sign Up
                                 </button>
@@ -127,7 +127,7 @@ export default function UserDropdown() {
                                 <div className="text-center pt-2">
                                     <Link
                                         href="/register"
-                                        className="text-[11px] text-gray-500 font-istok font-light uppercase tracking-[0.2em] border-b border-transparent hover:border-gray-200 transition-all"
+                                        className="text-[11px] text-gray-500 font-body font-light uppercase tracking-[0.2em] border-b border-transparent hover:border-gray-200 transition-all"
                                         onClick={() => setIsOpen(false)}
                                     >
                                         Create an account

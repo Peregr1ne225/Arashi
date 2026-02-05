@@ -26,15 +26,15 @@ export default function HeaderNavigation({
           <li>
             <Link
               href="/new"
-              className="font-istok text-[12px] uppercase tracking-[0.2em] font-bold text-gray-500 hover:text-[#0e4d80] px-6 py-3 rounded-full hover:bg-gray-50 transition-all inline-block"
+              className="font-body text-[12px] uppercase tracking-[0.2em] font-bold text-foreground/70 hover:text-[#0e4d80] px-6 py-3 rounded-full hover:bg-gray-50 transition-all inline-block"
             >
-              New Arrivals
+              New
             </Link>
           </li>
           <li>
             <Link
               href="/blogs"
-              className="font-istok text-[12px] uppercase tracking-[0.2em] font-bold text-gray-500 hover:text-[#0e4d80] px-6 py-3 rounded-full hover:bg-gray-50 transition-all inline-block"
+              className="font-body text-[12px] uppercase tracking-[0.2em] font-bold text-foreground/70 hover:text-[#0e4d80] px-6 py-3 rounded-full hover:bg-gray-50 transition-all inline-block"
             >
               Community
             </Link>
@@ -42,7 +42,7 @@ export default function HeaderNavigation({
           <li>
             <Link
               href="/model"
-              className="font-istok text-[12px] uppercase tracking-[0.2em] font-bold text-gray-500 hover:text-[#0e4d80] px-6 py-3 rounded-full hover:bg-gray-50 transition-all inline-block"
+              className="font-body text-[12px] uppercase tracking-[0.2em] font-bold text-foreground/70 hover:text-[#0e4d80] px-6 py-3 rounded-full hover:bg-gray-50 transition-all inline-block"
             >
               Model
             </Link>

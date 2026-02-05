@@ -124,7 +124,7 @@ export default function CategoryDropdown({
             className="flex-1 py-4 px-4 flex items-center gap-3"
             style={{ paddingLeft: `${depth * 1 + 1}rem` }}
           >
-            <span className="text-sm font-bold text-gray-800 font-istok uppercase tracking-wider group-hover:text-white transition-colors">
+            <span className="text-sm font-bold text-gray-800 font-body uppercase tracking-wider group-hover:text-white transition-colors">
               {category.name}
             </span>
           </Link>
@@ -181,7 +181,7 @@ export default function CategoryDropdown({
       >
         <button
           ref={buttonRef}
-          className="font-istok text-[12px] uppercase tracking-[0.2em] font-bold text-gray-500 hover:text-[#0e4d80] px-6 py-3 rounded-full hover:bg-gray-50 transition-all inline-block"
+          className="font-body text-[12px] uppercase tracking-[0.2em] font-bold text-gray-500 hover:text-[#0e4d80] px-6 py-3 rounded-full hover:bg-gray-50 transition-all inline-block"
           onMouseEnter={handleButtonMouseEnter}
         >
           <span>{buttonLabel}</span>
@@ -242,12 +242,12 @@ export default function CategoryDropdown({
                                   className="object-cover"
                                 />
                               ) : (
-                                <div className="w-full h-full flex items-center justify-center text-[10px] font-bold uppercase font-istok">
+                                <div className="w-full h-full flex items-center justify-center text-[10px] font-bold uppercase font-body">
                                   {cat.name.substring(0, 2)}
                                 </div>
                               )}
                             </div>
-                            <span className={`text-[11px] font-istok uppercase tracking-[0.2em] transition-colors font-bold
+                            <span className={`text-[11px] font-body uppercase tracking-[0.2em] transition-colors font-bold
                                 ${isActive ? "text-[#0e4d80]" : "text-gray-500 group-hover:text-[#0e4d80]"}
                             `}>
                               {cat.name}
@@ -264,7 +264,7 @@ export default function CategoryDropdown({
                   </div>
                 ))
               ) : (
-                <div className="p-12 text-gray-300 w-48 text-center font-istok font-light uppercase tracking-wider text-xs">
+                <div className="p-12 text-gray-300 w-48 text-center font-body font-light uppercase tracking-wider text-xs">
                   No items
                 </div>
               )}
@@ -286,18 +286,18 @@ export default function CategoryDropdown({
                   {/* Content Overlay */}
                   <div className="absolute inset-0 flex flex-col justify-end p-12">
                     <div className="overflow-hidden mb-4">
-                      <span className="inline-block px-4 py-1.5 bg-white/90 backdrop-blur-md text-black text-[10px] font-istok font-bold uppercase tracking-[0.3em] rounded-full translate-y-8 group-hover:translate-y-0 transition-transform duration-500">
+                      <span className="inline-block px-4 py-1.5 bg-white/90 backdrop-blur-md text-black text-[10px] font-body font-bold uppercase tracking-[0.3em] rounded-full translate-y-8 group-hover:translate-y-0 transition-transform duration-500">
                         Collection
                       </span>
                     </div>
-                    <h2 className="text-5xl font-normal text-white font-istok uppercase tracking-tighter mb-6 max-w-lg drop-shadow-lg">
+                    <h2 className="text-5xl font-normal text-white font-body uppercase tracking-tighter mb-6 max-w-lg drop-shadow-lg">
                       {featuredCategory.name}
                     </h2>
                     <Link
                       href={`/category/${featuredCategory.slug}`}
                       className="group/btn px-8 py-3 bg-white text-black rounded-full w-fit hover:bg-black hover:text-white transition-all duration-300"
                     >
-                      <span className="font-istok font-normal uppercase tracking-[0.2em] text-[11px]">
+                      <span className="font-body font-normal uppercase tracking-[0.2em] text-[11px]">
                         Explore
                       </span>
                     </Link>

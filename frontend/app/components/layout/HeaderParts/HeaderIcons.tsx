@@ -37,8 +37,8 @@ export default function HeaderIcons() {
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="SEARCH..."
-              className="bg-transparent border-none outline-none text-[#0e4d80] font-istok font-bold text-xs w-32 md:w-48 placeholder:text-gray-400"
+              placeholder="Search..."
+              className="bg-transparent border-none outline-none text-(--pastel-blue-dark) font-body font-bold text-sm w-40 md:w-64 placeholder:text-gray-400"
             />
             <button type="button" onClick={() => setIsSearchOpen(false)} className="ml-2 text-gray-400 hover:text-red-400">
               <X className="w-4 h-4" />
