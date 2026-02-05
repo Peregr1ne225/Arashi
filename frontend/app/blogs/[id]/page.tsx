@@ -15,12 +15,12 @@ export async function generateMetadata({ params }: BlogPostPageProps) {
     try {
         const post = await blogsApi.getPost(id);
         return {
-            title: `${post.title} - KawJaw Blog`,
+            title: `${post.title} - Arashi Blog`,
             description: post.content.substring(0, 160),
         };
     } catch {
         return {
-            title: "Post Not Found - KawJaw Blog",
+            title: "Post Not Found - Arashi Blog",
         };
     }
 }

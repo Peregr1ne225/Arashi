@@ -4,7 +4,7 @@ import { blogsApi } from "@/app/lib/api/blogs";
 import { BlogPost } from "@/app/types/blog";
 
 export const metadata = {
-    title: "Community Blog - KawJaw",
+    title: "Community Blog - Arashi",
     description: "Read the latest posts from our community",
 };
 

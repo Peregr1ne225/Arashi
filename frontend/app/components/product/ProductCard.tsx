@@ -68,7 +68,7 @@ const ProductCard = memo<ProductCardProps>(({ product }) => {
           previewImage={previewImage}
         />
 
-        {/* Product Options overlaid or below? KawJaw design usually clean. 
+        {/* Product Options overlaid or below? Arashi design usually clean. 
             Options often slide up or appear. Keeping structure but passing control to parts. */}
         <div className="absolute inset-x-0 bottom-0 z-20">
           <ProductOptions

@@ -1,11 +1,3 @@
-/**
- * TypeScript Types for Header and Footer Components
- * Based on KawJaw Figma Design
- */
-
-/**
- * Navigation item structure for header and other navigation components
- */
 export interface NavigationItem {
     label: string;
     href: string;

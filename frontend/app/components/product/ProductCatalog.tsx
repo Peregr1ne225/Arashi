@@ -267,7 +267,7 @@ function ProductCatalogContent({
             }
         >
             <div className="flex flex-col lg:flex-row lg:gap-12">
-                {/* Mobile Filter Button - Styled for KawJaw */}
+                {/* Mobile Filter Button - Styled for Arashi */}
                 <div className="lg:hidden mb-6">
                     <button
                         onClick={() => setIsMobileFiltersOpen(true)}
