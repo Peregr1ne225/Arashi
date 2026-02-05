@@ -21,10 +21,10 @@ export default function ProductSearch() {
                     type="text"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Search"
-                    className="w-full bg-[#E5E5E5] text-sm text-black placeholder-gray-500 py-3 pl-10 pr-6 focus:outline-none font-istok rounded-none transition-colors text-right tracking-wide"
+                    placeholder="Search Products..."
+                    className="w-full bg-white text-sm text-black placeholder-gray-400 py-3 pl-12 pr-6 border border-gray-100 rounded-full shadow-sm focus:border-[#0e4d80] focus:ring-4 focus:ring-[#0e4d80]/5 focus:outline-none font-body transition-all tracking-wide"
                 />
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-black">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#0e4d80]">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="18"
@@ -32,7 +32,7 @@ export default function ProductSearch() {
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        strokeWidth="1.5"
+                        strokeWidth="2"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                     >
