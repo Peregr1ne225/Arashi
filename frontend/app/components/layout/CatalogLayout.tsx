@@ -36,25 +36,20 @@ export default function CatalogLayout({
                         </div>
                     )}
 
-                    {/* Page Header - Left Aligned */}
+                    {/* Page Header */}
                     {(title || headerContent) && (
-                        <div className="mb-8">
-                            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4">
-                                <div>
-                                    {title && (
-                                        <h1 className="font-istok text-[32px] md:text-[42px] font-bold leading-tight text-black uppercase tracking-wide">
-                                            {title}
-                                        </h1>
-                                    )}
-                                </div>
+                        <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-gray-100">
+                            <div>
+                                {title && (
+                                    <h1 className="font-istok text-[32px] md:text-[42px] font-bold leading-tight text-black uppercase tracking-wide">
+                                        {title}
+                                    </h1>
+                                )}
                             </div>
 
-                            {/* Search Bar / Header Content Row */}
                             {headerContent && (
-                                <div className="flex flex-col md:flex-row md:items-center justify-start gap-4 mt-4">
-                                    <div className="w-full md:w-auto">
-                                        {headerContent}
-                                    </div>
+                                <div className="w-full md:w-auto md:min-w-[300px]">
+                                    {headerContent}
                                 </div>
                             )}
                         </div>

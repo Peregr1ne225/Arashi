@@ -2,6 +2,7 @@ import ProductCatalog from "@/app/components/product/ProductCatalog";
 import { productsApi } from "@/app/lib/api/client";
 import CatalogDataLoader from "@/app/components/utils/CatalogDataLoader";
 import Link from "next/link";
+import ProductSearch from "@/app/components/product/ProductSearch";
 
 export const dynamic = "force-dynamic";
 
@@ -31,6 +32,7 @@ export default function SalePage() {
           fetchParams={{ is_sale: true, ordering: "-created_at" }}
           title="Sale"
           breadcrumb={breadcrumb}
+          headerContent={<ProductSearch />}
         />
       )}
     </CatalogDataLoader>

@@ -2,6 +2,7 @@ import { productsApi } from "@/app/lib/api/client";
 import ProductCatalog from "@/app/components/product/ProductCatalog";
 import Link from "next/link";
 import CatalogDataLoader from "@/app/components/utils/CatalogDataLoader";
+import ProductSearch from "@/app/components/product/ProductSearch";
 
 // Server Component - No "use client" directive for better performance
 interface SearchPageProps {
@@ -14,11 +15,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
   // Breadcrumb
   const breadcrumb = (
-    <>
-      <Link href="/" className="hover:text-gray-900">Home</Link>
+    <div className="font-istok font-bold text-[12px] tracking-[1px] text-black/60 uppercase">
+      <Link href="/" className="hover:text-black transition-colors">Home</Link>
       <span className="mx-2">/</span>
-      <span className="text-gray-900">Search</span>
-    </>
+      <span className="text-black">Search</span>
+    </div>
   );
 
   const productPromise = productsApi.getProducts({
@@ -38,6 +39,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           fetchParams={{ q: query }}
           title={query ? `Results for "${query}"` : "Search Products"}
           breadcrumb={breadcrumb}
+          headerContent={<ProductSearch />}
         />
       )}
     </CatalogDataLoader>
