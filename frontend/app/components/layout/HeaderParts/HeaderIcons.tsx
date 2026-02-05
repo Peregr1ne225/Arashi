@@ -29,7 +29,7 @@ export default function HeaderIcons() {
   return (
     <div className="flex items-center space-x-2 shrink-0">
       {/* Search Section */}
-      <div className={`flex items-center transition-all duration-300 ${isSearchOpen ? "bg-gray-50 rounded-full px-4 py-1" : ""}`}>
+      <div className={`flex items-center transition-all duration-300 ${isSearchOpen ? "bg-white/10 rounded-full px-4 py-1" : ""}`}>
         {isSearchOpen && (
           <form onSubmit={handleSearch} className="flex items-center">
             <input
@@ -38,9 +38,9 @@ export default function HeaderIcons() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search..."
-              className="bg-transparent border-none outline-none text-(--pastel-blue-dark) font-body font-bold text-sm w-40 md:w-64 placeholder:text-gray-400"
+              className="bg-transparent border-none outline-none text-white font-body font-bold text-sm w-40 md:w-64 placeholder:text-white/50"
             />
-            <button type="button" onClick={() => setIsSearchOpen(false)} className="ml-2 text-gray-400 hover:text-red-400">
+            <button type="button" onClick={() => setIsSearchOpen(false)} className="ml-2 text-white/60 hover:text-white">
               <X className="w-4 h-4" />
             </button>
           </form>
@@ -49,7 +49,7 @@ export default function HeaderIcons() {
         {!isSearchOpen && (
           <button
             onClick={() => setIsSearchOpen(true)}
-            className="p-3 text-gray-400 hover:text-[#0e4d80] hover:bg-gray-50 rounded-full transition-all group"
+            className="p-3 text-white/90 hover:text-white hover:bg-white/10 rounded-full transition-all group"
           >
             <Search className="w-5 h-5 group-hover:scale-110 transition-transform" />
           </button>
@@ -59,7 +59,7 @@ export default function HeaderIcons() {
       {/* Cart Icon */}
       <button
         onClick={openCart}
-        className="relative p-3 text-gray-400 hover:text-[#0e4d80] hover:bg-gray-50 rounded-full transition-all group"
+        className="relative p-3 text-white/90 hover:text-white hover:bg-white/10 rounded-full transition-all group"
       >
         <ShoppingCart className="w-5 h-5 group-hover:scale-110 transition-transform" />
 

@@ -15,18 +15,18 @@ export default function HeaderClient({ categories }: HeaderClientProps) {
   const [mobileCategoryMenuOpen, setMobileCategoryMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 h-(--header-height) bg-white border-b border-gray-100">
+    <header className="sticky top-0 z-50 h-(--header-height) bg-[#0e4d80] border-b border-white/10">
       <div className="h-full flex items-center relative px-[40px]">
         {/* Left: Navigation & Mobile Menu Button */}
         <div className="z-10 flex items-center">
           <div className="lg:hidden mr-4">
             <button
               onClick={() => setMobileCategoryMenuOpen(true)}
-              className="text-gray-600 hover:text-[#0e4d80] transition-colors p-2 rounded-full hover:bg-gray-50"
+              className="text-white hover:text-white/80 transition-colors p-2 rounded-full hover:bg-white/10"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-gray-600"
+                className="h-6 w-6 text-white"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"

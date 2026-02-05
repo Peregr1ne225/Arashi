@@ -181,7 +181,7 @@ export default function CategoryDropdown({
       >
         <button
           ref={buttonRef}
-          className="font-body text-[12px] uppercase tracking-[0.2em] font-bold text-gray-500 hover:text-[#0e4d80] px-6 py-3 rounded-full hover:bg-gray-50 transition-all inline-block"
+          className="font-body text-[12px] uppercase tracking-[0.2em] font-bold text-white/90 hover:text-white px-6 py-3 rounded-full hover:bg-white/10 transition-all inline-block"
           onMouseEnter={handleButtonMouseEnter}
         >
           <span>{buttonLabel}</span>

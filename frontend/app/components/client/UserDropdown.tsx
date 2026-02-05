@@ -47,7 +47,7 @@ export default function UserDropdown() {
             >
                 <button
                     onClick={() => setIsOpen(!isOpen)}
-                    className="p-3 text-gray-400 hover:text-[#0e4d80] hover:bg-gray-50 rounded-full transition-all focus:outline-none"
+                    className="p-3 text-white/90 hover:text-white hover:bg-white/10 rounded-full transition-all focus:outline-none"
                 >
                     <svg width="24" height="24" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M12.6667 14V12.6667C12.6667 11.9594 12.3858 11.2811 11.8857 10.781C11.3856 10.281 10.7073 10 10 10H6C5.29276 10 4.61448 10.281 4.11438 10.781C3.61429 11.2811 3.33333 11.9594 3.33333 12.6667V14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />

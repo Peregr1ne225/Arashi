@@ -4,9 +4,9 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-(--pastel-blue-dark) text-white pt-24 pb-12 overflow-hidden relative">
+    <footer className="bg-(--pastel-blue-dark) text-white pt-4 pb-4 overflow-hidden relative">
       <div className="container mx-auto px-10 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 lg:gap-8 pb-16 border-b border-white/10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 lg:gap-8 pb-4 border-b border-white/10">
 
           {/* Column 1: Social Media */}
           <div className="space-y-8">
