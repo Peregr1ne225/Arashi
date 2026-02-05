@@ -212,7 +212,7 @@ export default function SidebarFilters({
   const renderCategories = (
     categories: Category[],
     level = 0,
-    parentPath = "",
+    parentPath = ""
   ) => {
     return categories.map((category) => {
       const hasChildren = category.children && category.children.length > 0;
@@ -221,17 +221,19 @@ export default function SidebarFilters({
         ? `${parentPath}/${category.slug}`
         : category.slug;
 
+      const isSelected = filters.category === currentPath;
+
       return (
-        <div key={category.id}>
+        <div key={category.id} className="mb-2">
           <div
-            className={`flex items-center group py-1 transition-all`}
-            style={{ marginLeft: `${level * 16}px` }}
+            className="flex items-center group"
+            style={{ marginLeft: `${level * 12}px` }}
           >
             {/* Toggle Button for Parents */}
             {hasChildren ? (
               <button
                 onClick={(e) => toggleCategory(category.id, e)}
-                className="p-1 mr-1 hover:bg-black/5 rounded text-gray-500 hover:text-black"
+                className="p-2 mr-1 hover:bg-black/5 rounded-full text-gray-400 hover:text-black transition-colors"
               >
                 <svg
                   className={`w-3 h-3 transition-transform ${isExpanded ? "rotate-90" : ""}`}
@@ -248,35 +250,37 @@ export default function SidebarFilters({
                 </svg>
               </button>
             ) : (
-              <span className="w-5 mr-1"></span> // Spacer
+              // Space holder if no children, unless it's top level then maybe no space needed?
+              // Actually let's keep alignment consistent if we are deep
+              level > 0 ? <span className="w-6 mr-1"></span> : null
             )}
 
-            <label className="flex-1 flex items-center cursor-pointer">
-              <div
-                className={`w-4 h-4 mr-3 border rounded-none flex items-center justify-center transition-colors ${filters.category === currentPath ? "border-black bg-black" : "border-gray-300 group-hover:border-black"}`}
-              >
-                {filters.category === currentPath && (
-                  <div className="w-2 h-2 bg-white" />
-                )}
-              </div>
+            <label className={`
+                flex-1 flex items-center justify-between cursor-pointer px-4 py-2 rounded-full border transition-all duration-200
+                ${isSelected
+                ? "bg-[#0e4d80] border-[#0e4d80] text-white shadow-md transform scale-[1.02]"
+                : "bg-white border-transparent hover:border-gray-200 hover:bg-gray-50 text-black"}
+            `}>
               <input
                 type="radio"
                 name="category"
-                checked={filters.category === currentPath}
+                checked={isSelected}
                 onChange={() => handleFilterChange({ category: currentPath })}
                 className="hidden"
               />
-              <span
-                className={`text-sm font-istok font-bold ${filters.category === currentPath ? "text-black" : "text-gray-500 group-hover:text-black"}`}
-              >
+              <span className={`text-sm font-body font-medium ${isSelected ? "text-white" : "text-black"}`}>
                 {category.name}
               </span>
+
+              {isSelected && (
+                <span className="w-2 h-2 rounded-full bg-white"></span>
+              )}
             </label>
           </div>
 
           {/* Children Container */}
           {hasChildren && isExpanded && (
-            <div className="transition-all duration-200">
+            <div className="mt-2 transition-all duration-200">
               {renderCategories(category.children!, level + 1, currentPath)}
             </div>
           )}
@@ -306,7 +310,7 @@ export default function SidebarFilters({
           </h3>
           <button
             onClick={clearFilters}
-            className="text-xs font-istok font-bold text-gray-400 hover:text-black transition-colors uppercase tracking-wider underline decoration-1 underline-offset-2"
+            className="text-xs font-istok font-bold text-gray-500 hover:text-black transition-colors uppercase tracking-wider underline decoration-1 underline-offset-2"
           >
             Reset All
           </button>
@@ -314,14 +318,14 @@ export default function SidebarFilters({
 
         {/* Sort Options - Compact */}
         <div className="mb-8">
-          <label className="text-[14px] font-koulen text-black uppercase tracking-wide mb-3 block">
+          <label className="text-xs font-koulen text-black uppercase tracking-wide mb-3 block">
             Sort by
           </label>
           <div className="relative">
             <select
               value={filters.sortBy}
               onChange={(e) => handleFilterChange({ sortBy: e.target.value })}
-              className="w-full pl-0 pr-8 py-2 text-base font-istok bg-transparent border-b border-gray-200 rounded-none focus:border-black focus:ring-0 cursor-pointer appearance-none transition-all hover:border-gray-400 text-gray-700 font-bold"
+              className="w-full pl-4 pr-10 py-3 text-sm font-body font-medium bg-gray-50 border border-transparent rounded-full focus:border-black focus:ring-0 cursor-pointer appearance-none transition-all hover:bg-white hover:border-gray-200 hover:shadow-sm text-black"
             >
               <option value="featured">Featured</option>
               <option value="price-low-high">Price: Low to High</option>
@@ -331,7 +335,7 @@ export default function SidebarFilters({
               <option value="rating">Rating</option>
             </select>
             {/* Custom Arrow */}
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center text-black">
+            <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-gray-500">
               <svg
                 className="h-4 w-4"
                 fill="none"
@@ -376,27 +380,31 @@ export default function SidebarFilters({
           >
             <div className="space-y-1">
               {!currentCategory && (
-                <label
-                  className={`flex items-center cursor-pointer group py-1 transition-all`}
-                >
-                  <div
-                    className={`w-4 h-4 mr-3 border rounded-none flex items-center justify-center transition-colors ${!filters.category ? "border-black bg-black" : "border-gray-300 group-hover:border-black"}`}
-                  >
-                    {!filters.category && <div className="w-2 h-2 bg-white" />}
+                <div className="mb-2">
+                  <div className="flex items-center group">
+                    <label className={`
+                          flex-1 flex items-center justify-between cursor-pointer px-4 py-2 rounded-full border transition-all duration-200
+                          ${!filters.category
+                        ? "bg-[#0e4d80] border-[#0e4d80] text-white shadow-md transform scale-[1.02]"
+                        : "bg-white border-transparent hover:border-gray-200 hover:bg-gray-50 text-black"}
+                      `}>
+                      <input
+                        type="radio"
+                        name="category"
+                        checked={!filters.category}
+                        onChange={() => handleFilterChange({ category: "" })}
+                        className="hidden"
+                      />
+                      <span className={`text-sm font-body font-medium ${!filters.category ? "text-white" : "text-black"}`}>
+                        All Categories
+                      </span>
+
+                      {!filters.category && (
+                        <span className="w-2 h-2 rounded-full bg-white"></span>
+                      )}
+                    </label>
                   </div>
-                  <input
-                    type="radio"
-                    name="category"
-                    checked={!filters.category}
-                    onChange={() => handleFilterChange({ category: "" })}
-                    className="hidden"
-                  />
-                  <span
-                    className={`text-sm font-istok font-bold ${!filters.category ? "text-black" : "text-gray-500 group-hover:text-black"}`}
-                  >
-                    All Categories
-                  </span>
-                </label>
+                </div>
               )}
 
               {renderCategories(categories)}
@@ -433,9 +441,9 @@ export default function SidebarFilters({
           >
             <div className="pt-1">
               {/* Inputs */}
-              <div className="flex items-center gap-4 mb-6">
+              <div className="flex items-center gap-3 mb-6">
                 <div className="relative flex-1">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-istok">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-xs font-body">
                     ฿
                   </span>
                   <input
@@ -448,12 +456,12 @@ export default function SidebarFilters({
                       })
                     }
                     placeholder="Min"
-                    className="w-full pl-8 pr-3 py-2 text-sm font-istok font-bold border border-gray-200 rounded-full focus:border-black focus:ring-0 placeholder:text-gray-300 bg-gray-50 transition-colors"
+                    className="w-full pl-8 pr-4 py-2.5 text-sm font-body font-medium border border-gray-200 rounded-full focus:border-black focus:ring-0 placeholder:text-gray-400 bg-gray-50/50 hover:bg-white transition-colors"
                   />
                 </div>
-                <span className="text-gray-400 text-xs">-</span>
+                <span className="text-gray-300 text-xs">-</span>
                 <div className="relative flex-1">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-istok">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-xs font-body">
                     ฿
                   </span>
                   <input
@@ -466,16 +474,16 @@ export default function SidebarFilters({
                       })
                     }
                     placeholder="Max"
-                    className="w-full pl-8 pr-3 py-2 text-sm font-istok font-bold border border-gray-200 rounded-full focus:border-black focus:ring-0 placeholder:text-gray-300 bg-gray-50 transition-colors"
+                    className="w-full pl-8 pr-4 py-2.5 text-sm font-body font-medium border border-gray-200 rounded-full focus:border-black focus:ring-0 placeholder:text-gray-400 bg-gray-50/50 hover:bg-white transition-colors"
                   />
                 </div>
               </div>
 
               {/* Dual Slider */}
-              <div className="relative h-2 rounded-full bg-gray-200 mt-6 mb-8 mx-1">
+              <div className="relative h-2 rounded-full bg-gray-200 mt-6 mx-1">
                 {/* Track Highlight */}
                 <div
-                  className="absolute h-full bg-black rounded-full z-10"
+                  className="absolute h-full bg-[#0e4d80] rounded-full z-10"
                   style={{
                     left: `${(filters.minPrice / limitMax) * 100}%`,
                     right: `${100 - (filters.maxPrice / limitMax) * 100}%`,
@@ -492,7 +500,7 @@ export default function SidebarFilters({
                   onChange={(e) => {
                     const val = Math.min(
                       Number(e.target.value),
-                      filters.maxPrice - 1,
+                      filters.maxPrice // Removed -1 to allow touching
                     );
                     setFilters({ ...filters, minPrice: val });
                   }}
@@ -509,18 +517,18 @@ export default function SidebarFilters({
                   onChange={(e) => {
                     const val = Math.max(
                       Number(e.target.value),
-                      filters.minPrice + 1,
+                      filters.minPrice // Removed +1 to allow touching
                     );
                     setFilters({ ...filters, maxPrice: val });
                   }}
                   className="absolute w-full h-full appearance-none bg-transparent pointer-events-none z-20 slider-thumb cursor-pointer"
                 />
+              </div>
 
-                {/* Legend */}
-                <div className="flex justify-between mt-4 text-xs text-gray-400 font-istok font-bold tracking-wide">
-                  <span>0</span>
-                  <span>{limitMax}</span>
-                </div>
+              {/* Legend */}
+              <div className="flex justify-between mt-4 mb-6 text-xs text-gray-500 font-istok font-bold tracking-wide">
+                <span>0</span>
+                <span>{limitMax}</span>
               </div>
 
               <style>{`
