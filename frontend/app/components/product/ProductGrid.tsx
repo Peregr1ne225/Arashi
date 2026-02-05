@@ -7,6 +7,7 @@ interface ProductGridProps {
   title?: string;
   loading?: boolean;
   viewAllLink?: string;
+  layout?: "grid" | "scroll";
 }
 
 // This is a server component at the RSC boundary
@@ -17,12 +18,13 @@ export default function ProductGrid({
   title,
   loading = false,
   viewAllLink,
+  layout = "grid",
 }: ProductGridProps) {
   // Convert full Products to minimal ProductCardData at RSC boundary
   // This reduces serialization from ~25+ fields to ~12 fields per product
   const productCardData: ProductCardData[] = products.map(toProductCardData);
 
   return (
-    <ProductGridClient products={productCardData} title={title} loading={loading} viewAllLink={viewAllLink} />
+    <ProductGridClient products={productCardData} title={title} loading={loading} viewAllLink={viewAllLink} layout={layout} />
   );
 }

@@ -43,6 +43,7 @@ async function FeaturedSection() {
       products={products}
       title="Featured Products"
       viewAllLink="/products?sort=featured"
+      layout="scroll"
     />
   );
 }
@@ -59,6 +60,7 @@ async function NewArrivalsSection() {
       products={products}
       title="New Arrivals"
       viewAllLink="/new"
+      layout="scroll"
     />
   );
 }
@@ -76,6 +78,7 @@ async function BestsellersSection() {
       products={products}
       title="Bestsellers"
       viewAllLink="/products?sort=bestsellers"
+      layout="scroll"
     />
   );
 }
@@ -92,6 +95,7 @@ async function SaleSection() {
       products={products}
       title="On Sale"
       viewAllLink="/sale"
+      layout="scroll"
     />
   );
 }

@@ -3,12 +3,14 @@
 import { ProductCardData } from "@/app/types/product";
 import ProductSkeleton from "./ProductSkeleton";
 import ProductScroll from "./ProductScroll";
+import ProductCard from "./ProductCard";
 
 interface ProductGridClientProps {
   products: ProductCardData[];
   title?: string;
   loading?: boolean;
   viewAllLink?: string;
+  layout?: "grid" | "scroll";
 }
 
 export default function ProductGridClient({
@@ -16,6 +18,7 @@ export default function ProductGridClient({
   title,
   loading = false,
   viewAllLink,
+  layout = "grid",
 }: ProductGridClientProps) {
   // Loading state placeholder
   if (loading) {
@@ -36,7 +39,17 @@ export default function ProductGridClient({
       )}
 
       {products.length > 0 ? (
-        <ProductScroll products={products} />
+        layout === "scroll" ? (
+          <ProductScroll products={products} />
+        ) : (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-8">
+            {products.map((product) => (
+              <div key={product.id} className="w-full">
+                <ProductCard product={product} />
+              </div>
+            ))}
+          </div>
+        )
       ) : (
         <div className="flex flex-col items-center justify-center py-16">
           <svg
