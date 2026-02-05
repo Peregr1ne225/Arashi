@@ -52,13 +52,12 @@ export default function LoginForm({
     return (
         <div className="w-full flex flex-col items-center">
             {/* Shared Header */}
-            <div className="text-center mb-12 px-8">
-                <h1 className="font-mrs-sheppards text-[40px] md:text-[56px] leading-none text-[#0e4d80] mb-3">
-                    Arashi
+            <div className="text-center mb-10">
+                <h1 className="font-koulen text-[48px] md:text-[64px] leading-tight text-[#0e4d80] mb-2 uppercase tracking-tighter">
+                    Login
                 </h1>
-                <p className="font-istok text-sm md:text-base text-gray-500 max-w-md mx-auto">
-                    Shop your styles, save top picks to your wishlist, track those orders
-                    & train with us.
+                <p className="font-body text-sm text-gray-400 max-w-xs mx-auto">
+                    Glad to have you back. Enter your credentials to access your squad profile.
                 </p>
             </div>
 
@@ -66,38 +65,36 @@ export default function LoginForm({
                 className="w-full space-y-6 flex flex-col items-center px-4"
                 onSubmit={handleSubmit}
             >
-                <div className="space-y-4 w-full max-w-sm">
-                    <div className="relative group">
-                        <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                            <span className="text-gray-400 font-istok text-xs font-bold uppercase tracking-wider">User</span>
-                        </div>
-                        <input
-                            id="username"
-                            name="username"
-                            type="text"
-                            required
-                            className="block w-full h-14 pl-16 pr-6 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-[#0e4d80]/20 focus:bg-white text-base font-istok font-bold text-[#0e4d80] focus:outline-none placeholder-gray-300 transition-all tracking-wide shadow-inner"
-                            placeholder="Username"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                        />
+                <div className="relative group">
+                    <div className="absolute h-14 left-5 flex items-center pointer-events-none">
+                        <span className="text-gray-300 font-koulen text-xs uppercase tracking-widest">User</span>
                     </div>
+                    <input
+                        id="username"
+                        name="username"
+                        type="text"
+                        required
+                        className="block w-full h-14 pl-16 pr-6 rounded-full bg-gray-50 border border-gray-100 focus:border-[#0e4d80] focus:bg-white text-base font-body font-normal text-black focus:outline-none placeholder-gray-300 transition-all shadow-sm"
+                        placeholder="Username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                    />
+                </div>
 
-                    <div className="relative group">
-                        <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                            <span className="text-gray-400 font-istok text-xs font-bold uppercase tracking-wider">Pass</span>
-                        </div>
-                        <input
-                            id="password"
-                            name="password"
-                            type="password"
-                            required
-                            className="block w-full h-14 pl-16 pr-6 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-[#0e4d80]/20 focus:bg-white text-base font-istok font-bold text-[#0e4d80] focus:outline-none placeholder-gray-300 transition-all tracking-wide shadow-inner"
-                            placeholder="Password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
+                <div className="relative group">
+                    <div className="absolute h-14 left-5 flex items-center pointer-events-none">
+                        <span className="text-gray-300 font-koulen text-xs uppercase tracking-widest">Pass</span>
                     </div>
+                    <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        required
+                        className="block w-full h-14 pl-16 pr-6 rounded-full bg-gray-50 border border-gray-100 focus:border-[#0e4d80] focus:bg-white text-base font-body font-normal text-black focus:outline-none placeholder-gray-300 transition-all shadow-sm"
+                        placeholder="********"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
                 </div>
 
                 {error && (
@@ -112,21 +109,21 @@ export default function LoginForm({
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full md:w-64 h-14 rounded-full bg-[#0e4d80] text-white font-istok text-sm font-bold uppercase tracking-[0.2em] hover:bg-[#b90326] hover:shadow-lg hover:shadow-red-900/20 hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                        className="w-full md:w-64 h-14 rounded-full bg-[#0e4d80] text-white font-koulen text-[18px] uppercase tracking-widest hover:bg-[#0a3a60] hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg"
                     >
-                        {loading ? "Logging in..." : "Sign In"}
+                        {loading ? "Logging in..." : "Continue"}
                     </button>
                 </div>
             </form>
 
             <div className="mt-8 text-center">
-                <p className="font-istok text-xs text-gray-400 uppercase tracking-wider">
+                <p className="font-body text-xs text-gray-400 uppercase tracking-widest">
                     Don&apos;t have an account?&nbsp;
                     <button
                         onClick={handleRegisterClick}
-                        className="font-bold text-[#0e4d80] hover:underline decoration-2 underline-offset-4 cursor-pointer hover:text-[#0b3d66] transition-colors ml-1"
+                        className="font-bold text-[#0e4d80] hover:text-[#0a3a60] transition-colors ml-1 underline decoration-1 underline-offset-4 cursor-pointer"
                     >
-                        Sign up
+                        Register
                     </button>
                 </p>
             </div>

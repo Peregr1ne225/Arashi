@@ -303,12 +303,12 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
   return (
     <div className="w-full flex flex-col items-center">
       {/* Header */}
-      <div className="text-center mb-12 px-8">
-        <h1 className="font-mrs-sheppards text-[40px] md:text-[56px] leading-none text-[#0e4d80] mb-3">
-          Arashi
+      <div className="text-center mb-10">
+        <h1 className="font-koulen text-[48px] md:text-[64px] leading-tight text-[#0e4d80] mb-2 uppercase tracking-tighter">
+          Register
         </h1>
-        <p className="font-istok text-sm md:text-base text-gray-500 max-w-md mx-auto">
-          One account, across all apps, just to make things a little easier.
+        <p className="font-body text-sm text-gray-400 max-w-xs mx-auto">
+          One account for all your gear. Join the high-speed movement today.
         </p>
       </div>
 
@@ -319,22 +319,22 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
         <div className="space-y-4 w-full max-w-sm">
           {/* Username */}
           <div className="relative group">
-            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-              <span className="text-gray-400 font-istok text-xs font-bold uppercase tracking-wider">User</span>
+            <div className="absolute h-14 left-5 flex items-center pointer-events-none">
+              <span className="text-gray-300 font-koulen text-xs uppercase tracking-widest">User</span>
             </div>
             <input
               id="username"
               name="username"
               type="text"
               required
-              className="block w-full h-14 pl-16 pr-6 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-[#0e4d80]/20 focus:bg-white text-base font-istok font-bold text-[#0e4d80] focus:outline-none placeholder-gray-300 transition-all tracking-wide shadow-inner"
+              className="block w-full h-14 pl-16 pr-6 rounded-full bg-gray-50 border border-gray-100 focus:border-[#0e4d80] focus:bg-white text-base font-body font-normal text-black focus:outline-none placeholder-gray-300 transition-all shadow-sm"
               placeholder="Username"
               value={formData.username}
               onChange={(e) => handleFieldChange("username", e.target.value)}
               onBlur={() => handleFieldBlur("username")}
             />
             {errors.username && (
-              <p className="mt-1 text-xs text-red-500 font-bold uppercase tracking-wider pl-4">
+              <p className="mt-1 text-[10px] text-red-500 font-bold uppercase tracking-widest pl-5">
                 {errors.username}
               </p>
             )}
@@ -342,22 +342,22 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
 
           {/* Email */}
           <div className="relative group">
-            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-              <span className="text-gray-400 font-istok text-xs font-bold uppercase tracking-wider">Email</span>
+            <div className="absolute h-14 left-5 flex items-center pointer-events-none">
+              <span className="text-gray-300 font-koulen text-xs uppercase tracking-widest">Email</span>
             </div>
             <input
               id="email"
               name="email"
               type="email"
               required
-              className="block w-full h-14 pl-16 pr-6 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-[#0e4d80]/20 focus:bg-white text-base font-istok font-bold text-[#0e4d80] focus:outline-none placeholder-gray-300 transition-all tracking-wide shadow-inner"
-              placeholder="Email Address"
+              className="block w-full h-14 pl-16 pr-6 rounded-full bg-gray-50 border border-gray-100 focus:border-[#0e4d80] focus:bg-white text-base font-body font-normal text-black focus:outline-none placeholder-gray-300 transition-all shadow-sm"
+              placeholder="email@example.com"
               value={formData.email}
               onChange={(e) => handleFieldChange("email", e.target.value)}
               onBlur={() => handleFieldBlur("email")}
             />
             {errors.email && (
-              <p className="mt-1 text-xs text-red-500 font-bold uppercase tracking-wider pl-4">
+              <p className="mt-1 text-[10px] text-red-500 font-bold uppercase tracking-widest pl-5">
                 {errors.email}
               </p>
             )}
@@ -366,43 +366,43 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
           {/* First Name & Last Name */}
           <div className="grid grid-cols-2 gap-4">
             <div className="relative group">
-              <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                <span className="text-gray-400 font-istok text-[10px] font-bold uppercase tracking-wider">First</span>
+              <div className="absolute h-14 left-5 flex items-center pointer-events-none">
+                <span className="text-gray-200 font-koulen text-[10px] uppercase tracking-widest">First</span>
               </div>
               <input
                 id="firstName"
                 name="firstName"
                 type="text"
                 required
-                className="block w-full h-14 pl-14 pr-4 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-[#0e4d80]/20 focus:bg-white text-base font-istok font-bold text-[#0e4d80] focus:outline-none placeholder-gray-300 transition-all tracking-wide shadow-inner"
+                className="block w-full h-14 pl-14 pr-4 rounded-full bg-gray-50 border border-gray-100 focus:border-[#0e4d80] focus:bg-white text-base font-body font-normal text-black focus:outline-none placeholder-gray-300 transition-all shadow-sm"
                 placeholder="Name"
                 value={formData.firstName}
                 onChange={(e) => handleFieldChange("firstName", e.target.value)}
                 onBlur={() => handleFieldBlur("firstName")}
               />
               {errors.firstName && (
-                <p className="mt-1 text-[10px] text-red-500 font-bold uppercase tracking-wider pl-2">
+                <p className="mt-1 text-[10px] text-red-500 font-bold uppercase tracking-widest pl-5">
                   {errors.firstName}
                 </p>
               )}
             </div>
             <div className="relative group">
-              <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                <span className="text-gray-400 font-istok text-[10px] font-bold uppercase tracking-wider">Last</span>
+              <div className="absolute h-14 left-5 flex items-center pointer-events-none">
+                <span className="text-gray-200 font-koulen text-[10px] uppercase tracking-widest">Last</span>
               </div>
               <input
                 id="lastName"
                 name="lastName"
                 type="text"
                 required
-                className="block w-full h-14 pl-14 pr-4 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-[#0e4d80]/20 focus:bg-white text-base font-istok font-bold text-[#0e4d80] focus:outline-none placeholder-gray-300 transition-all tracking-wide shadow-inner"
-                placeholder="Last Name"
+                className="block w-full h-14 pl-14 pr-4 rounded-full bg-gray-50 border border-gray-100 focus:border-[#0e4d80] focus:bg-white text-base font-body font-normal text-black focus:outline-none placeholder-gray-300 transition-all shadow-sm"
+                placeholder="Name"
                 value={formData.lastName}
                 onChange={(e) => handleFieldChange("lastName", e.target.value)}
                 onBlur={() => handleFieldBlur("lastName")}
               />
               {errors.lastName && (
-                <p className="mt-1 text-[10px] text-red-500 font-bold uppercase tracking-wider pl-2">
+                <p className="mt-1 text-[10px] text-red-500 font-bold uppercase tracking-widest pl-5">
                   {errors.lastName}
                 </p>
               )}
@@ -412,16 +412,16 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
           {/* Password */}
           <div className="relative group">
             <div className="relative">
-              <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                <span className="text-gray-400 font-istok text-xs font-bold uppercase tracking-wider">Pass</span>
+              <div className="absolute h-14 left-5 flex items-center pointer-events-none">
+                <span className="text-gray-300 font-koulen text-xs uppercase tracking-widest">Pass</span>
               </div>
               <input
                 id="password"
                 name="password"
                 type={showPassword ? "text" : "password"}
                 required
-                className="block w-full h-14 pl-16 pr-12 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-[#0e4d80]/20 focus:bg-white text-base font-istok font-bold text-[#0e4d80] focus:outline-none placeholder-gray-300 transition-all tracking-wide shadow-inner"
-                placeholder="Password"
+                className="block w-full h-14 pl-16 pr-12 rounded-full bg-gray-50 border border-gray-100 focus:border-[#0e4d80] focus:bg-white text-base font-body font-normal text-black focus:outline-none placeholder-gray-300 transition-all shadow-sm"
+                placeholder="********"
                 value={formData.password}
                 onChange={(e) => handleFieldChange("password", e.target.value)}
                 onBlur={() => handleFieldBlur("password")}
@@ -429,7 +429,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#0e4d80] focus:outline-none transition-colors"
+                className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-300 hover:text-[#0e4d80] focus:outline-none transition-colors"
               >
                 {showPassword ? (
                   <EyeOff className="w-5 h-5" />
@@ -439,7 +439,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
               </button>
             </div>
             {errors.password && (
-              <p className="mt-1 text-xs text-red-500 font-bold uppercase tracking-wider pl-4">
+              <p className="mt-1 text-[10px] text-red-500 font-bold uppercase tracking-widest pl-5">
                 {errors.password}
               </p>
             )}
@@ -460,16 +460,16 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
           {/* Confirm Password */}
           <div className="relative group">
             <div className="relative">
-              <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                <span className="text-gray-400 font-istok text-xs font-bold uppercase tracking-wider">Confirm</span>
+              <div className="absolute h-14 left-5 flex items-center pointer-events-none">
+                <span className="text-gray-300 font-koulen text-xs uppercase tracking-widest">Confirm</span>
               </div>
               <input
                 id="confirmPassword"
                 name="confirmPassword"
                 type={showConfirmPassword ? "text" : "password"}
                 required
-                className="block w-full h-14 pl-24 pr-12 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-[#0e4d80]/20 focus:bg-white text-base font-istok font-bold text-[#0e4d80] focus:outline-none placeholder-gray-300 transition-all tracking-wide shadow-inner"
-                placeholder="Confirm Password"
+                className="block w-full h-14 pl-24 pr-12 rounded-full bg-gray-50 border border-gray-100 focus:border-[#0e4d80] focus:bg-white text-base font-body font-normal text-black focus:outline-none placeholder-gray-300 transition-all shadow-sm"
+                placeholder="********"
                 value={formData.confirmPassword}
                 onChange={(e) =>
                   handleFieldChange("confirmPassword", e.target.value)
@@ -479,7 +479,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#0e4d80] focus:outline-none transition-colors"
+                className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-300 hover:text-[#0e4d80] focus:outline-none transition-colors"
               >
                 {showConfirmPassword ? (
                   <EyeOff className="w-5 h-5" />
@@ -489,7 +489,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
               </button>
             </div>
             {errors.confirmPassword && (
-              <p className="mt-1 text-xs text-red-500 font-bold uppercase tracking-wider pl-4">
+              <p className="mt-1 text-[10px] text-red-500 font-bold uppercase tracking-widest pl-5">
                 {errors.confirmPassword}
               </p>
             )}
@@ -500,23 +500,21 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full md:w-64 h-14 rounded-full bg-[#0e4d80] text-white font-istok text-sm font-bold uppercase tracking-[0.2em] hover:bg-[#b90326] hover:shadow-lg hover:shadow-red-900/20 hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            className="w-full md:w-64 h-14 rounded-full bg-[#0e4d80] text-white font-koulen text-[18px] uppercase tracking-widest hover:bg-[#0a3a60] hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg"
           >
-            {loading ? "Creating..." : "Sign Up"}
+            {loading ? "Creating..." : "Start Journey"}
           </button>
         </div>
       </form>
 
       <div className="mt-8 text-center">
-        <p className="font-istok text-xs text-gray-400 uppercase tracking-wider">
-          <span className="text-gray-500">
-            Already have an account?&nbsp;
-          </span>
+        <p className="font-body text-xs text-gray-400 uppercase tracking-widest">
+          Already have an account?&nbsp;
           <Link
             href="/login"
-            className="font-bold text-[#0e4d80] hover:underline decoration-2 underline-offset-4 cursor-pointer hover:text-[#0b3d66] transition-colors"
+            className="font-bold text-[#0e4d80] hover:text-[#0a3a60] transition-colors underline decoration-1 underline-offset-4 cursor-pointer"
           >
-            Log in
+            Log In
           </Link>
         </p>
       </div>
