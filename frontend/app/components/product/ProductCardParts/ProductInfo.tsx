@@ -91,7 +91,7 @@ function ProductInfoComponent({
       )}
 
       {/* Product Name */}
-      <h3 className="text-[16px] leading-tight font-koulen text-black line-clamp-2 mb-2 min-h-[2.5em] tracking-wide uppercase">
+      <h3 className="text-[16px] leading-tight font-body text-black line-clamp-2 mb-2 min-h-[2.5em] tracking-normal">
         <Link
           href={`/product/${productId}`}
           className="hover:underline decoration-1 underline-offset-2"

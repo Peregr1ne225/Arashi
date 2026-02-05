@@ -52,7 +52,7 @@ export default function HeroSection({ heroImages = DEFAULT_HERO_IMAGES }: HeroSe
     }, [heroImages.length]);
 
     return (
-        <section className="relative w-full h-[80vh] min-h-[600px] overflow-hidden bg-[#E5E5E5]">
+        <section className="relative w-full h-[80vh] min-h-[600px] overflow-hidden bg-linear-to-b from-(--pastel-blue) to-white">
             {/* Full Width Image Slider */}
             {heroImages.map((src, index) => (
                 <div
@@ -67,8 +67,8 @@ export default function HeroSection({ heroImages = DEFAULT_HERO_IMAGES }: HeroSe
                         className="object-cover"
                         priority={index === 0}
                     />
-                    {/* Darker Overlay for better text contrast */}
-                    <div className="absolute inset-0 bg-black/30" />
+                    {/* Light Overlay for pastel feel */}
+                    <div className="absolute inset-0 bg-white/20" />
                 </div>
             ))}
 
@@ -76,30 +76,30 @@ export default function HeroSection({ heroImages = DEFAULT_HERO_IMAGES }: HeroSe
             <div className="absolute inset-0 z-20 flex items-center">
                 <div className="container mx-auto px-10">
                     <div className="max-w-2xl space-y-8">
-                        <h2 className="font-istok text-xs md:text-sm tracking-[0.4em] uppercase text-white/90 font-bold pl-1 animate-in fade-in slide-in-from-left-4 duration-700 delay-100">
+                        <h2 className="font-body text-xs md:text-sm tracking-[0.4em] uppercase text-gray-900 font-bold pl-1 animate-in fade-in slide-in-from-left-4 duration-700 delay-100">
                             {content.smallText}
                         </h2>
 
-                        <h1 className="font-istok text-[48px] md:text-[86px] lg:text-[100px] leading-[0.9] text-white uppercase font-black tracking-tight animate-in fade-in slide-in-from-left-4 duration-700 delay-200">
+                        <h1 className="font-display text-[48px] md:text-[86px] lg:text-[100px] leading-[0.9] text-pastel-blue-dark uppercase font-black tracking-tight animate-in fade-in slide-in-from-left-4 duration-700 delay-200">
                             {content.headingLine1} <br />
-                            <span className="text-transparent bg-clip-text bg-linear-to-r from-accent to-white italic pr-4">{content.headingHighlight}</span>
+                            <span className="text-transparent bg-clip-text bg-linear-to-r from-black via-[#0e4d80] to-[#0ea5e9] italic pr-4">{content.headingHighlight}</span>
                         </h1>
 
                         <div className="pt-4 flex flex-col sm:flex-row items-center gap-4 animate-in fade-in slide-in-from-left-4 duration-700 delay-300">
                             <Link
                                 href={content.button1Link}
-                                className="group flex items-center justify-center px-10 py-4 bg-white rounded-full hover:bg-black hover:text-white transition-all duration-300 transform hover:scale-105"
+                                className="group btn-primary"
                             >
-                                <span className="font-istok text-sm text-black group-hover:text-white font-bold uppercase tracking-widest">
+                                <span className="text-sm font-bold uppercase tracking-widest">
                                     {content.button1Text}
                                 </span>
                             </Link>
 
                             <Link
                                 href={content.button2Link}
-                                className="group flex items-center justify-center px-10 py-4 border border-white rounded-full hover:bg-white hover:text-black transition-all duration-300 transform hover:scale-105"
+                                className="group btn-secondary"
                             >
-                                <span className="font-istok text-sm text-white group-hover:text-black font-bold uppercase tracking-widest">
+                                <span className="text-sm font-bold uppercase tracking-widest">
                                     {content.button2Text}
                                 </span>
                             </Link>
@@ -115,8 +115,8 @@ export default function HeroSection({ heroImages = DEFAULT_HERO_IMAGES }: HeroSe
                         key={index}
                         onClick={() => setCurrentImageIndex(index)}
                         className={`h-1.5 rounded-full transition-all duration-300 ${index === currentImageIndex
-                            ? "w-12 bg-accent shadow-[0_0_10px_rgba(255,255,255,0.5)]"
-                            : "w-3 bg-white/40 hover:bg-white/80 hover:w-6"}`}
+                            ? "w-12 bg-pastel-blue-dark shadow-sm"
+                            : "w-3 bg-gray-300 hover:bg-pastel-blue-dark/50 hover:w-6"}`}
                         aria-label={`Go to slide ${index + 1}`}
                     />
                 ))}

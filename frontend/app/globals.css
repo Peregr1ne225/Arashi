@@ -1,27 +1,27 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fdfbf7;
-  --foreground: #000000;
-  --primary-color: #222222;
-  --secondary-color: #f5f5f5;
-  --accent-color: #ff5252;
-  --text-color: #000000;
-  --text-light: #000000;
-  --header-bg: #B3C8CF;
-  --header-text: #262626;
-  --header-logo: #000000;
-  --header-height: 72px;
+  --background: #ffffff;
+  --foreground: #333333;
+  --primary-color: #E0F2FE;
+  /* Sky Blue */
+  --secondary-color: #F0F9FF;
+  --accent-color: #BAE6FD;
+  --text-color: #333333;
+  --text-light: #666666;
+  --header-bg: rgba(255, 255, 255, 0.85);
+  /* Frosted */
+  --header-text: #333333;
+  --header-logo: #333333;
+  --header-height: 80px;
 
-  /* Pastel Sport Palette */
-  --pastel-blue: #e0f2fe;
-  /* blue-100 */
+  /* Pastel Kinetics Palette */
+  --pastel-blue: #E0F2FE;
   --pastel-blue-dark: #0e4d80;
-  /* Original deep blue for text */
-  --pastel-red: #fee2e2;
-  /* red-100 */
-  --pastel-red-dark: #D2042D;
-  /* Original red for text */
+  /* Interactive */
+  --pastel-yellow: #FDE68A;
+  /* Soft Speed */
+  --pastel-pink: #FBCFE8;
   --cream-bg: #fdfbf7;
   --card-bg: #ffffff;
 }
@@ -30,26 +30,19 @@
   --font-mrs-sheppards: var(--font-mrs-sheppards);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
+  --color-primary: var(--primary-color);
+  --color-secondary: var(--secondary-color);
+  --color-accent: var(--accent-color);
 
   --font-sans: var(--font-base);
   --font-display: var(--font-display);
-  --font-handwriting: var(--font-handwriting);
-  --font-plus-jakarta: var(--font-plus-jakarta);
-  --font-istok: var(--font-istok);
-  --font-times: var(--font-times);
+  /* Oswald */
+  --font-body: var(--font-plus-jakarta);
+  /* Plus Jakarta for body */
+
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
+  --radius-full: 9999px;
 }
 
 body {
@@ -91,65 +84,68 @@ h6 {
 }
 
 /* Base Component Overrides */
+/* Base Component Overrides */
 .btn-primary {
-  background-color: var(--pastel-blue-dark);
+  background: linear-gradient(135deg, var(--pastel-blue-dark) 0%, #1e6091 100%);
   color: white;
   font-family: var(--font-display);
   text-transform: uppercase;
-  font-weight: 700;
-  padding: 0.75rem 2rem;
+  font-weight: 400;
+  /* Lighter weight */
+  letter-spacing: 0.05em;
+  padding: 0.75rem 2.5rem;
   border-radius: 9999px;
-  /* Pill shape */
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Full pill */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 4px solid transparent;
-  /* Prepare for border change on hover maybe? */
+  box-shadow: 0 4px 15px rgba(14, 77, 128, 0.15);
+  border: none;
 }
 
 .btn-primary:hover {
-  background-color: var(--pastel-blue-dark);
-  color: white;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(14, 77, 128, 0.2);
+  box-shadow: 0 8px 25px rgba(14, 77, 128, 0.25);
   filter: brightness(110%);
 }
 
 .btn-secondary {
-  background-color: white;
-  border: 1px solid var(--border);
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(8px);
+  border: 1px solid #e5e5e5;
   color: var(--foreground);
   font-family: var(--font-display);
   text-transform: uppercase;
-  font-weight: 700;
-  padding: 0.75rem 2rem;
+  font-weight: 400;
+  padding: 0.75rem 2.5rem;
   border-radius: 9999px;
-  /* Pill shape */
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
 .btn-secondary:hover {
-  border-color: var(--pastel-blue-dark);
-  color: var(--pastel-blue-dark);
-  background-color: var(--pastel-blue);
+  border-color: var(--pastel-blue);
+  background-color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .card-sport {
   background-color: var(--card-bg);
-  border: 1px solid transparent;
+  border: none;
   border-radius: 2rem;
-  /* rounded-4xl equivalent */
-  transition: all 0.3s ease;
+  /* Soft large radius */
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.03);
+  /* Soft diffuse shadow */
 }
 
 .card-sport:hover {
-  border-color: var(--pastel-blue);
-  transform: translateY(-4px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px -10px rgba(14, 77, 128, 0.08);
+  /* Hint of blue in shadow */
 }

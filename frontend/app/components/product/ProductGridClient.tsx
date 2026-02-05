@@ -1,8 +1,8 @@
 "use client";
 
-import ProductCard from "./ProductCard";
 import { ProductCardData } from "@/app/types/product";
 import ProductSkeleton from "./ProductSkeleton";
+import ProductScroll from "./ProductScroll";
 
 interface ProductGridClientProps {
   products: ProductCardData[];
@@ -25,10 +25,10 @@ export default function ProductGridClient({
   return (
     <div className="w-full">
       {title && (
-        <div className="flex justify-between items-end mb-8 border-b border-black/5 pb-4">
-          <h2 className="text-[32px] font-koulen uppercase tracking-wide text-black leading-none">{title}</h2>
+        <div className="flex justify-between items-end border-b border-black/5 pb-4">
+          <h2 className="text-[32px] font-display uppercase tracking-wide text-foreground leading-none">{title}</h2>
           {viewAllLink && (
-            <a href={viewAllLink} className="text-sm font-istok font-bold uppercase tracking-wider text-gray-500 hover:text-black hover:underline underline-offset-4 transition-all">
+            <a href={viewAllLink} className="text-sm font-body font-bold uppercase tracking-wider text-gray-500 hover:text-primary-dark hover:underline underline-offset-4 transition-all">
               View All
             </a>
           )}
@@ -36,13 +36,7 @@ export default function ProductGridClient({
       )}
 
       {products.length > 0 ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5 gap-x-5 gap-y-10 mb-10">
-          {products.map((product) => (
-            <div key={product.id} className="hover:-translate-y-1 transition-transform duration-300">
-              <ProductCard product={product} />
-            </div>
-          ))}
-        </div>
+        <ProductScroll products={products} />
       ) : (
         <div className="flex flex-col items-center justify-center py-16">
           <svg

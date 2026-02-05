@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import ProductCard from "./ProductCard";
 import { ProductCardData } from "@/app/types/product";
 
@@ -10,6 +10,23 @@ interface ProductScrollProps {
 
 export default function ProductScroll({ products }: ProductScrollProps) {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const [canScrollLeft, setCanScrollLeft] = useState(false);
+    const [canScrollRight, setCanScrollRight] = useState(true);
+
+    const checkScroll = () => {
+        if (scrollContainerRef.current) {
+            const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+            setCanScrollLeft(scrollLeft > 0);
+            // Allow a small buffer (1px) for calculation precision
+            setCanScrollRight(Math.ceil(scrollLeft + clientWidth) < scrollWidth);
+        }
+    };
+
+    useEffect(() => {
+        checkScroll();
+        window.addEventListener("resize", checkScroll);
+        return () => window.removeEventListener("resize", checkScroll);
+    }, [products]);
 
     const scroll = (direction: "left" | "right") => {
         if (scrollContainerRef.current) {
@@ -20,6 +37,8 @@ export default function ProductScroll({ products }: ProductScrollProps) {
             } else {
                 current.scrollBy({ left: scrollAmount, behavior: "smooth" });
             }
+            // Check scroll after animation (approx delay)
+            setTimeout(checkScroll, 300);
         }
     };
 
@@ -28,6 +47,7 @@ export default function ProductScroll({ products }: ProductScrollProps) {
             {/* Horizontal Scroll Product List */}
             <div
                 ref={scrollContainerRef}
+                onScroll={checkScroll}
                 className="w-full overflow-x-auto py-8 px-4 no-scrollbar scroll-smooth"
             >
                 <div className="flex gap-4 w-max px-1">
@@ -48,10 +68,11 @@ export default function ProductScroll({ products }: ProductScrollProps) {
             </div>
 
             {/* Controls */}
-            <div className="mt-8 flex items-center justify-center gap-2">
+            <div className="flex items-center justify-center gap-2">
                 <button
                     onClick={() => scroll("left")}
-                    className="w-12 h-12 border border-gray-200 bg-white flex items-center justify-center hover:bg-[#0e4d80] hover:text-white hover:border-[#0e4d80] transition-all rounded-full shadow-md hover:shadow-lg disabled:opacity-50"
+                    disabled={!canScrollLeft}
+                    className="w-12 h-12 border border-gray-200 bg-white flex items-center justify-center hover:bg-[#0e4d80] hover:text-white hover:border-[#0e4d80] transition-all rounded-full shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-gray-400 disabled:hover:border-gray-200"
                     aria-label="Scroll left"
                 >
                     <svg
@@ -72,7 +93,8 @@ export default function ProductScroll({ products }: ProductScrollProps) {
                 </button>
                 <button
                     onClick={() => scroll("right")}
-                    className="w-12 h-12 border border-gray-200 bg-white flex items-center justify-center hover:bg-[#0e4d80] hover:text-white hover:border-[#0e4d80] transition-all rounded-full shadow-md hover:shadow-lg disabled:opacity-50"
+                    disabled={!canScrollRight}
+                    className="w-12 h-12 border border-gray-200 bg-white flex items-center justify-center hover:bg-[#0e4d80] hover:text-white hover:border-[#0e4d80] transition-all rounded-full shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-gray-400 disabled:hover:border-gray-200"
                     aria-label="Scroll right"
                 >
                     <svg

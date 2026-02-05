@@ -56,7 +56,7 @@ const ProductCard = memo<ProductCardProps>(({ product }) => {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   return (
-    <div className="group relative flex flex-col h-full bg-white rounded-4xl overflow-hidden shadow-lg shadow-blue-900/5 hover:shadow-2xl transition-all duration-300 border border-gray-100">
+    <div className="card-sport group relative flex flex-col h-full">
       {/* Product Images */}
       <div className="relative overflow-hidden w-full bg-[#f4f4f5]">
         <ProductImage

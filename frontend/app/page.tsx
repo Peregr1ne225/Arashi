@@ -109,7 +109,7 @@ export default function Home() {
         <HeroSectionFetcher />
       </Suspense>
 
-      <main className="container mx-auto px-4 md:px-8 py-8 space-y-16">
+      <main className="container mx-auto px-4 md:px-8 py-8 space-y-4">
         {/* Featured Products - Streamed */}
         <Suspense fallback={<ProductSkeleton title="Featured Products" />}>
           <FeaturedSection />
