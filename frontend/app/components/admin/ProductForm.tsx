@@ -6,7 +6,7 @@ import { Product } from "@/app/types/product";
 import { Category } from "@/app/types/category";
 import { Color, Size, Tag } from "@/app/types/attributes";
 import { getImageUrl } from "@/app/lib/utils/image";
-import { X, Plus, Trash2 } from "lucide-react";
+import { X, Plus, Trash2, Box, Layers, Tag as TagIcon, UploadCloud, AlertCircle } from "lucide-react";
 import MessageModal from "@/app/components/ui/MessageModal";
 
 interface ProductFormProps {
@@ -23,16 +23,16 @@ interface ProductFormProps {
 // Helper for deterministic tag colors (matching AdminProductsPage)
 const getTagColorClass = (tag: string) => {
   const colors = [
-    "bg-blue-100 text-blue-700 border-blue-200",
-    "bg-red-100 text-red-700 border-red-200",
-    "bg-green-100 text-green-700 border-green-200",
-    "bg-yellow-100 text-yellow-700 border-yellow-200",
-    "bg-purple-100 text-purple-700 border-purple-200",
-    "bg-pink-100 text-pink-700 border-pink-200",
-    "bg-indigo-100 text-indigo-700 border-indigo-200",
-    "bg-orange-100 text-orange-700 border-orange-200",
-    "bg-teal-100 text-teal-700 border-teal-200",
-    "bg-cyan-100 text-cyan-700 border-cyan-200",
+    "bg-blue-50 text-blue-700 border-blue-100",
+    "bg-red-50 text-red-700 border-red-100",
+    "bg-green-50 text-green-700 border-green-100",
+    "bg-yellow-50 text-yellow-700 border-yellow-100",
+    "bg-purple-50 text-purple-700 border-purple-100",
+    "bg-pink-50 text-pink-700 border-pink-100",
+    "bg-indigo-50 text-indigo-700 border-indigo-100",
+    "bg-orange-50 text-orange-700 border-orange-100",
+    "bg-teal-50 text-teal-700 border-teal-100",
+    "bg-cyan-50 text-cyan-700 border-cyan-100",
   ];
   const hash = tag
     .split("")
@@ -65,15 +65,11 @@ export default function ProductForm({
   );
   const [categoryId, setCategoryId] = useState(
     initialData?.category_id?.toString() ||
-      initialData?.category?.id?.toString() ||
-      "",
+    initialData?.category?.id?.toString() ||
+    "",
   );
 
   // Variants State
-  // We map initial variants to a shape we can edit.
-  // For new variants, 'id' might be explicitly undefined or negative to distinguish.
-  // However, since backend deletes all & recreates, IDs are less critical for persistence but useful for keys.
-  // Local interface for form variants which might be new (temp ID)
   interface FormVariant {
     id: number;
     color_id: number;
@@ -88,7 +84,7 @@ export default function ProductForm({
   const [variants, setVariants] = useState<FormVariant[]>(
     initialData?.variants?.map((v) => ({
       ...v,
-      stock: v.stock, // ensure number
+      stock: v.stock,
     })) || [],
   );
   const [newVariantColor, setNewVariantColor] = useState("");
@@ -115,10 +111,10 @@ export default function ProductForm({
       const variant = variants.find((v) => v.color_id === id);
       return variant
         ? {
-            id: variant.color_id,
-            name: variant.color_name,
-            code: variant.color_code,
-          }
+          id: variant.color_id,
+          name: variant.color_name,
+          code: variant.color_code,
+        }
         : null;
     })
     .filter((c): c is { id: number; name: string; code: string } => c !== null);
@@ -145,9 +141,6 @@ export default function ProductForm({
     type: "info" as "success" | "error" | "info",
   });
 
-  // Sync with initialData changes - REMOVED because we use key={id} in parent
-  // causing re-mount on change.
-
   // Image Handlers
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -173,6 +166,19 @@ export default function ProductForm({
       setDeletedImageIds((prev) => [...prev, imageToRemove.id]);
     }
     setExistingImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleColorImageChange = (
+    colorId: number,
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setColorImages((prev) => ({
+        ...prev,
+        [colorId]: file,
+      }));
+    }
   };
 
   // Variant Handlers
@@ -317,7 +323,6 @@ export default function ProductForm({
     );
 
     // Variants (Serialize to JSON)
-    // Ensure we send strict numbers for IDs
     const variantsPayload = variants.map((v) => ({
       color_id: v.color_id,
       size_id: v.size_id,
@@ -329,7 +334,7 @@ export default function ProductForm({
     // Tags (Serialize to JSON)
     formData.append("tags", JSON.stringify(tags));
 
-    // Colors (Serialize to JSON) - vital for syncing ProductColors
+    // Colors (Serialize to JSON)
     const colorsPayload = activeColors.map((c) => ({ color_id: c.id }));
     formData.append("colors_json", JSON.stringify(colorsPayload));
 
@@ -338,67 +343,8 @@ export default function ProductForm({
       formData.append(`color_image_${colorId}`, file);
     });
 
-    if (!isDirty && initialData) {
-      return;
-    }
-
     await onSubmit(formData);
   };
-
-  // Check if form is dirty (has changes)
-  const isDirty = (() => {
-    if (!initialData) return true;
-
-    // Basic fields
-    const initPrice =
-      (initialData.originalPrice ?? initialData.price)?.toString() || "";
-    const initDiscount = initialData.discount?.toString() || "";
-    const initCatId =
-      initialData.category_id?.toString() ||
-      initialData.category?.id?.toString() ||
-      "";
-
-    if (name !== initialData.name) return true;
-    if (description !== initialData.description) return true;
-    if (price !== initPrice) return true;
-    if (discount !== initDiscount) return true;
-    if (categoryId !== initCatId) return true;
-
-    // Tags
-    const sortedTags = [...tags].sort();
-    const initTags = [...(initialData.tags || [])].sort();
-    if (JSON.stringify(sortedTags) !== JSON.stringify(initTags)) return true;
-
-    // Images
-    if (newFiles.length > 0) return true;
-    if (deletedImageIds.length > 0) return true;
-
-    // Color Images
-    if (Object.keys(colorImages).length > 0) return true;
-
-    // Variants
-    const currentVars = variants
-      .map((v) => ({
-        color_id: v.color_id,
-        size_id: v.size_id,
-        stock: Number(v.stock),
-        is_active: v.is_active,
-      }))
-      .sort((a, b) => a.color_id - b.color_id || a.size_id - b.size_id); // Sort for consistency
-
-    const initVars = (initialData.variants || [])
-      .map((v) => ({
-        color_id: v.color_id,
-        size_id: v.size_id,
-        stock: Number(v.stock),
-        is_active: v.is_active,
-      }))
-      .sort((a, b) => a.color_id - b.color_id || a.size_id - b.size_id);
-
-    if (JSON.stringify(currentVars) !== JSON.stringify(initVars)) return true;
-
-    return false;
-  })();
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8 px-1">
@@ -409,204 +355,240 @@ export default function ProductForm({
         type={messageModal.type}
         onClose={() => setMessageModal({ ...messageModal, isOpen: false })}
       />
+
       {/* Basic Information Section */}
-      <div className="bg-white rounded-4xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="bg-linear-to-r from-[#0e4d80] to-[#0a3a60] px-8 py-5">
-          <h3 className="text-lg font-bold text-white flex items-center gap-2 uppercase tracking-wide font-koulen">
+      <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-lg overflow-hidden relative">
+        <div className="bg-linear-to-r from-[#0e4d80] to-[#0a3a60] px-10 py-6 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+          <h3 className="text-xl font-bold text-white flex items-center gap-3 uppercase tracking-wide font-koulen relative z-10">
+            <Box className="w-5 h-5 opacity-70" />
             Basic Information
           </h3>
         </div>
 
-        <div className="p-6 grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="p-10 grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="md:col-span-3">
-            <label className="block text-sm font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
-              Product Name
+            <label className="block text-[10px] font-bold text-gray-500 mb-2 uppercase tracking-widest font-istok">
+              Product Name *
             </label>
             <input
               type="text"
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="block w-full rounded-2xl border-gray-200 bg-gray-50 shadow-sm focus:border-[#0e4d80] focus:ring-[#0e4d80] sm:text-sm py-3 px-5 font-medium text-gray-900 placeholder-gray-400 experiment-input"
+              className="block w-full rounded-2xl border-gray-200 bg-gray-50 shadow-sm focus:border-[#0e4d80] focus:ring-4 focus:ring-[#0e4d80]/5 outline-none transition-all py-4 px-5 font-bold text-gray-900 placeholder-gray-400 font-istok"
               placeholder="e.g. Minimalist Cotton T-Shirt"
             />
           </div>
           <div className="md:col-span-1">
-            <label className="block text-sm font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
-              Category
+            <label className="block text-[10px] font-bold text-gray-500 mb-2 uppercase tracking-widest font-istok">
+              Category *
             </label>
-            <select
-              required
-              value={categoryId}
-              onChange={(e) => setCategoryId(e.target.value)}
-              className="block w-full rounded-lg border-gray-400 bg-gray-50 shadow-sm focus:border-[#0e4d80] focus:ring-[#0e4d80] text-base py-3 px-4 font-medium text-gray-900"
-            >
-              <option value="">Select Category</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <select
+                required
+                value={categoryId}
+                onChange={(e) => setCategoryId(e.target.value)}
+                className="block w-full rounded-2xl border-gray-200 bg-gray-50 shadow-sm focus:border-[#0e4d80] focus:ring-4 focus:ring-[#0e4d80]/5 outline-none transition-all py-4 px-5 font-bold text-gray-900 appearance-none font-istok cursor-pointer"
+              >
+                <option value="">Select Category</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                ▼
+              </div>
+            </div>
           </div>
           <div className="md:col-span-4">
-            <label className="block text-sm font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
+            <label className="block text-[10px] font-bold text-gray-500 mb-2 uppercase tracking-widest font-istok">
               Description
             </label>
             <textarea
-              rows={8}
+              rows={6}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="block w-full rounded-lg border-gray-400 bg-gray-50 shadow-sm focus:border-[#0e4d80] focus:ring-[#0e4d80] sm:text-sm py-2.5 px-4 resize-none font-medium text-gray-900 placeholder-gray-400"
-              placeholder="Product description... (Enter details here)"
+              className="block w-full rounded-2xl border-gray-200 bg-gray-50 shadow-sm focus:border-[#0e4d80] focus:ring-4 focus:ring-[#0e4d80]/5 outline-none transition-all py-4 px-5 font-medium text-gray-900 placeholder-gray-400 resize-none font-istok"
+              placeholder="Describe the product details, features, and care instructions..."
             />
           </div>
         </div>
       </div>
 
       {/* Pricing & Inventory */}
-      <div className="bg-white rounded-4xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="bg-linear-to-r from-[#0e4d80] to-[#0a3a60] px-8 py-5">
-          <h3 className="text-lg font-bold text-white flex items-center gap-2 uppercase tracking-wide font-koulen">
-            Pricing & Inventory
+      <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-lg overflow-hidden">
+        <div className="bg-linear-to-r from-[#0e4d80] to-[#0a3a60] px-10 py-6 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+          <h3 className="text-xl font-bold text-white flex items-center gap-3 uppercase tracking-wide font-koulen relative z-10">
+            <TagIcon className="w-5 h-5 opacity-70" />
+            Pricing Strategy
           </h3>
         </div>
-        <div className="p-6 grid grid-cols-2 gap-6">
+        <div className="p-10 grid grid-cols-2 gap-8">
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
-              Price
+            <label className="block text-[10px] font-bold text-gray-500 mb-2 uppercase tracking-widest font-istok">
+              Base Price *
             </label>
-            <div className="relative rounded-md shadow-sm">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                <span className="text-gray-500 sm:text-sm font-bold">฿</span>
+            <div className="relative rounded-2xl shadow-sm">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-5">
+                <span className="text-gray-400 font-bold">฿</span>
               </div>
               <input
                 type="number"
                 required
                 step="0.01"
+                min="0"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
-                className="block w-full rounded-lg border-gray-400 bg-gray-50 pl-8 pr-4 shadow-sm focus:border-[#0e4d80] focus:ring-[#0e4d80] sm:text-sm py-2.5 font-medium text-gray-900 placeholder-gray-400"
+                className="block w-full rounded-2xl border-gray-200 bg-gray-50 pl-10 pr-5 shadow-sm focus:border-[#0e4d80] focus:ring-4 focus:ring-[#0e4d80]/5 outline-none transition-all py-4 font-bold text-gray-900 placeholder-gray-400 font-istok"
                 placeholder="0.00"
               />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
+            <label className="block text-[10px] font-bold text-gray-500 mb-2 uppercase tracking-widest font-istok">
               Discount (%)
             </label>
-            <input
-              type="number"
-              min="0"
-              max="100"
-              value={discount}
-              onChange={(e) => setDiscount(e.target.value)}
-              className="block w-full rounded-lg border-gray-400 bg-gray-50 shadow-sm focus:border-[#0e4d80] focus:ring-[#0e4d80] sm:text-sm py-2.5 px-4 font-medium text-gray-900 placeholder-gray-400"
-              placeholder="0"
-            />
+            <div className="relative">
+              <input
+                type="number"
+                min="0"
+                max="100"
+                value={discount}
+                onChange={(e) => setDiscount(e.target.value)}
+                className="block w-full rounded-2xl border-gray-200 bg-gray-50 shadow-sm focus:border-[#0e4d80] focus:ring-4 focus:ring-[#0e4d80]/5 outline-none transition-all py-4 px-5 font-bold text-gray-900 placeholder-gray-400 font-istok"
+                placeholder="0"
+              />
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-5">
+                <span className="text-gray-400 font-bold">%</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Media Section */}
-      <div className="bg-white rounded-4xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="bg-linear-to-r from-[#0e4d80] to-[#0a3a60] px-8 py-5">
-          <h3 className="text-lg font-bold text-white flex items-center gap-2 uppercase tracking-wide font-koulen">
-            Media Gallery
+      <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-lg overflow-hidden">
+        <div className="bg-linear-to-r from-[#0e4d80] to-[#0a3a60] px-10 py-6 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+          <h3 className="text-xl font-bold text-white flex items-center gap-3 uppercase tracking-wide font-koulen relative z-10">
+            <UploadCloud className="w-5 h-5 opacity-70" />
+            Visual Gallery
           </h3>
         </div>
 
-        <div className="p-6 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          {existingImages.map((img, index) => (
-            <div
-              key={`existing-${index}`}
-              className="relative aspect-square w-full border rounded-lg overflow-hidden group bg-gray-50"
-            >
-              <Image
-                src={getImageUrl(img.url)}
-                alt={`Existing ${index}`}
-                fill
-                className="object-cover transition-transform group-hover:scale-105"
-              />
-              <button
-                type="button"
-                onClick={() => removeExistingImage(index)}
-                className="absolute top-1.5 right-1.5 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-sm opacity-0 group-hover:opacity-100 transition-all transform scale-90 group-hover:scale-100"
+        <div className="p-10">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {existingImages.map((img, index) => (
+              <div
+                key={`existing-${index}`}
+                className="relative aspect-square w-full border border-gray-100 rounded-3xl overflow-hidden group bg-gray-50 shadow-sm hover:shadow-md transition-all"
               >
-                <X size={14} />
-              </button>
-            </div>
-          ))}
-          {newPreviews.map((url, index) => (
-            <div
-              key={`new-${index}`}
-              className="relative aspect-square w-full border-2 border-blue-500/20 rounded-lg overflow-hidden group bg-gray-50"
-            >
-              <Image
-                src={url}
-                alt={`New ${index}`}
-                fill
-                className="object-cover transition-transform group-hover:scale-105"
-              />
-              <button
-                type="button"
-                onClick={() => removeNewImage(index)}
-                className="absolute top-1.5 right-1.5 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-sm transition-transform transform scale-90 group-hover:scale-100"
+                <Image
+                  src={getImageUrl(img.url)}
+                  alt={`Existing ${index}`}
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeExistingImage(index)}
+                  className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1.5 shadow-lg opacity-0 group-hover:opacity-100 transition-all hover:bg-red-600 hover:scale-110"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            ))}
+
+            {newPreviews.map((url, index) => (
+              <div
+                key={`new-${index}`}
+                className="relative aspect-square w-full border-2 border-dashed border-[#0e4d80]/30 rounded-3xl overflow-hidden group bg-blue-50/20"
               >
-                <X size={14} />
-              </button>
+                <Image
+                  src={url}
+                  alt={`New ${index}`}
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeNewImage(index)}
+                  className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1.5 shadow-lg transition-all hover:bg-red-600 hover:scale-110"
+                >
+                  <X size={14} />
+                </button>
+                <div className="absolute bottom-0 inset-x-0 bg-[#0e4d80]/80 text-white text-[9px] font-bold uppercase tracking-widest text-center py-1">New</div>
+              </div>
+            ))}
+
+            <div
+              className="aspect-square border-2 border-dashed border-gray-300 rounded-3xl flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 hover:border-[#0e4d80] transition-colors group"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3 group-hover:bg-[#0e4d80]/10 transition-colors">
+                <Plus className="w-6 h-6 text-gray-400 group-hover:text-[#0e4d80] transition-colors" />
+              </div>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 group-hover:text-[#0e4d80] transition-colors">
+                Add Image
+              </span>
+              <input
+                type="file"
+                multiple
+                ref={fileInputRef}
+                className="hidden"
+                accept="image/*"
+                onChange={handleImageChange}
+              />
             </div>
-          ))}
-          <div
-            className="aspect-square border-2 border-dashed border-gray-400 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 hover:border-blue-500 transition-all text-gray-500 hover:text-blue-600"
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <Plus className="w-8 h-8 mb-1" />
-            <span className="text-xs font-bold uppercase tracking-wide">
-              Add Image
-            </span>
-            <input
-              type="file"
-              multiple
-              ref={fileInputRef}
-              className="hidden"
-              accept="image/*"
-              onChange={handleImageChange}
-            />
           </div>
+          <p className="mt-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1">
+            <AlertCircle className="w-3 h-3" />
+            First image will be the main product thumbnail
+          </p>
         </div>
       </div>
 
       {/* Tags Section */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm relative">
-        <div className="bg-linear-to-r from-[#0047AB] to-[#D2042D] px-6 py-4 rounded-t-xl">
-          <h3 className="text-base font-bold text-white flex items-center gap-2 uppercase tracking-wide">
-            Search Tags
+      <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-lg relative overflow-visible">
+        <div className="bg-linear-to-r from-[#0e4d80] to-[#0a3a60] px-10 py-6 rounded-t-[2.5rem] relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+          <h3 className="text-xl font-bold text-white flex items-center gap-3 uppercase tracking-wide font-koulen relative z-10">
+            <Plus className="w-5 h-5 opacity-70" />
+            Product Tags
           </h3>
         </div>
 
-        <div className="p-6 flex flex-col space-y-3">
+        <div className="p-10 flex flex-col space-y-4">
           <div className="relative">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={tagInput}
-                onChange={(e) => {
-                  setTagInput(e.target.value);
-                  setShowTagSuggestions(true);
-                }}
-                onFocus={() => setShowTagSuggestions(true)}
-                onBlur={() =>
-                  setTimeout(() => setShowTagSuggestions(false), 200)
-                }
-                onKeyDown={handleAddTag}
-                placeholder="Type tag and press Enter"
-                className="block flex-1 rounded-lg border-gray-400 bg-gray-50 shadow-sm focus:border-[#0e4d80] focus:ring-[#0e4d80] sm:text-sm py-2.5 px-4 font-medium"
-              />
+            <div className="flex gap-3">
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  value={tagInput}
+                  onChange={(e) => {
+                    setTagInput(e.target.value);
+                    setShowTagSuggestions(true);
+                  }}
+                  onFocus={() => setShowTagSuggestions(true)}
+                  onBlur={() =>
+                    setTimeout(() => setShowTagSuggestions(false), 200)
+                  }
+                  onKeyDown={handleAddTag}
+                  placeholder="Type to search or add new tag..."
+                  className="block w-full rounded-2xl border-gray-200 bg-gray-50 shadow-sm focus:border-[#0e4d80] focus:ring-4 focus:ring-[#0e4d80]/5 outline-none transition-all py-4 px-5 font-bold text-gray-900 placeholder-gray-400 font-istok"
+                />
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-bold uppercase tracking-wider hidden md:block">
+                  Press Enter to Add
+                </div>
+              </div>
               <button
                 type="button"
                 onClick={addTagManually}
-                className="bg-[#0e4d80] text-white px-6 py-2 rounded-full text-sm font-bold shadow-md hover:opacity-90 transition-opacity uppercase tracking-wide font-koulen"
+                className="bg-[#0e4d80] text-white px-8 py-4 rounded-2xl text-sm font-bold shadow-lg hover:shadow-blue-900/10 hover:-translate-y-0.5 transition-all uppercase tracking-wider font-koulen"
               >
                 Add
               </button>
@@ -614,7 +596,7 @@ export default function ProductForm({
 
             {/* Tag Suggestions Dropdown */}
             {showTagSuggestions && filteredTags.length > 0 && (
-              <div className="absolute z-10 w-full bg-white border border-gray-100 rounded-lg mt-1 shadow-xl max-h-48 overflow-y-auto ring-1 ring-black ring-opacity-5">
+              <div className="absolute z-10 w-full bg-white border border-gray-100 rounded-2xl mt-2 shadow-2xl max-h-64 overflow-y-auto overflow-hidden p-2">
                 {filteredTags.map((tag) => (
                   <button
                     key={tag.id}
@@ -623,31 +605,34 @@ export default function ProductForm({
                       e.preventDefault(); // Prevent blur
                       selectTag(tag.name);
                     }}
-                    className="w-full text-left px-4 py-3 hover:bg-gray-50 text-base text-gray-700 transition-colors flex items-center justify-between group"
+                    className="w-full text-left px-5 py-3 hover:bg-blue-50 rounded-xl text-sm font-bold text-gray-700 transition-colors flex items-center justify-between group font-istok"
                   >
-                    <span className="font-medium">{tag.name}</span>
-                    <Plus className="w-4 h-4 text-gray-400 group-hover:text-black" />
+                    <span className="group-hover:text-[#0e4d80] transition-colors">
+                      {tag.name}
+                    </span>
+                    <Plus className="w-4 h-4 text-gray-300 group-hover:text-[#0e4d80] transition-colors" />
                   </button>
                 ))}
               </div>
             )}
           </div>
-          <div className="flex flex-wrap gap-2 min-h-11 p-3 border border-dashed border-gray-300 rounded-lg bg-gray-50/50">
+
+          <div className="flex flex-wrap gap-2 min-h-[60px] p-5 border-2 border-dashed border-gray-100 rounded-3xl bg-gray-50/30">
             {tags.length === 0 && (
-              <span className="text-gray-400 text-sm italic font-medium">
+              <span className="text-gray-400 text-sm font-bold italic font-istok w-full text-center py-2 opacity-50">
                 No tags added yet.
               </span>
             )}
             {tags.map((tag) => (
               <span
                 key={tag}
-                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide border shadow-sm ${getTagColorClass(tag)}`}
+                className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider border shadow-sm transition-transform hover:scale-105 ${getTagColorClass(tag)}`}
               >
                 {tag}
                 <button
                   type="button"
                   onClick={() => handleRemoveTag(tag)}
-                  className="hover:text-red-700 hover:scale-110 transition-transform"
+                  className="hover:text-red-600 transition-colors bg-white/50 rounded-full p-0.5"
                 >
                   <X size={12} strokeWidth={3} />
                 </button>
@@ -658,304 +643,294 @@ export default function ProductForm({
       </div>
 
       {/* Variants Section */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="bg-linear-to-r from-[#0047AB] to-[#D2042D] px-6 py-4 flex items-center justify-between">
-          <h3 className="text-base font-bold text-white flex items-center gap-2 uppercase tracking-wide">
-            Product Variants
-            <span className="text-xs font-bold text-[#0047AB] ml-2 py-0.5 px-2 bg-white rounded-full">
-              {variants.length} items
-            </span>
+      <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-lg overflow-hidden">
+        <div className="bg-linear-to-r from-[#0e4d80] to-[#0a3a60] px-10 py-6 relative overflow-hidden flex items-center justify-between">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+          <h3 className="text-xl font-bold text-white flex items-center gap-3 uppercase tracking-wide font-koulen relative z-10">
+            <Layers className="w-5 h-5 opacity-70" />
+            Variants Configuration
           </h3>
+          <span className="relative z-5 bg-white/20 backdrop-blur-md px-4 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest text-white border border-white/20">
+            {variants.length} SKU{variants.length !== 1 && 's'}
+          </span>
         </div>
 
         {/* Add Variant Form */}
-        <div className="bg-gray-50 p-5 rounded-xl border border-gray-200 mb-6">
-          <h5 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2 uppercase tracking-wide">
-            <Plus size={16} /> Add New Variant
-          </h5>
-          <div className="flex flex-wrap gap-4 items-end">
-            <div className="flex-1 min-w-35">
-              <label className="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wide">
-                Color
-              </label>
-              <select
-                value={newVariantColor}
-                onChange={(e) => setNewVariantColor(e.target.value)}
-                className="block w-full rounded-lg border-gray-400 bg-white shadow-sm focus:border-[#0e4d80] focus:ring-[#0e4d80] text-base py-3 px-4 font-medium"
+        <div className="p-10 pb-0">
+          <div className="bg-gray-50 p-6 rounded-[2rem] border border-gray-100 mb-8">
+            <h5 className="text-xs font-bold text-gray-400 mb-6 flex items-center gap-2 uppercase tracking-widest font-istok">
+              <Plus size={14} /> Add New Variant Combination
+            </h5>
+            <div className="flex flex-col md:flex-row gap-4 items-end">
+              <div className="flex-1 w-full">
+                <label className="block text-[10px] font-bold text-gray-500 mb-2 uppercase tracking-widest font-istok">
+                  Color
+                </label>
+                <div className="relative">
+                  <select
+                    value={newVariantColor}
+                    onChange={(e) => setNewVariantColor(e.target.value)}
+                    className="block w-full rounded-2xl border-gray-200 bg-white shadow-sm focus:border-[#0e4d80] focus:ring-4 focus:ring-[#0e4d80]/5 outline-none transition-all py-3 px-5 font-bold text-gray-900 appearance-none font-istok cursor-pointer"
+                  >
+                    <option value="">Select Color</option>
+                    {availableColors.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                    ▼
+                  </div>
+                </div>
+
+              </div>
+              <div className="flex-1 w-full">
+                <label className="block text-[10px] font-bold text-gray-500 mb-2 uppercase tracking-widest font-istok">
+                  Size
+                </label>
+                <div className="relative">
+                  <select
+                    value={newVariantSize}
+                    onChange={(e) => setNewVariantSize(e.target.value)}
+                    className="block w-full rounded-2xl border-gray-200 bg-white shadow-sm focus:border-[#0e4d80] focus:ring-4 focus:ring-[#0e4d80]/5 outline-none transition-all py-3 px-5 font-bold text-gray-900 appearance-none font-istok cursor-pointer"
+                  >
+                    <option value="">Select Size</option>
+                    {availableSizes.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.name}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                    ▼
+                  </div>
+                </div>
+              </div>
+              <div className="w-full md:w-32">
+                <label className="block text-[10px] font-bold text-gray-500 mb-2 uppercase tracking-widest font-istok">
+                  Initial Stock
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  value={newVariantStock}
+                  onChange={(e) => setNewVariantStock(e.target.value)}
+                  className="block w-full rounded-2xl border-gray-200 bg-white shadow-sm focus:border-[#0e4d80] focus:ring-4 focus:ring-[#0e4d80]/5 outline-none transition-all py-3 px-5 font-bold text-gray-900 text-center font-istok"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={handleAddVariant}
+                disabled={!newVariantColor || !newVariantSize}
+                className="w-full md:w-auto bg-[#0e4d80] text-white px-8 py-3 rounded-2xl text-[10px] font-bold hover:bg-[#0b3d66] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-blue-900/10 uppercase tracking-[0.2em] font-istok h-[50px] flex items-center justify-center gap-2"
               >
-                <option value="">Select Color</option>
-                {availableColors.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
+                <Plus className="w-4 h-4" />
+                Add Variant
+              </button>
             </div>
-            <div className="min-w-30">
-              <label className="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wide">
-                Size
-              </label>
-              <select
-                value={newVariantSize}
-                onChange={(e) => setNewVariantSize(e.target.value)}
-                className="block w-full rounded-lg border-gray-400 bg-white shadow-sm focus:border-[#0e4d80] focus:ring-[#0e4d80] text-base py-3 px-4 font-medium"
-              >
-                <option value="">Select Size</option>
-                {availableSizes.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="w-24">
-              <label className="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wide">
-                Stock
-              </label>
-              <input
-                type="number"
-                min="0"
-                value={newVariantStock}
-                onChange={(e) => setNewVariantStock(e.target.value)}
-                className="block w-full rounded-lg border-gray-400 bg-white shadow-sm focus:border-[#0e4d80] focus:ring-[#0e4d80] text-sm py-2.5 px-4 font-medium"
-              />
-            </div>
-            <button
-              type="button"
-              onClick={handleAddVariant}
-              disabled={!newVariantColor || !newVariantSize}
-              className="bg-linear-to-b from-[#0e4d80] to-[#D2042D] text-white px-6 py-2.5 rounded-lg text-sm font-bold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity shadow-md uppercase tracking-wide"
-            >
-              Add Variant
-            </button>
           </div>
         </div>
 
         {/* Variants Table */}
-        <div className="border border-gray-200 rounded-xl overflow-hidden shadow-sm">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                  Color
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                  Size
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                  Stock
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {variants.length === 0 ? (
+        <div className="pb-4">
+          <div className="mx-4 md:mx-10 mb-10 overflow-hidden border border-gray-100 rounded-3xl">
+            <table className="min-w-full divide-y divide-gray-100">
+              <thead className="bg-gray-50/80">
                 <tr>
-                  <td
-                    colSpan={5}
-                    className="px-6 py-12 text-center text-gray-400 text-sm font-medium"
-                  >
-                    No variants added yet. Use the form above to create one.
-                  </td>
+                  <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] font-istok">
+                    Color
+                  </th>
+                  <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] font-istok">
+                    Size
+                  </th>
+                  <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] font-istok">
+                    Stock
+                  </th>
+                  <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] font-istok">
+                    Status
+                  </th>
+                  <th className="px-6 py-4 text-right text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] font-istok">
+                    Actions
+                  </th>
                 </tr>
-              ) : (
-                variants.map((v, idx) => (
-                  <tr
-                    key={idx}
-                    className="group hover:bg-gray-50 transition-colors"
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className="w-6 h-6 rounded-full border border-gray-300 shadow-sm ring-1 ring-black ring-opacity-10"
-                          style={{ backgroundColor: v.color_code }}
-                        ></div>
-                        <span className="text-sm font-bold text-gray-900">
-                          {v.color_name}
-                        </span>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-50">
+                {variants.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={5}
+                      className="px-6 py-12 text-center text-gray-400"
+                    >
+                      <div className="flex flex-col items-center justify-center opacity-50">
+                        <Box className="w-12 h-12 mb-2" />
+                        <span className="font-bold font-istok text-sm">No variants added yet</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-800 border border-gray-200 uppercase">
-                        {v.size_name}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <input
-                        type="number"
-                        min="0"
-                        value={v.stock}
-                        onChange={(e) =>
-                          handleVariantChange(
-                            idx,
-                            "stock",
-                            parseInt(e.target.value) || 0,
-                          )
-                        }
-                        className="w-24 rounded-lg border-gray-300 shadow-sm focus:border-[#0e4d80] focus:ring-[#0e4d80] text-sm py-1.5 font-medium"
-                      />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          handleVariantChange(idx, "is_active", !v.is_active)
-                        }
-                        className={`px-3 py-1 text-xs font-bold rounded-full border flex items-center gap-1 w-fit transition-colors uppercase tracking-wide ${
-                          v.is_active
-                            ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
-                            : "bg-red-50 text-red-700 border-red-200 hover:bg-red-100"
-                        }`}
-                      >
-                        <span
-                          className={`w-1.5 h-1.5 rounded-full ${v.is_active ? "bg-green-500" : "bg-red-500"}`}
-                        ></span>
-                        {v.is_active ? "Active" : "Archived"}
-                      </button>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right">
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveVariant(idx)}
-                        className="text-gray-400 hover:text-red-600 transition-colors p-1 rounded hover:bg-red-50"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  variants.map((v, idx) => (
+                    <tr
+                      key={idx}
+                      className="group hover:bg-blue-50/10 transition-colors"
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center gap-3">
+                          <div
+                            className="w-8 h-8 rounded-full border border-gray-100 shadow-sm ring-2 ring-white"
+                            style={{ backgroundColor: v.color_code }}
+                          ></div>
+                          <span className="text-sm font-bold text-gray-800 font-istok">
+                            {v.color_name}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold bg-gray-100 text-gray-600 border border-gray-200 uppercase font-istok">
+                          {v.size_name}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <input
+                          type="number"
+                          min="0"
+                          value={v.stock}
+                          onChange={(e) =>
+                            handleVariantChange(
+                              idx,
+                              "stock",
+                              parseInt(e.target.value) || 0,
+                            )
+                          }
+                          className="w-24 rounded-xl border-gray-200 bg-gray-50 shadow-sm focus:border-[#0e4d80] focus:ring-4 focus:ring-[#0e4d80]/5 text-sm py-2 px-3 font-bold text-center outline-none transition-all font-istok"
+                        />
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleVariantChange(
+                              idx,
+                              "is_active",
+                              !v.is_active,
+                            )
+                          }
+                          className={`
+                                inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all
+                                ${v.is_active
+                              ? "bg-green-50 text-green-700 border border-green-100"
+                              : "bg-gray-100 text-gray-500 border border-gray-200"
+                            }
+                                `}
+                        >
+                          {v.is_active ? (
+                            <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                          ) : (
+                            <span className="w-1.5 h-1.5 rounded-full bg-gray-400" />
+                          )}
+                          {v.is_active ? "Active" : "Hidden"}
+                        </button>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right">
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveVariant(idx)}
+                          className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
-      <hr className="border-gray-200" />
-
-      {/* Color Images Section (Only if we have active colors) */}
+      {/* Color Images Upload Section - Top Level Card */}
       {activeColors.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="bg-linear-to-r from-[#0047AB] to-[#D2042D] px-6 py-4">
-            <h3 className="text-base font-bold text-white flex items-center gap-2 uppercase tracking-wide">
-              Variant Images
+        <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-lg overflow-hidden">
+          <div className="bg-gradient-to-r from-[#0e4d80] to-[#0a3a60] px-10 py-6 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+            <h3 className="text-xl font-bold text-white flex items-center gap-3 uppercase tracking-wide font-koulen relative z-10">
+              <UploadCloud className="w-5 h-5 opacity-70" />
+              Color-Specific Images
             </h3>
           </div>
 
-          <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {activeColors.map((color) => {
-              // Check for existing image in initialData
-              const existingColorImg = initialData?.colors?.find(
-                (c) => c.color_id === color.id,
-              )?.image;
-              const newFile = colorImages[color.id];
+          <div className="p-10">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+              {activeColors.map((color) => (
+                <div key={color.id} className="space-y-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-4 h-4 rounded-full border border-gray-100 shadow-sm shrink-0" style={{ backgroundColor: color.code }} />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 font-istok truncate" title={color.name}>
+                      {color.name}
+                    </span>
+                  </div>
 
-              return (
-                <div
-                  key={color.id}
-                  className="border border-gray-200 rounded-lg p-4 bg-white shadow-sm flex items-start gap-4 hover:border-blue-500 transition-colors"
-                >
-                  <div className="w-20 h-20 bg-gray-50 border border-gray-100 rounded-lg shrink-0 relative overflow-hidden flex items-center justify-center">
-                    {newFile ? (
-                      <Image
-                        src={URL.createObjectURL(newFile)}
-                        alt="New"
-                        fill
-                        className="object-cover"
-                      />
-                    ) : existingColorImg ? (
-                      <Image
-                        src={getImageUrl(existingColorImg)}
-                        alt="Existing"
-                        fill
-                        className="object-cover"
-                      />
+                  <div className="relative aspect-square w-full border-2 border-dashed border-gray-200 rounded-3xl overflow-hidden hover:border-[#0e4d80] hover:bg-gray-50 transition-all group bg-gray-50/50">
+                    {colorImages[color.id] ? (
+                      <>
+                        <Image
+                          src={URL.createObjectURL(colorImages[color.id])}
+                          alt={color.name}
+                          fill
+                          className="object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newImages = { ...colorImages };
+                            delete newImages[color.id];
+                            setColorImages(newImages);
+                          }}
+                          className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all shadow-lg hover:scale-110 hover:bg-red-600"
+                        >
+                          <X size={14} />
+                        </button>
+                      </>
                     ) : (
-                      <span className="text-[10px] text-gray-300 text-center px-1 font-medium">
-                        No Image
-                      </span>
+                      <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-blue-50/30 transition-colors">
+                        <UploadCloud className="w-6 h-6 text-gray-300 group-hover:text-[#0e4d80] transition-colors mb-2" />
+                        <span className="text-[9px] font-bold uppercase tracking-widest text-gray-400 group-hover:text-[#0e4d80] transition-colors">Upload</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => handleColorImageChange(color.id, e)}
+                        />
+                      </label>
                     )}
                   </div>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div
-                        className="w-4 h-4 rounded-full border border-gray-300 shadow-sm ring-1 ring-black ring-opacity-10"
-                        style={{ backgroundColor: color.code }}
-                      ></div>
-                      <span className="text-sm font-bold text-gray-900 truncate">
-                        {color.name}
-                      </span>
-                    </div>
-
-                    <div className="flex flex-col gap-2">
-                      <input
-                        type="file"
-                        id={`color-img-${color.id}`}
-                        className="hidden"
-                        accept="image/*"
-                        onChange={(e) => {
-                          if (e.target.files?.[0]) {
-                            setColorImages((prev) => ({
-                              ...prev,
-                              [color.id]: e.target.files![0],
-                            }));
-                          }
-                        }}
-                      />
-                      <label
-                        htmlFor={`color-img-${color.id}`}
-                        className="inline-flex items-center justify-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-bold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer transition-colors uppercase tracking-wide"
-                      >
-                        {newFile
-                          ? "Change File"
-                          : existingColorImg
-                            ? "Replace File"
-                            : "Upload File"}
-                      </label>
-
-                      {existingColorImg && !newFile && (
-                        <div className="flex items-center gap-1.5 text-xs text-green-600 font-bold">
-                          <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
-                          <span>Image Set</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
                 </div>
-              );
-            })}
+              ))}
+            </div>
           </div>
         </div>
       )}
 
-      {/* Bottom Actions */}
-      <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
-        {onCancel && (
-          <button
-            type="button"
-            onClick={onCancel}
-            className="bg-white py-2.5 px-6 border border-gray-300 rounded shadow-sm text-sm font-bold text-gray-700 hover:bg-gray-50 uppercase tracking-wider font-istok"
-          >
-            Cancel
-          </button>
-        )}
+
+      {/* Final Actions */}
+      <div className="flex justify-end gap-4 pt-4 pb-12">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="bg-white py-4 px-10 border border-gray-200 rounded-full shadow-sm text-xs font-bold text-gray-600 hover:bg-gray-50 uppercase tracking-[0.2em] font-istok transition-all hover:-translate-y-0.5"
+        >
+          Discard Changes
+        </button>
         <button
           type="submit"
-          disabled={isLoading || (!!initialData && !isDirty)}
-          className="inline-flex justify-center py-2.5 px-8 border border-transparent shadow-lg text-sm font-bold rounded text-white bg-linear-to-b from-[#0047AB] to-[#D2042D] hover:opacity-90 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider font-istok transform transition-transform hover:scale-105"
+          disabled={isLoading}
+          className="bg-[#0e4d80] py-4 px-12 border border-transparent rounded-full shadow-xl text-xs font-bold text-white hover:bg-[#0b3d66] uppercase tracking-[0.2em] font-istok transition-all hover:-translate-y-0.5 hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isLoading
-            ? "Saving..."
-            : initialData
-              ? "Save Changes"
-              : "Create Product"}
+          {isLoading ? "Processing..." : "Save Product"}
         </button>
       </div>
-    </form>
+
+    </form >
   );
 }

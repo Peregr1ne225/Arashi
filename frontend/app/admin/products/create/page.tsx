@@ -82,25 +82,54 @@ export default function CreateProductPage() {
 
   return (
     <div className="flex flex-col space-y-8">
-      <div className="flex justify-between items-end">
-        <div>
-          <button
-            onClick={() => router.back()}
-            className="font-istok text-[10px] uppercase tracking-[0.2em] text-gray-400 hover:text-[#0e4d80] mb-6 flex items-center transition-colors font-bold"
-          >
-            ← Back to Products
-          </button>
-          <h2 className="font-koulen text-4xl text-[#0e4d80] uppercase tracking-wide">
-            New <span className="text-[#0e4d80]/60">Product</span>
-          </h2>
-          <div className="h-1 w-12 bg-[#0e4d80]/20 mt-2 rounded-full"></div>
+      {/* Hero Header */}
+      <div className="relative rounded-[2.5rem] overflow-hidden bg-gradient-to-r from-blue-50 to-white border border-blue-100/50 shadow-sm p-12 mb-8">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#0e4d80]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+        <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+          <div>
+            <button
+              onClick={() => router.back()}
+              className="group flex items-center gap-2 mb-6 px-5 py-2.5 bg-white rounded-full border border-gray-100 shadow-sm text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 hover:text-[#0e4d80] hover:border-blue-100 transition-all hover:-translate-y-0.5"
+            >
+              <span className="group-hover:-translate-x-1 transition-transform">←</span>
+              Back to Products
+            </button>
+            <h1 className="font-koulen text-5xl text-[#0e4d80] uppercase tracking-wide leading-none mb-2">
+              Create New <span className="text-[#0e4d80]/40">Product</span>
+            </h1>
+            <p className="font-istok text-gray-400 text-sm font-bold tracking-wider max-w-xl">
+              Add a new item to your catalog. Configure variants, pricing strategies, and visual assets.
+            </p>
+          </div>
+
+          <div className="flex gap-4">
+            <Link
+              href="/admin/categories"
+              className="flex items-center gap-3 px-8 py-4 bg-white rounded-full shadow-lg shadow-blue-900/5 border border-gray-100 group hover:border-[#0e4d80]/30 transition-all hover:-translate-y-1"
+            >
+              <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center group-hover:bg-[#0e4d80] transition-colors">
+                <span className="text-[#0e4d80] group-hover:text-white font-koulen text-lg pt-0.5">C</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest group-hover:text-[#0e4d80] transition-colors">Manage</span>
+                <span className="font-koulen text-xl text-[#0e4d80] leading-none">Categories</span>
+              </div>
+            </Link>
+
+            <Link
+              href="/admin/attributes"
+              className="flex items-center gap-3 px-8 py-4 bg-white rounded-full shadow-lg shadow-blue-900/5 border border-gray-100 group hover:border-[#0e4d80]/30 transition-all hover:-translate-y-1"
+            >
+              <div className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center group-hover:bg-[#0e4d80] transition-colors">
+                <span className="text-purple-600 group-hover:text-white font-koulen text-lg pt-0.5">V</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest group-hover:text-[#0e4d80] transition-colors">Manage</span>
+                <span className="font-koulen text-xl text-[#0e4d80] leading-none">Variants</span>
+              </div>
+            </Link>
+          </div>
         </div>
-        <Link
-          href="/admin/categories"
-          className="font-istok text-[10px] uppercase tracking-[0.2em] bg-white border border-gray-100 hover:border-[#0e4d80] hover:text-[#0e4d80] px-6 py-3 rounded-full font-bold text-gray-400 transition-all shadow-sm shadow-blue-900/5"
-        >
-          Categories
-        </Link>
       </div>
 
       <div className="max-w-5xl mx-auto w-full">
