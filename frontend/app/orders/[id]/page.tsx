@@ -136,7 +136,7 @@ export default function OrderDetailPage() {
             </div>
 
             {/* Main Content Card Container */}
-            <div className="container mx-auto p-4 max-w-[1600px]">
+            <div className="container mx-auto p-4 max-w-7xl">
                 <div className="mb-8 pl-4">
                     <Link
                         href="/account?tab=orders"
