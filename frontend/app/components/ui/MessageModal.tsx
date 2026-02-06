@@ -10,6 +10,7 @@ interface MessageModalProps {
     message: string;
     onClose: () => void;
     type?: "success" | "error" | "info";
+    actions?: React.ReactNode;
 }
 
 export default function MessageModal({
@@ -18,6 +19,7 @@ export default function MessageModal({
     message,
     onClose,
     type = "info",
+    actions,
 }: MessageModalProps) {
     useEffect(() => {
         if (isOpen) {
@@ -76,12 +78,16 @@ export default function MessageModal({
                     </p>
                 </div>
 
-                <button
-                    onClick={onClose}
-                    className="px-8 py-3 rounded-full font-istok uppercase tracking-[0.2em] font-bold text-[10px] transition-all cursor-pointer text-white shadow-lg bg-[#0e4d80] hover:bg-[#0b3d66] shadow-blue-900/10 w-full hover:-translate-y-0.5 active:scale-95"
-                >
-                    Close
-                </button>
+                {actions ? (
+                    <div className="w-full">{actions}</div>
+                ) : (
+                    <button
+                        onClick={onClose}
+                        className="px-8 py-3 rounded-full font-istok uppercase tracking-[0.2em] font-bold text-[10px] transition-all cursor-pointer text-white shadow-lg bg-[#0e4d80] hover:bg-[#0b3d66] shadow-blue-900/10 w-full hover:-translate-y-0.5 active:scale-95"
+                    >
+                        Close
+                    </button>
+                )}
             </div>
         </div>,
         document.body
