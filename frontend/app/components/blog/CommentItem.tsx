@@ -77,7 +77,7 @@ export default function CommentItem({ comment, onDelete, onImageClick }: Comment
                     <div className="flex items-center gap-2">
                         <span className="font-bold text-gray-900 font-istok uppercase tracking-tight text-sm">{comment.author_name}</span>
                         <span className="w-1.5 h-1.5 bg-gray-300 rounded-full" />
-                        <span className="text-xs text-gray-400 uppercase tracking-widest font-istok">{formattedDate}</span>
+                        <span className="text-xs text-gray-400 uppercase tracking-widest font-istok" suppressHydrationWarning>{formattedDate}</span>
                     </div>
                     {canDelete && (
                         <button

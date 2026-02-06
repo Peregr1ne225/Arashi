@@ -7,6 +7,7 @@ import { blogsApi, getCommentsWebSocketUrl } from "@/app/lib/api/blogs";
 import { useAuth } from "@/app/contexts/AuthContext";
 import CommentItem from "@/app/components/blog/CommentItem";
 import Link from "next/link";
+import ConfirmationModal from "@/app/components/ui/ConfirmationModal";
 
 interface CommentSectionProps {
     postId: number;
@@ -31,6 +32,7 @@ export default function CommentSection({ postId, initialComments = [], children 
     const [loading, setLoading] = useState(false);
     const [loadingMore, setLoadingMore] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [commentToDelete, setCommentToDelete] = useState<number | null>(null);
 
     const [sortBy, setSortBy] = useState("-created_at");
 
@@ -194,16 +196,22 @@ export default function CommentSection({ postId, initialComments = [], children 
         }
     }, [newComment, image, isAuthenticated, postId, removeImage]);
 
-    const handleDeleteComment = async (commentId: number) => {
-        if (!confirm("Are you sure you want to delete this comment?")) return;
+    const handleDeleteComment = (commentId: number) => {
+        setCommentToDelete(commentId);
+    };
+
+    const confirmDelete = async () => {
+        if (!commentToDelete) return;
 
         try {
-            await blogsApi.deleteComment(commentId);
-            setComments((prev) => prev.filter((c) => c.id !== commentId));
+            await blogsApi.deleteComment(commentToDelete);
+            setComments((prev) => prev.filter((c) => c.id !== commentToDelete));
             setTotalCount(prev => prev - 1);
         } catch (err) {
             console.error("Failed to delete comment:", err);
             setError("Failed to delete comment");
+        } finally {
+            setCommentToDelete(null);
         }
     };
 
@@ -384,7 +392,7 @@ export default function CommentSection({ postId, initialComments = [], children 
             {
                 selectedImage && (
                     <div
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 transition-all animate-in fade-in"
+                        className="fixed inset-0 z-100 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 transition-all animate-in fade-in"
                         onClick={() => setSelectedImage(null)}
                     >
                         <div className="relative max-w-7xl max-h-[90vh] w-full flex items-center justify-center">
@@ -410,6 +418,17 @@ export default function CommentSection({ postId, initialComments = [], children 
                     </div>
                 )
             }
+
+            <ConfirmationModal
+                isOpen={!!commentToDelete}
+                onCancel={() => setCommentToDelete(null)}
+                onConfirm={confirmDelete}
+                title="Delete Comment"
+                message="Are you sure you want to delete this comment? This action cannot be undone."
+                confirmText="Delete"
+                cancelText="Cancel"
+                variant="danger"
+            />
         </div >
     );
 }

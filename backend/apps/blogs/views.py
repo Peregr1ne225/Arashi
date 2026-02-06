@@ -2,6 +2,7 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from django.db.models import Count, OuterRef, Subquery, Value
 from django.db.models.functions import Coalesce
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action
 
@@ -84,7 +85,12 @@ class PostViewSet(viewsets.ModelViewSet):
 
     parser_classes = (MultiPartParser, FormParser, JSONParser)
     permission_classes = [IsAuthorOrAdminOrReadOnly]
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter,
+    ]
+    filterset_fields = ["author__username"]
     search_fields = [
         "title",
         "content",

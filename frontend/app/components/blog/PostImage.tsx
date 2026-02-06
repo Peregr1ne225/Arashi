@@ -36,7 +36,7 @@ export default function PostImage({ src, alt, className = "aspect-4/5" }: PostIm
             {/* Lightbox Modal */}
             {isOpen && (
                 <div
-                    className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center cursor-zoom-out p-4"
+                    className="fixed inset-0 z-100 bg-black/90 flex items-center justify-center cursor-zoom-out p-4"
                     onClick={() => setIsOpen(false)}
                 >
                     <div className="relative w-full h-full max-w-7xl max-h-[90vh]">

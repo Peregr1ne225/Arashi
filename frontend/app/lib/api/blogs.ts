@@ -117,6 +117,7 @@ export const blogsApi = {
             search?: string;
             category?: string;
             ordering?: string;
+            author?: string;
         } = {},
     ): Promise<BlogPostListResponse> {
         try {
@@ -127,6 +128,7 @@ export const blogsApi = {
             if (params.search) queryParams.append("search", params.search);
             if (params.category) queryParams.append("category", params.category);
             if (params.ordering) queryParams.append("ordering", params.ordering);
+            if (params.author) queryParams.append("author__username", params.author);
 
             const response = await cachedApiFetch<BlogPostListResponse>(
                 `/blogs/posts/?${queryParams.toString()}`,
