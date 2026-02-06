@@ -124,7 +124,7 @@ function CheckoutCancelContent() {
                         </div>
 
                         <p className="text-gray-500 mb-10 font-body text-lg max-w-md mx-auto leading-relaxed">
-                            Your payment was not completed and items have been removed from your cart. Don't worry, you can easily reorder them below.
+                            Your payment was not completed and items have been removed from your cart. Don&apos;t worry, you can easily reorder them below.
                         </p>
 
                         <div className="space-y-4 max-w-sm mx-auto">
