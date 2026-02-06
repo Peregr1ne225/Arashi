@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { X } from "lucide-react";
 import { Color } from "@/app/types/attributes";
 
 interface ColorFormProps {
@@ -40,39 +41,39 @@ export default function ColorForm({ initialData, onSubmit, onCancel, isLoading }
     };
 
     return (
-        <form onSubmit={handleSubmit} className="p-6">
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="font-koulen text-3xl tracking-wide text-[#0e4d80]">
-                    {initialData ? "EDIT COLOR" : "NEW COLOR"}
+        <form onSubmit={handleSubmit} className="bg-white rounded-4xl shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh] border border-gray-100">
+            {/* Header */}
+            <div className="bg-linear-to-r from-[#0e4d80] to-[#0a3a60] px-8 py-5 flex items-center justify-between shrink-0">
+                <h2 className="font-koulen text-2xl text-white tracking-widest uppercase">
+                    {initialData ? "Edit Color" : "New Color"}
                 </h2>
                 <button
                     type="button"
                     onClick={onCancel}
-                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                    className="text-gray-400 hover:text-white transition-colors"
                 >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    <X size={20} />
                 </button>
             </div>
 
-            {error && (
-                <div className="mb-4 bg-red-50 text-red-600 p-4 rounded-2xl text-[10px] font-bold font-istok uppercase tracking-wider border border-red-100">
-                    {error}
-                </div>
-            )}
+            {/* Scrollable Content */}
+            <div className="p-6 overflow-y-auto flex-1 space-y-5">
+                {error && (
+                    <div className="bg-red-50 text-red-600 p-4 rounded-2xl text-[10px] font-bold font-istok uppercase tracking-wider border border-red-100">
+                        {error}
+                    </div>
+                )}
 
-            <div className="space-y-4">
                 {/* Name */}
                 <div>
-                    <label className="block text-sm font-bold text-gray-700 uppercase tracking-wider font-istok mb-1">
-                        Name
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">
+                        Color Name
                     </label>
                     <input
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="block w-full px-4 py-3 border border-gray-100 bg-gray-50 rounded-2xl shadow-sm focus:ring-4 focus:ring-[#0e4d80]/5 focus:border-[#0e4d80] outline-none font-istok text-base transition-all"
+                        className="block w-full rounded-2xl border-gray-100 shadow-sm focus:border-[#0e4d80] focus:ring-4 focus:ring-[#0e4d80]/5 sm:text-sm py-3 px-4 font-medium bg-gray-50 border outline-none transition-all placeholder:text-gray-400"
                         placeholder="e.g. Midnight Blue"
                         required
                     />
@@ -80,21 +81,23 @@ export default function ColorForm({ initialData, onSubmit, onCancel, isLoading }
 
                 {/* Hex Code */}
                 <div>
-                    <label className="block text-sm font-bold text-gray-700 uppercase tracking-wider font-istok mb-1">
-                        Color Code
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">
+                        Hex Code
                     </label>
-                    <div className="flex gap-4">
-                        <input
-                            type="color"
-                            value={code}
-                            onChange={(e) => setCode(e.target.value)}
-                            className="h-12 w-20 p-1 border border-gray-100 bg-gray-50 rounded-2xl shadow-sm cursor-pointer"
-                        />
+                    <div className="flex gap-3">
+                        <div className="relative shrink-0">
+                            <input
+                                type="color"
+                                value={code}
+                                onChange={(e) => setCode(e.target.value)}
+                                className="h-[50px] w-[50px] p-1 border border-gray-100 bg-white rounded-2xl shadow-sm cursor-pointer"
+                            />
+                        </div>
                         <input
                             type="text"
                             value={code}
                             onChange={(e) => setCode(e.target.value)}
-                            className="flex-1 px-4 py-3 border border-gray-100 bg-gray-50 rounded-2xl shadow-sm focus:ring-4 focus:ring-[#0e4d80]/5 focus:border-[#0e4d80] outline-none font-istok uppercase text-base transition-all"
+                            className="block w-full rounded-2xl border-gray-100 shadow-sm focus:border-[#0e4d80] focus:ring-4 focus:ring-[#0e4d80]/5 sm:text-sm py-3 px-4 font-medium bg-gray-50 border outline-none transition-all placeholder:text-gray-400 uppercase"
                             placeholder="#000000"
                             pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
                             required
@@ -103,19 +106,19 @@ export default function ColorForm({ initialData, onSubmit, onCancel, isLoading }
                 </div>
             </div>
 
-            {/* Actions */}
-            <div className="mt-8 flex justify-end space-x-3 pt-6 border-t border-gray-100">
+            {/* Footer */}
+            <div className="px-8 py-5 bg-gray-50/50 border-t border-gray-100 flex justify-end gap-3 shrink-0">
                 <button
                     type="button"
                     onClick={onCancel}
-                    className="bg-white py-3 px-8 border border-gray-200 rounded-full shadow-sm text-[10px] font-bold text-gray-600 hover:bg-gray-50 uppercase tracking-[0.2em] font-istok transition-all"
+                    className="px-6 py-2.5 border border-gray-200 text-gray-600 font-bold uppercase tracking-[0.2em] text-[10px] rounded-full hover:bg-white hover:border-gray-300 transition-all shadow-sm"
                 >
                     Discard
                 </button>
                 <button
                     type="submit"
                     disabled={isLoading}
-                    className="inline-flex justify-center py-3 px-10 border border-transparent shadow-lg text-[10px] font-bold rounded-full text-white bg-[#0e4d80] hover:bg-[#0b3d66] focus:outline-none disabled:opacity-50 uppercase tracking-[0.2em] font-istok transform transition-all active:scale-95"
+                    className="px-8 py-2.5 bg-[#0e4d80] text-white font-bold uppercase tracking-[0.2em] text-[10px] rounded-full hover:bg-[#0b3d66] transition-all shadow-lg hover:shadow-blue-900/10 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {isLoading ? "SAVING..." : (initialData ? "UPDATE COLOR" : "SAVE COLOR")}
                 </button>
