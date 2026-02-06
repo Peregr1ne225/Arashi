@@ -36,20 +36,20 @@ export default function ConfiguratorPanel({
     const items = selectedCategory === "shirts" ? availableShirts : availablePants;
 
     return (
-        <div className="flex flex-col h-full bg-white border-l border-neutral-200">
+        <div className="flex flex-col h-full bg-white/50">
             {/* Avatar Selector Section */}
-            <div className="p-6 border-b border-neutral-200">
-                <h3 className="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-3">Model</h3>
-                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+            <div className="p-8 border-b border-gray-100">
+                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-[0.2em] mb-4 font-koulen text-[#0e4d80]">Select Model</h3>
+                <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                     {avatars.map(avatar => (
                         <button
                             key={avatar.id}
                             onClick={() => setCurrentAvatar(avatar)}
                             className={cn(
-                                "shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all border",
+                                "shrink-0 px-5 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all font-istok border",
                                 currentAvatar?.id === avatar.id
-                                    ? "bg-neutral-900 text-white border-neutral-900 shadow-sm"
-                                    : "bg-white text-neutral-600 border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50"
+                                    ? "bg-[#0e4d80] text-white border-[#0e4d80] shadow-lg shadow-blue-900/20"
+                                    : "bg-white text-gray-400 border-gray-100 hover:border-blue-200 hover:text-[#0e4d80]"
                             )}
                         >
                             {avatar.name}
@@ -59,14 +59,14 @@ export default function ConfiguratorPanel({
             </div>
 
             {/* Category Tabs */}
-            <div className="flex border-b border-neutral-200">
+            <div className="flex border-b border-gray-100 p-2 gap-2">
                 <button
                     onClick={() => setSelectedCategory("shirts")}
                     className={cn(
-                        "flex-1 py-4 text-sm font-medium transition-colors",
+                        "flex-1 py-3 text-xs font-bold uppercase tracking-widest transition-all rounded-2xl font-istok border border-transparent",
                         selectedCategory === "shirts"
-                            ? "text-black border-b-2 border-black"
-                            : "text-neutral-500 hover:text-black"
+                            ? "bg-[#0e4d80] text-white shadow-md shadow-blue-900/10"
+                            : "text-gray-400 hover:bg-gray-50 hover:text-gray-600"
                     )}
                 >
                     Shirts
@@ -74,10 +74,10 @@ export default function ConfiguratorPanel({
                 <button
                     onClick={() => setSelectedCategory("pants")}
                     className={cn(
-                        "flex-1 py-4 text-sm font-medium transition-colors",
+                        "flex-1 py-3 text-xs font-bold uppercase tracking-widest transition-all rounded-2xl font-istok border border-transparent",
                         selectedCategory === "pants"
-                            ? "text-black border-b-2 border-black"
-                            : "text-neutral-500 hover:text-black"
+                            ? "bg-[#0e4d80] text-white shadow-md shadow-blue-900/10"
+                            : "text-gray-400 hover:bg-gray-50 hover:text-gray-600"
                     )}
                 >
                     Pants
@@ -85,7 +85,7 @@ export default function ConfiguratorPanel({
             </div>
 
             {/* Items Grid */}
-            <div className="flex-1 overflow-y-auto p-6">
+            <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
                 <div className="grid grid-cols-2 gap-4">
                     {items.map((item) => {
                         const isSelected =
@@ -103,18 +103,25 @@ export default function ConfiguratorPanel({
                                     }
                                 }}
                                 className={cn(
-                                    "flex flex-col items-start p-4 rounded-lg border text-left transition-all",
+                                    "flex flex-col items-start p-3 rounded-3xl border text-left transition-all group relative overflow-hidden",
                                     isSelected
-                                        ? "border-black bg-neutral-50 ring-1 ring-black"
-                                        : "border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50"
+                                        ? "border-[#0e4d80] bg-blue-50/50 shadow-md ring-1 ring-[#0e4d80]"
+                                        : "border-gray-100 bg-white hover:border-blue-200 hover:shadow-sm"
                                 )}
                             >
-                                <div className="w-full aspect-square bg-neutral-200 rounded-md mb-3 flex items-center justify-center text-2xl">
-                                    {/* Placeholder icon/emoji logic */}
+                                <div className="w-full aspect-square bg-[#FDFDFB] rounded-2xl mb-3 flex items-center justify-center text-4xl border border-gray-50 group-hover:scale-105 transition-transform duration-500">
+                                    {/* Placeholder icon/emoji logic - could be replaced with Image if available in future */}
                                     {selectedCategory === "shirts" ? "👕" : "👖"}
                                 </div>
-                                <span className="font-medium text-sm">{item.name}</span>
-                                <span className="text-xs text-neutral-500 mt-1">{item.description}</span>
+                                <span className={cn(
+                                    "font-koulen text-lg leading-none uppercase tracking-wide truncate w-full mb-1",
+                                    isSelected ? "text-[#0e4d80]" : "text-gray-700"
+                                )}>
+                                    {item.name}
+                                </span>
+                                <span className="text-[10px] text-gray-400 font-bold font-istok uppercase tracking-wider line-clamp-1">
+                                    {item.description}
+                                </span>
                             </button>
                         );
                     })}
@@ -122,15 +129,15 @@ export default function ConfiguratorPanel({
             </div>
 
             {/* Reset Button */}
-            <div className="p-6 border-t border-neutral-200">
+            <div className="p-6 border-t border-gray-100 bg-white/50 backdrop-blur-sm">
                 <button
                     onClick={() => {
                         setSelectedShirt(null);
                         setSelectedPant(null);
                     }}
-                    className="w-full py-3 px-4 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 rounded-lg font-medium transition-colors"
+                    className="w-full py-4 px-6 bg-white border-2 border-gray-100 text-gray-400 rounded-full hover:bg-gray-50 hover:text-gray-600 font-koulen uppercase tracking-[0.2em] text-sm transition-all shadow-sm hover:shadow-md"
                 >
-                    Reset Avatar
+                    Reset Outfit
                 </button>
             </div>
         </div>

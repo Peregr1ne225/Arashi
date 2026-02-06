@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import AvatarScene from "@/app/components/avatar/AvatarScene";
 import ConfiguratorPanel from "@/app/components/avatar/ConfiguratorPanel";
 import Link from "next/link";
-import { ChevronLeft } from "lucide-react";
 import { visualizationApi } from "@/app/lib/api/client";
 import { Avatar } from "@/app/types/visualization";
 
@@ -76,83 +75,104 @@ export default function ModelPage() {
     const pantUrl = availablePants.find(p => p.slug === selectedPant)?.file || null;
 
     return (
-        <div className="flex h-[calc(100vh-var(--header-height,72px))] w-full bg-neutral-50 overflow-hidden">
-            {/* 3D Scene Area */}
-            <div className="flex-1 relative">
-                <header className="absolute top-0 left-0 p-6 z-10 w-full flex items-center justify-between pointer-events-none">
+        <div className="min-h-screen bg-white pb-8 animate-in fade-in duration-700">
+            {/* Main Content Card Container */}
+            <div className="container mx-auto p-4 w-[95%] max-w-[1800px]">
+                <div className="mb-8 pl-4">
                     <Link
                         href="/"
-                        className="pointer-events-auto flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-md rounded-full shadow-sm text-sm font-medium hover:bg-white transition-colors"
+                        className="inline-flex items-center text-xs font-bold uppercase tracking-[0.2em] text-gray-400 hover:text-[#0e4d80] font-body transition-colors group"
                     >
-                        <ChevronLeft size={16} />
-                        Back to Shop
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={1.5}
+                                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                            />
+                        </svg>
+                        Back to Home
                     </Link>
-                </header>
+                </div>
 
-                {/* Environment Controls (Top Left) */}
-                <div className="absolute top-24 left-6 z-10 bg-white/90 backdrop-blur rounded-lg p-2 shadow-sm border border-neutral-200">
-                    <div className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-2 px-1">Environment</div>
-                    <div className="flex flex-col gap-1">
-                        {ENVIRONMENTS.map(env => (
-                            <button
-                                key={env.id}
-                                onClick={() => setEnvironment(env.id)}
-                                className={cn(
-                                    "px-3 py-1.5 text-xs font-medium rounded-md text-left transition-colors",
-                                    environment === env.id
-                                        ? "bg-black text-white"
-                                        : "hover:bg-neutral-100 text-neutral-600"
-                                )}
-                            >
-                                {env.label}
-                            </button>
-                        ))}
+                <div className="bg-white rounded-[3rem] md:rounded-[4rem] shadow-2xl shadow-blue-900/5 overflow-hidden border border-gray-100 relative h-auto md:h-[80vh] flex flex-col md:flex-row">
+                    {/* 3D Scene Area */}
+                    <div className="w-full md:flex-1 h-[50vh] md:h-full relative bg-neutral-50/50">
+
+                        {/* Environment Controls (Top Left) */}
+                        <div className="absolute top-6 left-6 z-10 bg-white/80 backdrop-blur-sm rounded-[2rem] p-3 shadow-lg shadow-blue-900/5 border border-white/50">
+                            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 px-2 font-istok">Environment</div>
+                            <div className="flex flex-col gap-1">
+                                {ENVIRONMENTS.map(env => (
+                                    <button
+                                        key={env.id}
+                                        onClick={() => setEnvironment(env.id)}
+                                        className={cn(
+                                            "px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-full text-left transition-all font-istok",
+                                            environment === env.id
+                                                ? "bg-[#0e4d80] text-white shadow-md shadow-blue-900/20"
+                                                : "hover:bg-white text-gray-500 hover:text-[#0e4d80]"
+                                        )}
+                                    >
+                                        {env.label}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Actions Bar (Bottom Floating) - Disabled for now
+                        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 bg-white/80 backdrop-blur-md rounded-full p-2 shadow-xl shadow-blue-900/10 border border-white/50 flex gap-2">
+                            {ACTIONS.map((action) => (
+                                <button
+                                    key={action.id}
+                                    onClick={() => setActionName(action.id)}
+                                    className={cn(
+                                        "px-6 py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all flex items-center gap-3 font-istok",
+                                        actionName === action.id
+                                            ? "bg-[#0e4d80] text-white shadow-lg shadow-blue-900/20 scale-105"
+                                            : "bg-transparent text-gray-500 hover:bg-white hover:text-[#0e4d80]"
+                                    )}
+                                >
+                                    <span className="text-lg">{action.icon}</span>
+                                    <span>{action.label}</span>
+                                </button>
+                            ))}
+                        </div>
+                        */}
+                        <div className="w-full h-full">
+                            <AvatarScene
+                                baseModelUrl={currentAvatar.base_file}
+                                shirtUrl={shirtUrl}
+                                pantUrl={pantUrl}
+                                actionName={actionName}
+                                environmentPreset={environment}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Configurator Sidebar */}
+                    <div className="w-full md:w-[400px] h-[40vh] md:h-full md:border-l border-t md:border-t-0 border-gray-100 bg-white relative z-20">
+                        <ConfiguratorPanel
+                            selectedCategory={selectedCategory}
+                            setSelectedCategory={setSelectedCategory}
+                            selectedShirt={selectedShirt}
+                            setSelectedShirt={setSelectedShirt}
+                            selectedPant={selectedPant}
+                            setSelectedPant={setSelectedPant}
+                            availableShirts={availableShirts}
+                            availablePants={availablePants}
+                            avatars={avatars}
+                            currentAvatar={currentAvatar}
+                            setCurrentAvatar={setCurrentAvatar}
+                        />
                     </div>
                 </div>
-
-                {/* Actions Bar (Bottom Floating) */}
-                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 bg-white/90 backdrop-blur rounded-full p-2 shadow-lg border border-neutral-200 flex gap-2">
-                    {ACTIONS.map((action) => (
-                        <button
-                            key={action.id}
-                            onClick={() => setActionName(action.id)}
-                            className={cn(
-                                "px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-2",
-                                actionName === action.id
-                                    ? "bg-black text-white shadow-md"
-                                    : "bg-transparent text-neutral-600 hover:bg-neutral-100"
-                            )}
-                        >
-                            <span>{action.icon}</span>
-                            <span>{action.label}</span>
-                        </button>
-                    ))}
-                </div>
-
-                <AvatarScene
-                    baseModelUrl={currentAvatar.base_file}
-                    shirtUrl={shirtUrl}
-                    pantUrl={pantUrl}
-                    actionName={actionName}
-                    environmentPreset={environment}
-                />
-            </div>
-
-            {/* Configurator Sidebar */}
-            <div className="w-[400px] h-full shadow-xl z-20">
-                <ConfiguratorPanel
-                    selectedCategory={selectedCategory}
-                    setSelectedCategory={setSelectedCategory}
-                    selectedShirt={selectedShirt}
-                    setSelectedShirt={setSelectedShirt}
-                    selectedPant={selectedPant}
-                    setSelectedPant={setSelectedPant}
-                    availableShirts={availableShirts}
-                    availablePants={availablePants}
-                    avatars={avatars}
-                    currentAvatar={currentAvatar}
-                    setCurrentAvatar={setCurrentAvatar}
-                />
             </div>
         </div>
     );
