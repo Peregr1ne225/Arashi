@@ -24,6 +24,8 @@ class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
     lookup_field = "display_id"
+    search_fields = ["id", "display_id", "full_name", "user__first_name", "user__last_name", "user__email", "phone_number"]
+    filterset_fields = ["status", "is_paid"]
 
     def get_object(self):
         """

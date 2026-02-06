@@ -71,48 +71,56 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
     return (
         <AuthGuard requireAdmin={true}>
-            <div className="bg-[#FDFDFB] h-[calc(100vh-3.75rem)] flex flex-col lg:flex-row w-full overflow-hidden">
+            <div className="bg-[#FDFDFB] min-h-screen flex flex-col lg:flex-row w-full">
                 {/* Sidebar Navigation */}
-                <aside className="w-full lg:w-72 shrink-0 bg-white lg:sticky lg:top-0 lg:h-full lg:overflow-y-auto border-r border-gray-100 p-6 space-y-8 group scrollbar-hide">
-                    <div>
-                        <h1 className="font-koulen text-4xl tracking-tight text-[#0e4d80] flex items-center gap-2">
-                            ADMIN <span className="text-[#0e4d80]/60">PANEL</span>
-                        </h1>
-                        <p className="font-istok text-[10px] text-gray-400 uppercase tracking-[0.3em] font-bold mt-2">
-                            Core Control System
-                        </p>
-                    </div>
+                <aside className="w-full lg:w-72 shrink-0 lg:h-[calc(100vh-5rem)] lg:sticky lg:top-20 p-4 lg:p-6 overflow-y-auto scrollbar-hide z-40">
+                    <div className="bg-white rounded-[2.5rem] shadow-xl shadow-blue-900/5 border border-gray-100 h-full flex flex-col p-6">
+                        <div className="mb-8 px-2">
+                            <h1 className="font-koulen text-3xl tracking-tight text-[#0e4d80] flex items-center gap-2">
+                                ADMIN <span className="text-[#0e4d80]/60">PANEL</span>
+                            </h1>
+                            <p className="font-istok text-[9px] text-gray-400 uppercase tracking-[0.3em] font-bold mt-2 pl-1">
+                                Core Control System
+                            </p>
+                        </div>
 
-                    <nav className="flex flex-col space-y-2">
-                        {navItems.map((item) => {
-                            const active = isActive(item.href);
-                            const Icon = item.icon;
-                            return (
-                                <Link
-                                    key={item.id}
-                                    href={item.href}
-                                    className={`
-                                        flex items-center space-x-4 px-4 py-4 rounded-full transition-all duration-300 group
-                                        ${active
-                                            ? "bg-[#e0f2fe] text-[#0e4d80] shadow-sm translate-x-2 font-bold"
-                                            : "text-gray-400 hover:text-[#0e4d80] hover:bg-gray-50 hover:translate-x-1"
-                                        }
-                                    `}
-                                >
-                                    <Icon
-                                        className={`w-5 h-5 ${active ? "text-[#0e4d80]" : "text-gray-400 group-hover:text-[#0e4d80]"}`}
-                                    />
-                                    <span className="font-istok text-[12px] uppercase tracking-[0.2em]">
-                                        {item.label}
-                                    </span>
-                                </Link>
-                            );
-                        })}
-                    </nav>
+                        <nav className="flex flex-col space-y-2 flex-1">
+                            {navItems.map((item) => {
+                                const active = isActive(item.href);
+                                const Icon = item.icon;
+                                return (
+                                    <Link
+                                        key={item.id}
+                                        href={item.href}
+                                        className={`
+                                            flex items-center space-x-4 px-5 py-4 rounded-full transition-all duration-300 group
+                                            ${active
+                                                ? "bg-[#0e4d80] text-white shadow-lg shadow-blue-900/20 translate-x-1"
+                                                : "text-gray-400 hover:text-[#0e4d80] hover:bg-blue-50/50 hover:translate-x-1"
+                                            }
+                                        `}
+                                    >
+                                        <Icon
+                                            className={`w-5 h-5 ${active ? "text-white" : "text-gray-400 group-hover:text-[#0e4d80]"}`}
+                                        />
+                                        <span className="font-istok text-[11px] font-bold uppercase tracking-[0.2em]">
+                                            {item.label}
+                                        </span>
+                                    </Link>
+                                );
+                            })}
+                        </nav>
+
+                        <div className="mt-auto pt-6 border-t border-gray-50">
+                            <Link href="/" className="flex items-center gap-3 px-5 py-3 rounded-full text-gray-400 hover:text-[#0e4d80] hover:bg-gray-50 transition-colors group">
+                                <span className="font-koulen text-sm uppercase tracking-wider">Exit to Shop</span>
+                            </Link>
+                        </div>
+                    </div>
                 </aside>
 
                 {/* Main Content Area */}
-                <main className="flex-1 min-w-0 bg-white px-6 lg:px-8 pb-8 overflow-auto">
+                <main className="flex-1 min-w-0 px-4 lg:px-6 lg:py-6 h-auto">
                     {children}
                 </main>
             </div>

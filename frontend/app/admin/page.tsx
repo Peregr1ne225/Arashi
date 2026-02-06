@@ -118,174 +118,192 @@ export default function AdminDashboard() {
     const activeOrders = (orderStats?.status_counts?.processing || 0) + (orderStats?.status_counts?.shipped || 0);
 
     return (
-        <div className="pt-8 flex flex-col space-y-10 pb-20">
-            {/* Header section */}
-            <div className="flex justify-between items-end">
-                <div>
-                    <h1 className="font-koulen text-4xl tracking-wide text-[#0e4d80]">
-                        Management <span className="text-[#0e4d80]/60">Dashboard</span>
-                    </h1>
-                    <p className="font-istok text-xs text-gray-500 uppercase tracking-[0.2em] mt-1 font-bold">
-                        Real-time system metrics
-                    </p>
+        <div className="flex flex-col space-y-10 pb-20">
+            {/* Header section - Hero Style */}
+            <div className="relative overflow-hidden bg-gradient-to-r from-blue-50 to-white rounded-[2.5rem] p-10 border border-blue-100 shadow-sm">
+                <div className="absolute top-0 right-0 w-64 h-full bg-blue-100/30 skew-x-[-20deg] translate-x-12 pointer-events-none" />
+                <div className="relative z-10 flex flex-col md:flex-row justify-between items-end gap-6">
+                    <div>
+                        <div className="px-4 py-1.5 rounded-full border border-blue-100 bg-white/80 backdrop-blur-sm shadow-sm inline-flex items-center gap-2 mb-4">
+                            <div className="w-2 h-2 rounded-full bg-[#0e4d80] animate-pulse"></div>
+                            <span className="font-koulen text-[10px] text-[#0e4d80] uppercase tracking-[0.2em]">
+                                Live Overview
+                            </span>
+                        </div>
+                        <h1 className="font-koulen text-5xl md:text-6xl tracking-tight text-[#0e4d80] leading-[0.9]">
+                            Management <span className="text-gray-300">Dashboard</span>
+                        </h1>
+                        <p className="font-istok text-xs text-gray-500 uppercase tracking-[0.2em] mt-2 font-bold ml-1">
+                            Real-time system metrics & analytics
+                        </p>
+                    </div>
+                    <button
+                        onClick={fetchDashboardData}
+                        className="px-6 py-3 bg-white border border-gray-200 rounded-full text-[10px] font-bold font-istok uppercase tracking-widest hover:border-[#0e4d80] hover:text-[#0e4d80] hover:shadow-lg hover:-translate-y-0.5 transition-all shadow-sm"
+                    >
+                        Refresh Data
+                    </button>
                 </div>
-                <button
-                    onClick={fetchDashboardData}
-                    className="px-6 py-2 bg-white border border-gray-200 rounded-full text-xs font-istok uppercase tracking-widest hover:border-[#0e4d80] hover:text-[#0e4d80] transition-colors"
-                >
-                    Refresh Data
-                </button>
             </div>
 
             {/* Stats Overview - KPI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {/* Total Revenue */}
-                <div className="card-sport p-6 group">
-                    <div className="flex justify-between items-start mb-4">
-                        <p className="font-istok text-[10px] uppercase tracking-widest text-gray-400">Total Revenue</p>
-                        <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                <div className="bg-white rounded-[2.5rem] p-6 shadow-xl shadow-blue-900/5 border border-gray-100 group hover:border-blue-200 transition-colors relative overflow-hidden">
+                    <div className="absolute -right-6 -top-6 w-24 h-24 bg-blue-50 rounded-full blur-2xl opacity-50 group-hover:opacity-100 transition-opacity" />
+                    <div className="flex justify-between items-start mb-6 relative">
+                        <div className="p-3 bg-blue-50 rounded-2xl group-hover:scale-110 transition-transform duration-300">
                             <DollarSign className="w-5 h-5 text-blue-600" />
                         </div>
+                        <div className="px-3 py-1 rounded-full bg-green-100 border border-green-200">
+                            <span className="font-istok text-[9px] font-bold uppercase tracking-widest text-green-700 flex items-center gap-1">
+                                <TrendingUp className="w-3 h-3" /> +12%
+                            </span>
+                        </div>
                     </div>
-                    <h3 className="font-koulen text-3xl text-blue-600 tracking-tight">
-                        ฿{Number(orderStats?.total_revenue || 0).toLocaleString()}
-                    </h3>
-                    <p className="font-istok text-[9px] uppercase tracking-widest text-gray-500 mt-2 flex items-center gap-1">
-                        <TrendingUp className="w-3 h-3 text-green-500" />
-                        <span className="text-green-500">From {orderStats?.total_orders || 0} orders</span>
-                    </p>
+                    <div className="relative">
+                        <p className="font-istok text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Total Revenue</p>
+                        <h3 className="font-koulen text-4xl text-[#0e4d80] tracking-tight leading-none mb-1">
+                            ฿{Number(orderStats?.total_revenue || 0).toLocaleString()}
+                        </h3>
+                        <p className="font-istok text-[10px] text-gray-400">
+                            From <span className="font-bold text-gray-600">{orderStats?.total_orders || 0}</span> orders
+                        </p>
+                    </div>
                 </div>
 
                 {/* Active Orders */}
-                <div className="card-sport p-6 group border-l-4 border-l-[#D2042D]/20">
-                    <div className="flex justify-between items-start mb-4">
-                        <p className="font-istok text-[10px] uppercase tracking-widest text-gray-400">Active Orders</p>
-                        <div className="w-10 h-10 bg-red-50 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                <div className="bg-white rounded-[2.5rem] p-6 shadow-xl shadow-blue-900/5 border border-gray-100 group hover:border-red-200 transition-colors relative overflow-hidden">
+                    <div className="absolute -right-6 -top-6 w-24 h-24 bg-red-50 rounded-full blur-2xl opacity-50 group-hover:opacity-100 transition-opacity" />
+                    <div className="flex justify-between items-start mb-6 relative">
+                        <div className="p-3 bg-red-50 rounded-2xl group-hover:scale-110 transition-transform duration-300">
                             <ShoppingCart className="w-5 h-5 text-[#D2042D]" />
                         </div>
                     </div>
-                    <h3 className="font-koulen text-3xl text-[#D2042D] tracking-tight">{activeOrders}</h3>
-                    <p className="font-istok text-[9px] uppercase tracking-widest text-gray-500 mt-2">
-                        {orderStats?.status_counts?.pending || 0} Pending · {orderStats?.status_counts?.processing || 0} Processing
-                    </p>
+                    <div className="relative">
+                        <p className="font-istok text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Active Orders</p>
+                        <h3 className="font-koulen text-4xl text-[#D2042D] tracking-tight leading-none mb-1">
+                            {activeOrders}
+                        </h3>
+                        <p className="font-istok text-[10px] text-gray-400">
+                            {orderStats?.status_counts?.processing || 0} Processing · {orderStats?.status_counts?.shipped || 0} Shipped
+                        </p>
+                    </div>
                 </div>
 
                 {/* Total Products */}
-                <div className="card-sport p-6 group">
-                    <div className="flex justify-between items-start mb-4">
-                        <p className="font-istok text-[10px] uppercase tracking-widest text-gray-400">Total Products</p>
-                        <div className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                <div className="bg-white rounded-[2.5rem] p-6 shadow-xl shadow-blue-900/5 border border-gray-100 group hover:border-gray-300 transition-colors relative overflow-hidden">
+                    <div className="absolute -right-6 -top-6 w-24 h-24 bg-gray-100 rounded-full blur-2xl opacity-50 group-hover:opacity-100 transition-opacity" />
+                    <div className="flex justify-between items-start mb-6 relative">
+                        <div className="p-3 bg-gray-50 rounded-2xl group-hover:scale-110 transition-transform duration-300">
                             <Package className="w-5 h-5 text-gray-600" />
                         </div>
-                    </div>
-                    <h3 className="font-koulen text-3xl text-gray-900 tracking-tight">{productStats?.total_count || 0}</h3>
-                    <p className="font-istok text-[9px] uppercase tracking-widest text-gray-500 mt-2 flex items-center gap-1">
-                        {(productStats?.low_stock_count || 0) > 0 ? (
-                            <>
-                                <AlertTriangle className="w-3 h-3 text-orange-500" />
-                                <span className="text-orange-500">{productStats?.low_stock_count} Low stock</span>
-                            </>
-                        ) : (
-                            <span className="text-green-500">All stocked</span>
+                        {(productStats?.low_stock_count || 0) > 0 && (
+                            <div className="px-3 py-1 rounded-full bg-orange-100 border border-orange-200">
+                                <span className="font-istok text-[9px] font-bold uppercase tracking-widest text-orange-700 flex items-center gap-1">
+                                    <AlertTriangle className="w-3 h-3" /> Alert
+                                </span>
+                            </div>
                         )}
-                    </p>
+                    </div>
+                    <div className="relative">
+                        <p className="font-istok text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Inventory</p>
+                        <h3 className="font-koulen text-4xl text-gray-900 tracking-tight leading-none mb-1">
+                            {productStats?.total_count || 0}
+                        </h3>
+                        <p className="font-istok text-[10px] text-gray-400">
+                            {(productStats?.low_stock_count || 0) > 0
+                                ? <span className="text-orange-600 font-bold">{productStats?.low_stock_count} Low Stock Items</span>
+                                : <span className="text-green-600 font-bold">All Stocked</span>
+                            }
+                        </p>
+                    </div>
                 </div>
 
                 {/* Total Users */}
-                <div className="card-sport p-6 group">
-                    <div className="flex justify-between items-start mb-4">
-                        <p className="font-istok text-[10px] uppercase tracking-widest text-gray-400">Total Users</p>
-                        <div className="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                <div className="bg-white rounded-[2.5rem] p-6 shadow-xl shadow-blue-900/5 border border-gray-100 group hover:border-green-200 transition-colors relative overflow-hidden">
+                    <div className="absolute -right-6 -top-6 w-24 h-24 bg-green-50 rounded-full blur-2xl opacity-50 group-hover:opacity-100 transition-opacity" />
+                    <div className="flex justify-between items-start mb-6 relative">
+                        <div className="p-3 bg-green-50 rounded-2xl group-hover:scale-110 transition-transform duration-300">
                             <Users className="w-5 h-5 text-green-600" />
                         </div>
                     </div>
-                    <h3 className="font-koulen text-3xl text-green-600 tracking-tight">{userStats?.total_users || 0}</h3>
-                    <p className="font-istok text-[9px] uppercase tracking-widest text-gray-500 mt-2">
-                        {userStats?.admin_users || 0} Admins · {userStats?.active_users || 0} Active
-                    </p>
+                    <div className="relative">
+                        <p className="font-istok text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Customers</p>
+                        <h3 className="font-koulen text-4xl text-green-600 tracking-tight leading-none mb-1">
+                            {userStats?.total_users || 0}
+                        </h3>
+                        <p className="font-istok text-[10px] text-gray-400">
+                            <span className="font-bold text-gray-600">{userStats?.active_users || 0}</span> Active Users
+                        </p>
+                    </div>
                 </div>
             </div>
 
             {/* Second Row: Order Status & Low Stock */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Order Status Distribution */}
-                <div className="lg:col-span-2 card-sport p-8">
+                <div className="lg:col-span-2 bg-white rounded-[3rem] p-8 shadow-xl shadow-blue-900/5 border border-gray-100">
                     <div className="flex justify-between items-center mb-8">
                         <div>
-                            <h2 className="font-koulen text-xl text-black uppercase tracking-tight">Order Status Distribution</h2>
-                            <div className="h-0.5 w-8 bg-[#D2042D] mt-1"></div>
+                            <h2 className="font-koulen text-2xl text-[#0e4d80] uppercase tracking-tight">Order Distribution</h2>
+                            <div className="h-1 w-12 bg-[#D2042D] mt-2 rounded-full"></div>
                         </div>
-                        <Link href="/admin/orders" className="font-istok text-[10px] text-gray-400 uppercase tracking-widest hover:text-black transition-colors flex items-center gap-1">
-                            View All <ArrowRight className="w-3 h-3" />
+                        <Link href="/admin/orders" className="px-4 py-2 rounded-full border border-gray-100 bg-gray-50 font-istok text-[10px] text-gray-500 uppercase tracking-widest font-bold hover:bg-white hover:border-gray-300 hover:text-[#0e4d80] transition-colors flex items-center gap-2">
+                            View All Orders <ArrowRight className="w-3 h-3" />
                         </Link>
                     </div>
 
                     {/* Donut Chart + Legend Layout */}
-                    <div className="flex flex-col md:flex-row items-center gap-8">
+                    <div className="flex flex-col md:flex-row items-center gap-12">
                         {/* Donut Chart */}
-                        <div className="relative">
+                        <div className="relative shrink-0">
                             {orderStats?.total_orders && orderStats.total_orders > 0 ? (
                                 <>
                                     <div
-                                        className="w-48 h-48 rounded-full relative"
+                                        className="w-56 h-56 rounded-full relative shadow-inner"
                                         style={{
                                             background: (() => {
                                                 const total = orderStats.total_orders;
-                                                const pending = orderStats.status_counts?.pending || 0;
-                                                const processing = orderStats.status_counts?.processing || 0;
-                                                const shipped = orderStats.status_counts?.shipped || 0;
-                                                const delivered = orderStats.status_counts?.delivered || 0;
-                                                const cancelled = orderStats.status_counts?.cancelled || 0;
+                                                const counts = orderStats.status_counts || {};
 
                                                 let cumulative = 0;
                                                 const segments: string[] = [];
 
-                                                if (pending > 0) {
+                                                // Function to add segment
+                                                const addSegment = (count: number, color: string) => {
+                                                    if (!count) return;
                                                     const start = cumulative;
-                                                    cumulative += (pending / total) * 100;
-                                                    segments.push(`#facc15 ${start}% ${cumulative}%`);
-                                                }
-                                                if (processing > 0) {
-                                                    const start = cumulative;
-                                                    cumulative += (processing / total) * 100;
-                                                    segments.push(`#60a5fa ${start}% ${cumulative}%`);
-                                                }
-                                                if (shipped > 0) {
-                                                    const start = cumulative;
-                                                    cumulative += (shipped / total) * 100;
-                                                    segments.push(`#c084fc ${start}% ${cumulative}%`);
-                                                }
-                                                if (delivered > 0) {
-                                                    const start = cumulative;
-                                                    cumulative += (delivered / total) * 100;
-                                                    segments.push(`#4ade80 ${start}% ${cumulative}%`);
-                                                }
-                                                if (cancelled > 0) {
-                                                    const start = cumulative;
-                                                    cumulative += (cancelled / total) * 100;
-                                                    segments.push(`#f87171 ${start}% ${cumulative}%`);
-                                                }
+                                                    cumulative += (count / total) * 100;
+                                                    segments.push(`${color} ${start}% ${cumulative}%`);
+                                                };
+
+                                                addSegment(counts.pending || 0, '#facc15');   // Yellow
+                                                addSegment(counts.processing || 0, '#60a5fa'); // Blue
+                                                addSegment(counts.shipped || 0, '#c084fc');    // Purple
+                                                addSegment(counts.delivered || 0, '#4ade80');  // Green
+                                                addSegment(counts.cancelled || 0, '#f87171');  // Red
 
                                                 return `conic-gradient(${segments.join(", ")})`;
                                             })(),
                                         }}
                                     >
                                         {/* Inner circle for donut effect */}
-                                        <div className="absolute inset-6 bg-white rounded-full flex flex-col items-center justify-center shadow-inner">
-                                            <span className="font-koulen text-3xl text-black">{orderStats.total_orders}</span>
-                                            <span className="font-istok text-[9px] text-gray-400 uppercase tracking-widest">Total Orders</span>
+                                        <div className="absolute inset-8 bg-white rounded-full flex flex-col items-center justify-center shadow-lg shadow-gray-200/50">
+                                            <span className="font-koulen text-4xl text-[#0e4d80]">{orderStats.total_orders}</span>
+                                            <span className="font-istok text-[9px] text-gray-400 uppercase tracking-widest font-bold">Total Orders</span>
                                         </div>
                                     </div>
                                 </>
                             ) : (
-                                <div className="w-48 h-48 rounded-full bg-gray-100 flex items-center justify-center">
-                                    <span className="font-istok text-sm text-gray-400">No orders yet</span>
+                                <div className="w-56 h-56 rounded-full bg-gray-50 flex items-center justify-center border-4 border-gray-100 border-dashed">
+                                    <span className="font-istok text-xs font-bold text-gray-300 uppercase tracking-widest">No Data</span>
                                 </div>
                             )}
                         </div>
 
                         {/* Status Legend - Vertical */}
-                        <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="flex-1 w-full grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {[
                                 { label: "Pending", count: orderStats?.status_counts?.pending || 0, color: "bg-yellow-400", textColor: "text-yellow-600", icon: Clock },
                                 { label: "Processing", count: orderStats?.status_counts?.processing || 0, color: "bg-blue-400", textColor: "text-blue-600", icon: Package },
@@ -299,23 +317,22 @@ export default function AdminDashboard() {
                                 return (
                                     <div
                                         key={status.label}
-                                        className="flex items-center gap-3 p-3 bg-gray-50/50 rounded-lg border border-gray-100 hover:border-gray-200 transition-colors"
+                                        className="flex items-center gap-4 p-4 bg-white rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-md transition-all group"
                                     >
-                                        <div className={`w-10 h-10 ${status.color} rounded-full flex items-center justify-center`}>
+                                        <div className={`w-10 h-10 ${status.color} rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform`}>
                                             <status.icon className="w-5 h-5 text-white" />
                                         </div>
-                                        <div className="flex-1">
-                                            <div className="flex justify-between items-baseline">
-                                                <span className="font-istok text-xs uppercase tracking-widest text-gray-500">{status.label}</span>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex justify-between items-baseline mb-1">
+                                                <span className="font-istok text-[10px] uppercase tracking-widest font-bold text-gray-500">{status.label}</span>
                                                 <span className={`font-koulen text-lg ${status.textColor}`}>{status.count}</span>
                                             </div>
-                                            <div className="mt-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                            <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                                                 <div
-                                                    className={`h-full ${status.color} transition-all duration-500`}
+                                                    className={`h-full ${status.color} transition-all duration-1000 ease-out`}
                                                     style={{ width: `${percentage}%` }}
                                                 />
                                             </div>
-                                            <span className="font-istok text-[9px] text-gray-400 mt-0.5">{percentage}% of total</span>
                                         </div>
                                     </div>
                                 );
@@ -325,53 +342,60 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* Low Stock Products */}
-                <div className="card-sport p-8">
+                <div className="bg-white rounded-[3rem] p-8 shadow-xl shadow-blue-900/5 border border-gray-100 flex flex-col h-full">
                     <div className="flex justify-between items-center mb-6">
                         <div>
-                            <h2 className="font-koulen text-xl text-black uppercase tracking-tight">Low Stock Alert</h2>
-                            <div className="h-0.5 w-8 bg-orange-500 mt-1"></div>
+                            <h2 className="font-koulen text-xl text-[#0e4d80] uppercase tracking-tight">Low Stock Alert</h2>
+                            <div className="h-1 w-8 bg-orange-400 mt-2 rounded-full"></div>
                         </div>
-                        <AlertTriangle className="w-5 h-5 text-orange-500" />
+                        <div className="w-10 h-10 bg-orange-50 rounded-full flex items-center justify-center animate-pulse">
+                            <AlertTriangle className="w-5 h-5 text-orange-500" />
+                        </div>
                     </div>
 
-                    {lowStockProducts.length > 0 ? (
-                        <div className="space-y-4 max-h-[280px] overflow-y-auto per-2 pr-2">
-                            {lowStockProducts.map((product) => (
-                                <Link
-                                    key={product.id}
-                                    href={`/admin/products/${product.id}/edit`}
-                                    className="flex items-center gap-3 p-3 bg-orange-50/50 border border-orange-100 rounded-lg hover:border-orange-300 transition-colors group"
-                                >
-                                    <div className="relative w-10 h-10 bg-white rounded-lg overflow-hidden border border-gray-100 shrink-0">
-                                        <Image
-                                            src={getImageUrl(product.image)}
-                                            alt={product.name}
-                                            fill
-                                            className="object-contain p-0.5"
-                                        />
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <p className="font-istok text-xs font-bold text-black truncate group-hover:text-[#D2042D] transition-colors">
-                                            {product.name}
-                                        </p>
-                                        <p className="font-istok text-[10px] text-orange-600 uppercase tracking-widest">
-                                            {product.stock} in stock
-                                        </p>
-                                    </div>
-                                    <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-[#D2042D] transition-colors" />
-                                </Link>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="flex flex-col items-center justify-center py-8 text-center">
-                            <CheckCircle className="w-10 h-10 text-green-400 mb-3" />
-                            <p className="font-istok text-sm text-gray-500">All products are well-stocked!</p>
-                        </div>
-                    )}
+                    <div className="flex-1 min-h-0 relative">
+                        {lowStockProducts.length > 0 ? (
+                            <div className="absolute inset-0 overflow-y-auto pr-2 custom-scrollbar space-y-3">
+                                {lowStockProducts.map((product) => (
+                                    <Link
+                                        key={product.id}
+                                        href={`/admin/products/${product.id}/edit`}
+                                        className="flex items-center gap-3 p-3 bg-orange-50/30 border border-orange-100/50 rounded-2xl hover:bg-orange-50 hover:border-orange-200 transition-all group"
+                                    >
+                                        <div className="relative w-12 h-12 bg-white rounded-xl overflow-hidden border border-gray-100 shrink-0 shadow-sm group-hover:shadow-md transition-shadow">
+                                            <Image
+                                                src={getImageUrl(product.image)}
+                                                alt={product.name}
+                                                fill
+                                                className="object-contain p-1"
+                                            />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="font-istok text-xs font-bold text-gray-800 truncate group-hover:text-orange-600 transition-colors">
+                                                {product.name}
+                                            </p>
+                                            <p className="font-istok text-[10px] text-orange-500 uppercase tracking-widest font-bold mt-0.5">
+                                                Only {product.stock} Left
+                                            </p>
+                                        </div>
+                                        <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-orange-500 transition-colors" />
+                                    </Link>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="h-full flex flex-col items-center justify-center text-center p-6">
+                                <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mb-4">
+                                    <CheckCircle className="w-8 h-8 text-green-500" />
+                                </div>
+                                <p className="font-koulen text-lg text-gray-400">All Good!</p>
+                                <p className="font-istok text-xs text-gray-400 mt-1">Inventory levels are healthy.</p>
+                            </div>
+                        )}
+                    </div>
 
                     <Link
                         href="/admin/products"
-                        className="block w-full mt-6 py-3 border border-gray-100 font-istok text-[10px] font-bold uppercase tracking-widest hover:border-black transition-all text-center rounded-lg"
+                        className="block w-full mt-6 py-4 border border-gray-200 font-istok text-[10px] font-bold uppercase tracking-widest hover:border-[#0e4d80] hover:bg-[#0e4d80] hover:text-white transition-all text-center rounded-2xl shadow-sm hover:shadow-lg"
                     >
                         Manage Inventory
                     </Link>
@@ -379,53 +403,65 @@ export default function AdminDashboard() {
             </div>
 
             {/* Recent Orders Table */}
-            <div className="card-sport overflow-hidden">
-                <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+            <div className="bg-white rounded-[3rem] shadow-xl shadow-blue-900/5 border border-gray-100 overflow-hidden">
+                <div className="p-8 border-b border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gray-50/30">
                     <div>
-                        <h2 className="font-koulen text-xl text-black uppercase tracking-tight">Recent Orders</h2>
-                        <p className="font-istok text-[10px] text-gray-400 uppercase tracking-widest mt-1">Latest transactions</p>
+                        <h2 className="font-koulen text-2xl text-[#0e4d80] uppercase tracking-tight">Recent Transactions</h2>
+                        <p className="font-istok text-[10px] text-gray-400 uppercase tracking-widest mt-1 font-bold">Latest customer orders</p>
                     </div>
-                    <Link href="/admin/orders" className="font-istok text-[10px] text-gray-400 uppercase tracking-widest hover:text-black transition-colors flex items-center gap-1">
-                        View All <ArrowRight className="w-3 h-3" />
-                    </Link>
                 </div>
-                <table className="w-full">
-                    <thead className="bg-gray-100">
-                        <tr>
-                            <th className="px-6 py-3 text-left font-istok text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold">Order ID</th>
-                            <th className="px-6 py-3 text-left font-istok text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold">Customer</th>
-                            <th className="px-6 py-3 text-left font-istok text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold">Status</th>
-                            <th className="px-6 py-3 text-left font-istok text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold">Date</th>
-                            <th className="px-6 py-3 text-right font-istok text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold">Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                        {recentOrders.length > 0 ? (
-                            recentOrders.map((order) => (
-                                <tr key={order.id} className="hover:bg-gray-50 transition-colors group cursor-pointer" onClick={() => router.push(`/admin/orders/${order.display_id || order.id}`)}>
-                                    <td className="px-6 py-4 font-istok text-xs text-black font-bold">#{order.display_id || order.id}</td>
-                                    <td className="px-6 py-4 font-istok text-xs text-gray-600">{order.full_name}</td>
-                                    <td className="px-6 py-4">
-                                        <span className={`px-2 py-0.5 border rounded-full font-istok text-[9px] uppercase tracking-widest font-bold ${getStatusColor(order.status)}`}>
-                                            {order.status}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 font-istok text-xs text-gray-500">
-                                        {new Date(order.created_at).toLocaleDateString()}
-                                    </td>
-                                    <td className="px-6 py-4 text-right font-koulen text-sm text-black">฿{Number(order.total_amount).toLocaleString()}</td>
-                                </tr>
-                            ))
-                        ) : (
+
+                <div className="overflow-x-auto">
+                    <table className="w-full">
+                        <thead className="bg-gray-50 border-y border-gray-100">
                             <tr>
-                                <td colSpan={5} className="px-6 py-12 text-center font-istok text-gray-400 text-sm">
-                                    No orders yet
-                                </td>
+                                <th className="px-8 py-5 text-left font-koulen text-xs text-gray-400 uppercase tracking-wider font-light">Order ID</th>
+                                <th className="px-8 py-5 text-left font-koulen text-xs text-gray-400 uppercase tracking-wider font-light">Customer</th>
+                                <th className="px-8 py-5 text-left font-koulen text-xs text-gray-400 uppercase tracking-wider font-light">Status</th>
+                                <th className="px-8 py-5 text-left font-koulen text-xs text-gray-400 uppercase tracking-wider font-light">Date</th>
+                                <th className="px-8 py-5 text-right font-koulen text-xs text-gray-400 uppercase tracking-wider font-light">Amount</th>
                             </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div >
-        </div >
+                        </thead>
+                        <tbody className="divide-y divide-gray-50">
+                            {recentOrders.length > 0 ? (
+                                recentOrders.map((order) => (
+                                    <tr
+                                        key={order.id}
+                                        className="hover:bg-blue-50/30 transition-colors group cursor-pointer"
+                                        onClick={() => router.push(`/admin/orders/${order.display_id || order.id}`)}
+                                    >
+                                        <td className="px-8 py-6 font-istok text-xs font-bold text-[#0e4d80] group-hover:underline decoration-blue-200 underline-offset-4">
+                                            #{order.display_id || order.id}
+                                        </td>
+                                        <td className="px-8 py-6 font-istok text-xs font-bold text-gray-700">
+                                            {order.full_name}
+                                        </td>
+                                        <td className="px-8 py-6">
+                                            <span className={`px-3 py-1.5 rounded-full font-istok text-[9px] uppercase tracking-widest font-bold border shadow-sm ${getStatusColor(order.status)}`}>
+                                                {order.status}
+                                            </span>
+                                        </td>
+                                        <td className="px-8 py-6 font-istok text-xs text-gray-500 font-medium">
+                                            {new Date(order.created_at).toLocaleDateString()}
+                                        </td>
+                                        <td className="px-8 py-6 text-right">
+                                            <span className="font-koulen text-lg text-black">
+                                                ฿{Number(order.total_amount).toLocaleString()}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan={5} className="px-6 py-12 text-center font-istok text-gray-400 text-sm">
+                                        No recent orders found
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     );
 }
