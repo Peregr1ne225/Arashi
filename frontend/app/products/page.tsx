@@ -9,10 +9,10 @@ export const dynamic = "force-dynamic";
 export default function ProductsPage() {
     // Create logic for breadcrumb first as it doesn't need data
     const breadcrumb = (
-        <div className="font-istok font-bold text-[12px] tracking-[1px] text-black/60 uppercase">
-            <Link href="/" className="hover:text-black transition-colors">Home</Link>
-            <span className="mx-2">/</span>
-            <span className="text-black">Products</span>
+        <div className="font-body font-bold text-[10px] tracking-[0.2em] text-gray-400 uppercase">
+            <Link href="/" className="hover:text-[#0e4d80] transition-colors border-b border-transparent hover:border-[#0e4d80]">Home</Link>
+            <span className="mx-3 text-gray-300">/</span>
+            <span className="text-[#0e4d80]">Products</span>
         </div>
     );
 

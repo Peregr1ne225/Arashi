@@ -87,25 +87,25 @@ export default function ChangePasswordForm() {
     };
 
     const inputClasses =
-        "block w-full h-[52px] px-6 rounded-2xl bg-gray-50 text-gray-900 border border-transparent focus:border-[#0e4d80] focus:outline-none focus:ring-2 focus:ring-[#0e4d80]/10 font-istok text-base font-bold transition-all disabled:opacity-60 disabled:cursor-not-allowed placeholder-gray-400 shadow-inner";
+        "block w-full h-[56px] px-8 rounded-full bg-gray-50 text-gray-900 border border-gray-100 focus:border-[#0e4d80] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#0e4d80]/5 font-body text-base font-normal transition-all disabled:opacity-60 disabled:cursor-not-allowed placeholder-gray-300 shadow-sm";
     const labelClasses =
-        "block font-istok text-xs font-bold uppercase tracking-[0.15em] mb-2 text-gray-400 ml-2";
+        "block font-koulen text-[11px] mb-2 text-gray-400 uppercase tracking-widest px-6";
 
     return (
-        <div className="mt-16 pt-16 border-t border-gray-100">
-            <div className="flex justify-between items-end mb-8">
+        <div className="pt-4 border-t border-gray-100">
+            <div className="flex justify-between items-end mb-10">
                 <div>
-                    <h3 className="font-koulen text-3xl text-[#0e4d80] leading-none">
-                        Security
+                    <h3 className="font-koulen text-[40px] text-[#0e4d80] leading-[0.85] uppercase tracking-tighter">
+                        Security <span className="text-gray-300">Settings.</span>
                     </h3>
-                    <p className="font-istok text-sm text-gray-400 uppercase tracking-widest mt-1">
+                    <p className="font-body text-xs text-gray-400 uppercase tracking-widest mt-3 font-bold">
                         Update your password
                     </p>
                 </div>
                 {!isEditing && (
                     <button
                         onClick={() => setIsEditing(true)}
-                        className="font-istok text-xs font-bold uppercase tracking-[0.2em] text-[#0e4d80] hover:text-[#0b3d66] transition-colors border-b-2 border-transparent hover:border-[#0e4d80] pb-0.5"
+                        className="font-koulen text-sm uppercase tracking-widest text-[#0e4d80] hover:text-[#0b3d66] transition-colors border-2 border-transparent hover:border-[#0e4d80] px-6 py-2 rounded-full"
                     >
                         Edit
                     </button>
@@ -114,9 +114,9 @@ export default function ChangePasswordForm() {
 
             {message && (
                 <div
-                    className={`mb-6 p-4 rounded-2xl text-center font-istok uppercase tracking-wider text-sm font-bold ${message.type === "success"
+                    className={`mb-8 p-5 rounded-3xl text-center font-koulen uppercase tracking-widest text-sm ${message.type === "success"
                         ? "bg-green-50 text-green-700 border border-green-100"
-                        : "bg-red-50 text-[#D2042D] border border-red-100"
+                        : "bg-blue-50 text-[#0e4d80] border border-blue-100"
                         }`}
                 >
                     {message.text}
@@ -124,8 +124,8 @@ export default function ChangePasswordForm() {
             )}
 
             {isEditing ? (
-                <form onSubmit={handleSubmit} className="space-y-6 w-full">
-                    <div>
+                <form onSubmit={handleSubmit} className="space-y-8 w-full">
+                    <div className="relative group">
                         <label className={labelClasses}>Current Password</label>
                         <input
                             type="password"
@@ -133,13 +133,14 @@ export default function ChangePasswordForm() {
                             value={formData.old_password}
                             onChange={handleChange}
                             required
+                            disabled={isSubmitting}
                             className={inputClasses}
-                            placeholder="••••••••"
+                            placeholder="Current Password"
                         />
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="relative group">
                             <label className={labelClasses}>New Password</label>
                             <input
                                 type="password"
@@ -148,12 +149,13 @@ export default function ChangePasswordForm() {
                                 onChange={handleChange}
                                 required
                                 minLength={8}
+                                disabled={isSubmitting}
                                 className={inputClasses}
-                                placeholder="••••••••"
+                                placeholder="New Password"
                             />
                         </div>
 
-                        <div>
+                        <div className="relative group">
                             <label className={labelClasses}>Confirm New Password</label>
                             <input
                                 type="password"
@@ -161,35 +163,36 @@ export default function ChangePasswordForm() {
                                 value={formData.confirm_new_password}
                                 onChange={handleChange}
                                 required
+                                disabled={isSubmitting}
                                 className={inputClasses}
-                                placeholder="••••••••"
+                                placeholder="Confirm New Password"
                             />
                         </div>
                     </div>
 
-                    <div className="pt-6 flex justify-center gap-4">
+                    <div className="pt-8 flex justify-center gap-4">
                         <button
                             type="button"
                             onClick={handleCancel}
-                            className="px-8 h-12 rounded-full border-2 border-gray-100 text-gray-500 font-istok text-sm font-bold uppercase tracking-[0.2em] hover:bg-gray-50 hover:text-gray-700 transition-colors"
+                            className="px-10 h-14 rounded-full border-2 border-gray-100 text-gray-400 font-koulen text-lg uppercase tracking-widest hover:bg-gray-50 hover:text-gray-600 transition-all duration-300"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="w-full md:w-auto px-12 h-12 rounded-full bg-[#0e4d80] text-white font-istok text-sm font-bold uppercase tracking-[0.2em] hover:bg-[#0b3d66] hover:shadow-lg hover:shadow-blue-900/20 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:transform-none"
+                            className="w-full md:w-auto px-12 h-14 rounded-full bg-[#0e4d80] text-white font-koulen text-lg uppercase tracking-widest hover:bg-[#0b3d66] hover:shadow-2xl hover:shadow-blue-900/30 hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 shadow-lg"
                         >
                             {isSubmitting ? "Updating..." : "Change Password"}
                         </button>
                     </div>
                 </form>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 opacity-60">
-                    <div className="md:col-span-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 opacity-40">
+                    <div className="md:col-span-2 relative group">
                         <label className={labelClasses}>Password</label>
                         <div
-                            className={`${inputClasses} flex items-center justify-center cursor-default`}
+                            className={`${inputClasses} flex items-center justify-center cursor-not-allowed tracking-widest`}
                         >
                             ••••••••••••••••
                         </div>

@@ -41,7 +41,7 @@ export default function CatalogLayout({
                         <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-gray-100">
                             <div>
                                 {title && (
-                                    <h1 className="font-istok text-[32px] md:text-[42px] font-bold leading-tight text-black uppercase tracking-wide">
+                                    <h1 className="font-koulen text-[40px] md:text-[56px] font-bold leading-[0.9] text-[#0e4d80] uppercase tracking-tighter">
                                         {title}
                                     </h1>
                                 )}

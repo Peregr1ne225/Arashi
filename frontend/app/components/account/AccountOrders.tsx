@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ordersApi } from "@/app/lib/api/orders";
 import { Order } from "@/app/types/order";
-import { Package, ChevronDown, ChevronUp, Star } from "lucide-react";
+import { Package, ChevronDown, Star } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import dynamic from "next/dynamic";
@@ -68,15 +68,15 @@ export default function AccountOrders() {
             case "delivered":
                 return "bg-green-50 text-green-700 border border-green-100";
             case "shipped":
-                return "bg-blue-50 text-blue-700 border border-blue-100";
+                return "bg-blue-50 text-[#0e4d80] border border-blue-100";
             case "processing":
                 return "bg-indigo-50 text-indigo-700 border border-indigo-100";
             case "cancelled":
-                return "bg-red-50 text-[#D2042D] border border-red-100";
+                return "bg-gray-100 text-gray-500 border border-gray-200";
             case "pending":
                 return "bg-amber-50 text-amber-700 border border-amber-100";
             default:
-                return "bg-gray-50 text-gray-600 border border-gray-100";
+                return "bg-gray-50 text-gray-400 border border-gray-100";
         }
     };
 
@@ -157,27 +157,28 @@ export default function AccountOrders() {
 
     if (loading) {
         return (
-            <div className="text-center py-20 font-istok uppercase tracking-[0.2em] text-gray-400 font-bold">
-                Loading orders...
+            <div className="text-center py-20 flex flex-col items-center gap-4">
+                <div className="w-10 h-10 border-4 border-gray-100 border-t-[#0e4d80] rounded-full animate-spin"></div>
+                <p className="font-koulen text-lg uppercase tracking-widest text-gray-300">Loading orders...</p>
             </div>
         );
     }
 
     if (orders.length === 0) {
         return (
-            <div className="text-center py-24 bg-white rounded-3xl border border-gray-100 shadow-sm animate-fadeIn">
-                <div className="bg-gray-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Package className="h-8 w-8 text-gray-300" />
+            <div className="text-center py-24 bg-white rounded-[3rem] border border-gray-100 shadow-2xl shadow-blue-900/5 animate-in fade-in duration-700">
+                <div className="bg-blue-50/50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
+                    <Package className="h-10 w-10 text-[#0e4d80]/40" />
                 </div>
-                <h3 className="font-koulen text-2xl text-[#0e4d80] mb-2 leading-none">
-                    No orders yet
+                <h3 className="font-koulen text-[40px] text-[#0e4d80] mb-4 uppercase tracking-tighter leading-none">
+                    No orders <span className="text-gray-200">yet.</span>
                 </h3>
-                <p className="font-istok text-sm text-gray-400 uppercase tracking-widest mb-8 font-bold">
+                <p className="font-body text-xs text-gray-400 uppercase tracking-widest mb-10 font-bold">
                     Start shopping to see your orders here
                 </p>
                 <Link
                     href="/"
-                    className="inline-flex h-12 items-center justify-center px-8 rounded-full bg-[#0e4d80] text-white font-istok text-sm font-bold uppercase tracking-[0.2em] hover:bg-[#0b3d66] hover:shadow-lg hover:shadow-blue-900/20 hover:-translate-y-0.5 transition-all"
+                    className="inline-flex h-14 items-center justify-center px-12 rounded-full bg-[#0e4d80] text-white font-koulen text-lg uppercase tracking-widest hover:bg-[#0b3d66] hover:shadow-2xl hover:shadow-blue-900/30 hover:-translate-y-1 transition-all duration-300"
                 >
                     Start Shopping
                 </Link>
@@ -186,10 +187,10 @@ export default function AccountOrders() {
     }
 
     return (
-        <div className="space-y-8 animate-fadeIn">
-            <div className="border-b border-gray-100 pb-4">
-                <h3 className="font-koulen text-3xl text-[#0e4d80] leading-none">
-                    Order History
+        <div className="space-y-12 animate-in fade-in duration-700 slide-in-from-bottom-4">
+            <div className="border-b border-gray-100 pb-6 mb-8 mt-4">
+                <h3 className="font-koulen text-[40px] text-[#0e4d80] leading-[0.85] uppercase tracking-tighter">
+                    Order <span className="text-gray-300">History.</span>
                 </h3>
             </div>
 
@@ -197,45 +198,43 @@ export default function AccountOrders() {
                 {orders.map((order) => (
                     <div
                         key={order.id}
-                        className="bg-white border border-gray-100 rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all group"
+                        className="bg-white border border-gray-100 rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-500 group"
                     >
                         <div
-                            className="px-8 py-6 flex flex-col md:flex-row justify-between items-center cursor-pointer bg-white group-hover:bg-gray-50/50 transition-colors"
+                            className="px-10 py-8 flex flex-col md:flex-row justify-between items-center cursor-pointer bg-white group-hover:bg-gray-50/30 transition-all duration-300"
                             onClick={() => toggleOrder(order.id)}
                         >
-                            <div className="flex flex-col md:flex-row items-center gap-4 text-center md:text-left">
-                                <span className="font-istok font-bold uppercase tracking-[0.15em] text-lg text-gray-900">
-                                    Order #{order.display_id || order.id}
+                            <div className="flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
+                                <span className="font-koulen text-2xl tracking-widest text-[#0e4d80]">
+                                    ORDER #{order.display_id || order.id}
                                 </span>
                                 <span
-                                    className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest ${getStatusColor(order.status)}`}
+                                    className={`px-6 py-2 rounded-full text-[10px] font-koulen uppercase tracking-[0.2em] shadow-sm border ${getStatusColor(order.status)}`}
                                 >
                                     {order.status}
                                 </span>
                             </div>
-                            <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8 mt-4 md:mt-0">
-                                <span className="font-istok text-gray-400 text-sm font-bold tracking-widest">
-                                    {new Date(order.created_at).toLocaleDateString()}
+                            <div className="flex flex-col md:flex-row items-center gap-6 md:gap-12 mt-6 md:mt-0">
+                                <span className="font-body text-gray-400 text-xs font-bold uppercase tracking-widest">
+                                    {new Date(order.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
                                 </span>
-                                <span className="font-istok font-bold text-lg text-[#0e4d80]">
-                                    ฿{Number(order.total_amount).toFixed(2)}
+                                <span className="font-koulen text-2xl text-[#0e4d80]">
+                                    ฿{Number(order.total_amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                 </span>
-                                {expandedOrderId === order.id ? (
-                                    <ChevronUp className="w-5 h-5 text-[#0e4d80]" />
-                                ) : (
-                                    <ChevronDown className="w-5 h-5 text-gray-300 group-hover:text-[#0e4d80]" />
-                                )}
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500 ${expandedOrderId === order.id ? "bg-[#0e4d80] text-white rotate-180 shadow-lg shadow-blue-900/20" : "bg-gray-50 text-gray-300 group-hover:bg-blue-50 group-hover:text-[#0e4d80]"}`}>
+                                    <ChevronDown className="w-5 h-5" />
+                                </div>
                             </div>
                         </div>
 
                         {/* Expanded Details */}
                         {expandedOrderId === order.id && (
-                            <div className="px-8 py-8 bg-gray-50/50 border-t border-gray-100">
-                                <div className="flow-root mb-8">
-                                    <ul className="-my-6 divide-y divide-gray-100">
+                            <div className="px-10 py-10 bg-gray-50/20 border-t border-gray-100 animate-in slide-in-from-top-4 duration-500">
+                                <div className="flow-root mb-10">
+                                    <ul className="-my-8 divide-y divide-gray-100">
                                         {order.items.map((item) => (
-                                            <li key={item.id} className="py-6 flex">
-                                                <div className="shrink-0 w-20 h-20 border border-gray-100 rounded-2xl overflow-hidden relative bg-white shadow-sm">
+                                            <li key={item.id} className="py-8 flex items-center">
+                                                <div className="shrink-0 w-24 h-24 border border-gray-100 rounded-[2rem] overflow-hidden relative bg-white shadow-sm ring-4 ring-gray-50 group-hover:ring-blue-50 transition-all">
                                                     <Image
                                                         src={getImageUrl(
                                                             (item.product.images && item.product.images[0]) ||
@@ -246,28 +245,29 @@ export default function AccountOrders() {
                                                         className="object-cover"
                                                     />
                                                 </div>
-                                                <div className="ml-6 flex-1 flex flex-col justify-center">
+                                                <div className="ml-8 flex-1 flex flex-col">
                                                     <div className="flex justify-between items-start">
                                                         <div>
-                                                            <h3 className="font-istok font-bold uppercase tracking-widest text-sm md:text-base text-gray-900">
+                                                            <h3 className="font-koulen text-xl tracking-wide text-[#0e4d80] uppercase">
                                                                 {item.product.name}
                                                             </h3>
                                                             {item.color_name && item.size_name && (
-                                                                <div className="font-istok text-gray-400 text-xs font-bold uppercase tracking-wider space-y-0.5 mt-1">
-                                                                    <p>Color: {item.color_name}</p>
-                                                                    <p>Size: {item.size_name}</p>
+                                                                <div className="font-body text-gray-400 text-[10px] font-bold uppercase tracking-[0.2em] mt-2 flex items-center gap-3">
+                                                                    <span className="bg-gray-100 px-2 py-0.5 rounded-full">{item.color_name}</span>
+                                                                    <span className="w-1 h-1 rounded-full bg-gray-200" />
+                                                                    <span className="bg-gray-100 px-2 py-0.5 rounded-full">{item.size_name}</span>
                                                                 </div>
                                                             )}
-                                                            <p className="font-istok text-gray-400 text-xs font-bold uppercase tracking-wider mt-1">
-                                                                Qty: {item.quantity}
+                                                            <p className="font-body text-gray-300 text-[10px] font-bold uppercase tracking-[0.2em] mt-2">
+                                                                Quantity: {item.quantity}
                                                             </p>
                                                         </div>
                                                         <div className="text-right">
                                                             {(item.original_price || item.product.price) >
                                                                 item.price ? (
                                                                 <div className="flex flex-col items-end">
-                                                                    <div className="flex items-center gap-2">
-                                                                        <span className="text-[10px] bg-[#D2042D] text-white px-1.5 py-0.5 rounded-sm font-bold font-istok">
+                                                                    <div className="flex items-center gap-3">
+                                                                        <span className="text-[10px] bg-[#0e4d80] text-white px-2 py-0.5 rounded-full font-koulen tracking-widest">
                                                                             -
                                                                             {Math.round(
                                                                                 (((item.original_price ||
@@ -279,7 +279,7 @@ export default function AccountOrders() {
                                                                             )}
                                                                             %
                                                                         </span>
-                                                                        <span className="font-istok text-xs text-gray-300 line-through font-bold">
+                                                                        <span className="font-body text-xs text-gray-200 line-through font-bold">
                                                                             ฿
                                                                             {Number(
                                                                                 item.original_price ||
@@ -287,23 +287,23 @@ export default function AccountOrders() {
                                                                             ).toFixed(2)}
                                                                         </span>
                                                                     </div>
-                                                                    <p className="font-istok font-bold text-[#D2042D]">
+                                                                    <p className="font-koulen text-xl text-[#0e4d80] mt-1">
                                                                         ฿{Number(item.price).toFixed(2)}
                                                                     </p>
                                                                 </div>
                                                             ) : (
-                                                                <p className="font-istok font-bold text-gray-900">
+                                                                <p className="font-koulen text-xl text-gray-900">
                                                                     ฿{Number(item.price).toFixed(2)}
                                                                 </p>
                                                             )}
                                                         </div>
                                                     </div>
-                                                    <div className="mt-2 flex justify-end">
+                                                    <div className="mt-4 flex justify-end">
                                                         {(order.status === "shipped" ||
                                                             order.status === "delivered") &&
                                                             (item.is_rated ? (
-                                                                <span className="text-gray-300 font-istok uppercase tracking-wider text-xs font-bold flex items-center">
-                                                                    <Star className="w-4 h-4 mr-1 text-yellow-400 fill-current" />
+                                                                <span className="text-gray-300 font-koulen uppercase tracking-widest text-[11px] flex items-center bg-gray-50 px-4 py-1.5 rounded-full">
+                                                                    <Star className="w-3.5 h-3.5 mr-2 text-yellow-400 fill-current" />
                                                                     Rated
                                                                 </span>
                                                             ) : (
@@ -311,9 +311,9 @@ export default function AccountOrders() {
                                                                     onClick={(e) =>
                                                                         handleRateProduct(item.product, order.id, e)
                                                                     }
-                                                                    className="text-[#0e4d80] hover:text-[#0b3d66] font-istok uppercase tracking-wider font-bold text-xs flex items-center border-b-2 border-transparent hover:border-[#0e4d80] pb-0.5 transition-all cursor-pointer"
+                                                                    className="text-[#0e4d80] hover:text-[#0b3d66] font-koulen uppercase tracking-widest text-xs flex items-center bg-blue-50 px-6 py-2 rounded-full hover:bg-blue-100 transition-all duration-300"
                                                                 >
-                                                                    <Star className="w-4 h-4 mr-1" />
+                                                                    <Star className="w-3.5 h-3.5 mr-2" />
                                                                     Rate Product
                                                                 </button>
                                                             ))}
@@ -324,36 +324,32 @@ export default function AccountOrders() {
                                     </ul>
                                 </div>
 
-                                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pt-6 border-t border-gray-200/50">
-                                    <div className="text-xs font-istok font-bold uppercase tracking-wider text-gray-500 space-y-2">
-                                        <p>
-                                            <strong className="text-gray-900">
-                                                Shipping:
-                                            </strong>{" "}
-                                            <span className="text-gray-400">{order.shipping_address}</span>
+                                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 pt-8 border-t border-gray-100">
+                                    <div className="font-koulen text-[11px] uppercase tracking-widest text-gray-400 space-y-3">
+                                        <p className="flex items-center gap-4">
+                                            <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-[9px] font-bold">DESTINATION</span>
+                                            <span className="text-gray-500 font-body text-xs font-bold">{order.shipping_address}</span>
                                         </p>
-                                        <p>
-                                            <strong className="text-gray-900">Phone:</strong>{" "}
-                                            <span className="text-gray-400">{order.phone_number}</span>
+                                        <p className="flex items-center gap-4">
+                                            <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-[9px] font-bold">CONTACT</span>
+                                            <span className="text-gray-500 font-body text-xs font-bold">{order.phone_number}</span>
                                         </p>
                                         {order.tracking_number && (
-                                            <p>
-                                                <strong className="text-gray-900">
-                                                    Tracking:
-                                                </strong>{" "}
-                                                <span className="text-[#0e4d80]">{order.tracking_number}</span>
+                                            <p className="flex items-center gap-4">
+                                                <span className="bg-[#0e4d80]/10 text-[#0e4d80] px-3 py-1 rounded-full text-[9px] font-bold">TRACKING</span>
+                                                <span className="text-[#0e4d80] font-body text-xs font-bold">{order.tracking_number}</span>
                                             </p>
                                         )}
                                     </div>
 
-                                    <div className="flex gap-3 w-full md:w-auto">
+                                    <div className="flex gap-4 w-full md:w-auto">
                                         {order.status === "pending" && (
                                             <>
                                                 <button
                                                     onClick={() =>
                                                         handleCancelOrder(order.display_id || order.id)
                                                     }
-                                                    className="flex-1 md:flex-none px-6 h-10 border border-red-100 text-[#D2042D] rounded-full hover:bg-red-50 font-istok uppercase tracking-[0.15em] font-bold text-xs transition-colors cursor-pointer"
+                                                    className="flex-1 md:flex-none px-8 h-12 border-2 border-gray-100 text-gray-400 rounded-full hover:bg-gray-50 hover:text-gray-600 font-koulen uppercase tracking-widest text-sm transition-all duration-300"
                                                 >
                                                     Cancel
                                                 </button>
@@ -361,7 +357,7 @@ export default function AccountOrders() {
                                                     onClick={() =>
                                                         handlePay(order.display_id || order.id)
                                                     }
-                                                    className="flex-1 md:flex-none px-6 h-10 bg-[#0e4d80] text-white rounded-full hover:bg-[#0b3d66] font-istok uppercase tracking-[0.15em] font-bold text-xs transition-colors cursor-pointer shadow-lg shadow-blue-900/10 hover:shadow-blue-900/20"
+                                                    className="flex-1 md:flex-none px-10 h-12 bg-[#0e4d80] text-white rounded-full hover:bg-[#0b3d66] font-koulen uppercase tracking-widest text-sm transition-all duration-300 shadow-lg shadow-blue-900/10 hover:shadow-blue-900/30 hover:-translate-y-0.5"
                                                 >
                                                     Pay Now
                                                 </button>
@@ -373,14 +369,14 @@ export default function AccountOrders() {
                                                     onClick={() =>
                                                         handleReorder(order.display_id || order.id)
                                                     }
-                                                    className="flex-1 md:flex-none px-6 h-10 bg-[#0e4d80] text-white rounded-full hover:bg-[#0b3d66] font-istok uppercase tracking-[0.15em] font-bold text-xs transition-colors cursor-pointer shadow-lg shadow-blue-900/10 hover:shadow-blue-900/20"
+                                                    className="flex-1 md:flex-none px-10 h-12 bg-[#0e4d80] text-white rounded-full hover:bg-[#0b3d66] font-koulen uppercase tracking-widest text-sm transition-all duration-300 shadow-lg shadow-blue-900/10 hover:shadow-blue-900/30 hover:-translate-y-0.5"
                                                 >
                                                     Reorder
                                                 </button>
                                             )}
                                         <Link
                                             href={`/orders/${order.display_id || order.id}`}
-                                            className="flex-1 md:flex-none px-6 h-10 border border-gray-200 text-gray-500 rounded-full hover:border-[#0e4d80] hover:text-[#0e4d80] font-istok uppercase tracking-[0.15em] font-bold text-xs text-center transition-colors bg-white cursor-pointer flex items-center justify-center"
+                                            className="flex-1 md:flex-none px-8 h-12 border-2 border-gray-100 text-gray-400 rounded-full hover:border-[#0e4d80] hover:text-[#0e4d80] font-koulen uppercase tracking-widest text-sm text-center transition-all bg-white flex items-center justify-center hover:bg-blue-50/30"
                                         >
                                             Details
                                         </Link>

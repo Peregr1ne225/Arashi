@@ -2,6 +2,7 @@ import ProductCatalog from "@/app/components/product/ProductCatalog";
 import { productsApi, categoriesApi } from "@/app/lib/api/client";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import ProductSearch from "@/app/components/product/ProductSearch";
 import CatalogDataLoader from "@/app/components/utils/CatalogDataLoader";
 
 // Separate data fetching function - Just for initial category details
@@ -31,12 +32,12 @@ export default async function CategoryPage({
   }
 
   const breadcrumb = (
-    <>
-      <Link href="/" className="hover:text-gray-900">Home</Link>
-      <span className="mx-2">/</span>
+    <div className="font-body font-bold text-[10px] tracking-[0.2em] text-gray-400 uppercase">
+      <Link href="/" className="hover:text-[#0e4d80] transition-colors border-b border-transparent hover:border-[#0e4d80]">Home</Link>
+      <span className="mx-3 text-gray-300">/</span>
       {/* We could improve this to show full hierarchy link if we had parent info loaded recursively */}
-      <span className="text-gray-900 capitalize">{category.name}</span>
-    </>
+      <span className="text-[#0e4d80] capitalize">{category.name}</span>
+    </div>
   );
 
   const productPromise = productsApi.getProducts({
@@ -58,6 +59,9 @@ export default async function CategoryPage({
           }}
           title={category.name}
           breadcrumb={breadcrumb}
+          headerContent={
+            <ProductSearch />
+          }
         />
       )}
     </CatalogDataLoader>
