@@ -75,7 +75,7 @@ export default function CreateBlogPage() {
                             </p>
                             {user?.username && (
                                 <div className="mt-6 inline-flex items-center gap-2 bg-black/20 px-4 py-2 rounded-full border border-white/10">
-                                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-[10px] font-bold">
+                                    <div className="w-6 h-6 rounded-full bg-linear-to-br from-blue-400 to-purple-500 flex items-center justify-center text-[10px] font-bold">
                                         {user.username.charAt(0).toUpperCase()}
                                     </div>
                                     <p className="text-xs text-blue-100 font-istok">
